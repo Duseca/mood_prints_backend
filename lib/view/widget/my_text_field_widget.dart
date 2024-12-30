@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';
@@ -230,17 +232,173 @@ class _MyTextField2State extends State<MyTextField2> {
   }
 }
 
-// ignore: must_be_immutable
+// // ignore: must_be_immutable
+// class PhoneField extends StatefulWidget {
+//   PhoneField(
+//       {Key? key,
+//       this.controller,
+//       this.onChanged,
+//       this.marginBottom = 16.0,
+//       this.countryCodeValue})
+//       : super(key: key);
+
+//   TextEditingController? controller;
+//   ValueChanged<String>? onChanged;
+//   double? marginBottom;
+//   String? countryCodeValue;
+
+//   @override
+//   State<PhoneField> createState() => _PhoneFieldState();
+// }
+
+// class _PhoneFieldState extends State<PhoneField> {
+//   String countryFlag = '🇺🇸';
+//   String countryCode = '1';
+//   bool isFocused = false;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 16),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.stretch,
+//         children: [
+//           MyText(
+//             text: 'Phone Number',
+//             size: 12,
+//             paddingBottom: 6,
+//             weight: FontWeight.bold,
+//           ),
+//           ClipRRect(
+//             borderRadius: BorderRadius.circular(8),
+//             child: Focus(
+//               onFocusChange: (focus) {
+//                 setState(() {
+//                   isFocused = focus;
+//                 });
+//               },
+//               child: TextFormField(
+//                 cursorColor: isFocused ? kQuaternaryColor : kTertiaryColor,
+//                 controller: widget.controller,
+//                 onChanged: widget.onChanged,
+//                 textInputAction: TextInputAction.next,
+//                 style: TextStyle(
+//                   fontSize: 12,
+//                   color: isFocused ? kQuaternaryColor : kTertiaryColor,
+//                 ),
+//                 decoration: InputDecoration(
+//                   filled: true,
+//                   fillColor: isFocused
+//                       ? kQuaternaryColor.withOpacity(0.05)
+//                       : kWhiteColor,
+//                   prefixIcon: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       MyText(
+//                         paddingLeft: 15,
+//                         paddingRight: 10,
+//                         onTap: () {
+//                           showCountryPicker(
+//                             context: context,
+//                             countryListTheme: CountryListThemeData(
+//                               flagSize: 25,
+//                               backgroundColor: kPrimaryColor,
+//                               textStyle: TextStyle(
+//                                 fontSize: 14,
+//                                 color: kTertiaryColor,
+//                                 fontFamily: AppFonts.URBANIST,
+//                               ),
+//                               bottomSheetHeight: 500,
+//                               borderRadius: BorderRadius.only(
+//                                 topLeft: Radius.circular(25.0),
+//                                 topRight: Radius.circular(25.0),
+//                               ),
+//                               searchTextStyle: TextStyle(
+//                                 fontSize: 14,
+//                                 color: kTertiaryColor,
+//                                 fontFamily: AppFonts.URBANIST,
+//                               ),
+//                               inputDecoration: InputDecoration(
+//                                 contentPadding:
+//                                     EdgeInsets.symmetric(horizontal: 15),
+//                                 fillColor: kWhiteColor,
+//                                 filled: true,
+//                                 hintText: 'Search',
+//                                 hintStyle: TextStyle(
+//                                   fontSize: 14,
+//                                   color: kHintColor,
+//                                   fontFamily: AppFonts.URBANIST,
+//                                 ),
+//                                 border: InputBorder.none,
+//                                 enabledBorder: InputBorder.none,
+//                                 focusedBorder: InputBorder.none,
+//                                 focusedErrorBorder: InputBorder.none,
+//                               ),
+//                             ),
+//                             onSelect: (Country country) {
+//                               setState(() {
+//                                 countryFlag = country.flagEmoji;
+//                                 countryCode = country.countryCode;
+//                                 widget.countryCodeValue = countryCode;
+//                                 log("country Code With Number:${widget.countryCodeValue}-${widget.controller?.text}");
+//                               });
+//                             },
+//                           );
+//                         },
+//                         text: '${countryFlag} +${countryCode}',
+//                         size: 14,
+//                         weight: FontWeight.w600,
+//                       ),
+//                     ],
+//                   ),
+//                   contentPadding: EdgeInsets.symmetric(
+//                     horizontal: 15,
+//                   ),
+//                   hintText: '000 000 0000',
+//                   hintStyle: TextStyle(
+//                     fontSize: 12,
+//                     color: kHintColor,
+//                   ),
+//                   border: InputBorder.none,
+//                   enabledBorder: OutlineInputBorder(
+//                     borderSide: BorderSide(
+//                       color: isFocused ? kQuaternaryColor : kWhiteColor,
+//                       width: 1,
+//                     ),
+//                     borderRadius: BorderRadius.circular(8),
+//                   ),
+//                   focusedBorder: OutlineInputBorder(
+//                     borderSide: BorderSide(
+//                       color: isFocused ? kQuaternaryColor : kBorderColor,
+//                       width: 1,
+//                     ),
+//                     borderRadius: BorderRadius.circular(8),
+//                   ),
+//                   errorBorder: InputBorder.none,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+//-----------------------------------------
+
 class PhoneField extends StatefulWidget {
   PhoneField({
     Key? key,
     this.controller,
     this.onChanged,
     this.marginBottom = 16.0,
+    this.onPhoneNumberChanged,
   }) : super(key: key);
 
   TextEditingController? controller;
   ValueChanged<String>? onChanged;
+  ValueChanged<String>? onPhoneNumberChanged; // Callback for full number
   double? marginBottom;
 
   @override
@@ -249,7 +407,7 @@ class PhoneField extends StatefulWidget {
 
 class _PhoneFieldState extends State<PhoneField> {
   String countryFlag = '🇺🇸';
-  String countryCode = '1';
+  String countryCode = '1'; // Default numeric country code
   bool isFocused = false;
 
   @override
@@ -274,9 +432,14 @@ class _PhoneFieldState extends State<PhoneField> {
                 });
               },
               child: TextFormField(
+                keyboardType: TextInputType.number,
                 cursorColor: isFocused ? kQuaternaryColor : kTertiaryColor,
                 controller: widget.controller,
-                onChanged: widget.onChanged,
+                onChanged: (value) {
+                  widget.onChanged?.call(value);
+                  String fullNumber = '+$countryCode${widget.controller?.text}';
+                  widget.onPhoneNumberChanged?.call(fullNumber);
+                },
                 textInputAction: TextInputAction.next,
                 style: TextStyle(
                   fontSize: 12,
@@ -287,67 +450,72 @@ class _PhoneFieldState extends State<PhoneField> {
                   fillColor: isFocused
                       ? kQuaternaryColor.withOpacity(0.05)
                       : kWhiteColor,
-                  prefixIcon: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      MyText(
-                        paddingLeft: 15,
-                        paddingRight: 10,
-                        onTap: () {
-                          showCountryPicker(
-                            context: context,
-                            countryListTheme: CountryListThemeData(
-                              flagSize: 25,
-                              backgroundColor: kPrimaryColor,
-                              textStyle: TextStyle(
-                                fontSize: 14,
-                                color: kTertiaryColor,
-                                fontFamily: AppFonts.URBANIST,
-                              ),
-                              bottomSheetHeight: 500,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(25.0),
-                                topRight: Radius.circular(25.0),
-                              ),
-                              searchTextStyle: TextStyle(
-                                fontSize: 14,
-                                color: kTertiaryColor,
-                                fontFamily: AppFonts.URBANIST,
-                              ),
-                              inputDecoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 15),
-                                fillColor: kWhiteColor,
-                                filled: true,
-                                hintText: 'Search',
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                  color: kHintColor,
-                                  fontFamily: AppFonts.URBANIST,
-                                ),
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                              ),
+                  prefixIcon: SizedBox(
+                    width: 90,
+                    child: GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          countryListTheme: CountryListThemeData(
+                            flagSize: 25,
+                            backgroundColor: kPrimaryColor,
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              color: kTertiaryColor,
+                              fontFamily: AppFonts.URBANIST,
                             ),
-                            onSelect: (Country country) {
-                              setState(() {
-                                countryFlag = country.flagEmoji;
-                                countryCode = country.countryCode;
-                              });
-                            },
-                          );
-                        },
-                        text: '${countryFlag} +${countryCode}',
-                        size: 14,
-                        weight: FontWeight.w600,
+                            bottomSheetHeight: 500,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25.0),
+                              topRight: Radius.circular(25.0),
+                            ),
+                            searchTextStyle: TextStyle(
+                              fontSize: 14,
+                              color: kTertiaryColor,
+                              fontFamily: AppFonts.URBANIST,
+                            ),
+                            inputDecoration: InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 15),
+                              fillColor: kWhiteColor,
+                              filled: true,
+                              hintText: 'Search',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: kHintColor,
+                                fontFamily: AppFonts.URBANIST,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              focusedErrorBorder: InputBorder.none,
+                            ),
+                          ),
+                          onSelect: (Country country) {
+                            setState(() {
+                              countryFlag = country.flagEmoji;
+                              countryCode = country.phoneCode;
+                            });
+                            // Call full number callback
+                            String fullNumber =
+                                '+$countryCode${widget.controller?.text}';
+                            widget.onPhoneNumberChanged?.call(fullNumber);
+                            // log("Full Number: $fullNumber");
+                          },
+                        );
+                      },
+                      child: Center(
+                        child: MyText(
+                          text: '$countryFlag +$countryCode',
+                          size: 14,
+                          weight: FontWeight.w600,
+                          paddingLeft: 15,
+                          paddingRight: 10,
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
                   hintText: '000 000 0000',
                   hintStyle: TextStyle(
                     fontSize: 12,

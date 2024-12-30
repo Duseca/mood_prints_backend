@@ -1,7 +1,10 @@
+import 'dart:developer';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/auth/auth_client_controller.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/therapist_complete_profile/complete_profile.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -11,7 +14,30 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
-class EmailVerification extends StatelessWidget {
+class EmailVerification extends StatefulWidget {
+  String? email;
+  String? id;
+  String? token;
+  EmailVerification({
+    Key? key,
+    this.email,
+    this.id,
+    this.token,
+  }) : super(key: key);
+
+  @override
+  State<EmailVerification> createState() => _EmailVerificationState();
+}
+
+class _EmailVerificationState extends State<EmailVerification> {
+  final ctrl = Get.find<AuthController>();
+
+  @override
+  void dispose() {
+    super.dispose();
+    ctrl.otpMessage.value = '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final DEFAULT_THEME = PinTheme(
@@ -55,7 +81,10 @@ class EmailVerification extends StatelessWidget {
                 ),
                 Pinput(
                   length: 6,
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    ctrl.otpCode = value;
+                    log('1--> OTP CODE: ${ctrl.otpCode}');
+                  },
                   pinContentAlignment: Alignment.center,
                   defaultPinTheme: DEFAULT_THEME,
                   focusedPinTheme: DEFAULT_THEME.copyWith(
@@ -86,6 +115,19 @@ class EmailVerification extends StatelessWidget {
                   },
                   onCompleted: (pin) => print(pin),
                 ),
+                Obx(
+                  () => Align(
+                    alignment: Alignment.center,
+                    child: MyText(
+                      paddingTop: 20,
+                      text: "${ctrl.otpMessage}",
+                      size: 12,
+                      color: kSecondaryColor,
+                      weight: FontWeight.w600,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                )
               ],
             ),
           ),
@@ -116,7 +158,18 @@ class EmailVerification extends StatelessWidget {
                 ),
                 MyButton(
                   onTap: () {
-                    Get.dialog(_SuccessDialog());
+                    if (ctrl.otpCode != null) {
+                      log('2--> OTP CODE: ${ctrl.otpCode}');
+                      ctrl.otpVerificationMethod(
+                          email: widget.email.toString(),
+                          otp: ctrl.otpCode.toString(),
+                          token: widget.token.toString(),
+                          id: widget.id.toString(),
+                          widget: _SuccessDialog());
+                      log('OTP value not null');
+                    } else {
+                      log('OTP value is null');
+                    }
                   },
                   buttonText: 'Continue',
                 ),
@@ -176,7 +229,8 @@ class _SuccessDialog extends StatelessWidget {
                   buttonText: 'Done',
                   onTap: () {
                     Get.back();
-                    Get.to(() => CompleteProfile());
+                    Get.to(() => ClientCompleteProfile());
+                    // Get.to(() => CompleteProfile());
                   },
                 ),
               ],

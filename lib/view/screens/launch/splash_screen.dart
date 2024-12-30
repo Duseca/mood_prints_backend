@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:mood_prints/constants/app_colors.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/fill_therapist_details.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +22,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void splashScreenHandler() {
     Timer(
       Duration(seconds: 2),
-      () => Get.offAll(() => GetStarted()),
+      () => Get.offAll(() => GetStarted()
+          // ClientCompleteProfile(),
+
+          ),
     );
   }
 

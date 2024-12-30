@@ -1,8 +1,9 @@
+import 'dart:developer';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/auth/login.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -14,8 +15,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ClientSignUp extends StatelessWidget {
+  final String type;
+  ClientSignUp({Key? key, required this.type}) : super(key: key);
+
+  final ctrl = Get.find<AuthController>();
+
   @override
   Widget build(BuildContext context) {
+    log("I am a $type");
     return Scaffold(
       appBar: logoAppBar(),
       body: ListView(
@@ -29,14 +36,17 @@ class ClientSignUp extends StatelessWidget {
                 'Create your account to discover and book the best photographers effortlessly.',
           ),
           MyTextField(
+            controller: ctrl.fullNameController,
             labelText: 'Full Name',
             hintText: 'Your full name here...',
           ),
           MyTextField(
+            controller: ctrl.emailController,
             labelText: 'Email Address',
             hintText: 'Your email address...',
           ),
           MyTextField(
+            controller: ctrl.passwordController,
             labelText: 'Create Password',
             hintText: 'Your password...',
             suffix: Column(
@@ -77,7 +87,14 @@ class ClientSignUp extends StatelessWidget {
           ),
           MyButton(
             onTap: () {
-              Get.to(() => ClientCompleteProfile());
+              ctrl.signUpClientMethod(
+                  email: ctrl.emailController.text.trim(),
+                  password: ctrl.passwordController.text.trim(),
+                  fullName: ctrl.fullNameController.text.trim(),
+                  userType: type);
+
+              // Get.to(() => ClientCompleteProfile());
+              // Get.to(() => EmailVerification());
             },
             buttonText: 'Continue',
           ),

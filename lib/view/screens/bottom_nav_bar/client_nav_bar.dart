@@ -9,8 +9,6 @@ import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
-import 'package:mood_prints/view/screens/profile/profile.dart';
-
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 // ignore: must_be_immutable

@@ -2,7 +2,6 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/therapist_complete_profile/complete_profile.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';

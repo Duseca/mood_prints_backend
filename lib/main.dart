@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
+import 'package:mood_prints/core/binding/binding.dart';
 import 'config/routes/routes.dart';
 import 'config/theme/light_theme.dart';
 
@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: AppLinks.splash_screen,
       getPages: AppRoutes.pages,
       defaultTransition: Transition.fadeIn,
+      initialBinding: InitialBindings(),
     );
   }
 }

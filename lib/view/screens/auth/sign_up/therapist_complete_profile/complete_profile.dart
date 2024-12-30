@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/auth/auth_client_controller.dart';
 import 'package:mood_prints/main.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/phone_verification.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
@@ -138,7 +138,8 @@ class CompleteProfile extends StatelessWidget {
             child: MyButton(
               buttonText: 'Continue',
               onTap: () {
-                Get.to(() => PhoneVerification());
+                // Get.to(() => PhoneVerification());
+                Get.find<AuthController>().profileCompletionMethod();
               },
             ),
           ),
