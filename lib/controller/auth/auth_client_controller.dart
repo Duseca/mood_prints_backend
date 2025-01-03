@@ -28,6 +28,47 @@ class AuthController extends GetxController {
   final TextEditingController TherapistAccountNumberController =
       TextEditingController();
 
+  //  --- Login Method ---
+
+  Future<void> loginMethod({
+    required String email,
+    required String password,
+  }) async {
+    log("Try Called Login");
+    log("Email ${email}");
+    log("Password ${password}");
+    try {
+      showLoadingDialog();
+      Map<String, dynamic> body = {
+        'email': email,
+        'password': password,
+      };
+      final response = await apiService.post(loginUrl, body, true,
+          showResult: true, successCode: 200);
+      hideLoadingDialog();
+
+      if (response != null) {
+        final token = response['token'];
+        final user = response['user'];
+
+        if (token != null && token.isNotEmpty) {
+          UserModel userModel = UserModel.fromJson(user);
+          log('user model -> ${userModel.username}');
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('id', userModel.id.toString());
+          resetValues();
+          Get.to(() => ClientNavBar());
+        }
+      }
+
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error:-> $e');
+    }
+  }
+
   //  --- SignUp Method ---
 
   Future<void> signUpClientMethod({
@@ -37,10 +78,6 @@ class AuthController extends GetxController {
     required String userType,
   }) async {
     log("Try Called SignUp");
-    log("Email ${email}");
-    log("Password ${password}");
-    log("userType ${userType}");
-    log("fullName ${fullName}");
     try {
       showLoadingDialog();
       Map<String, dynamic> body = {
@@ -58,13 +95,10 @@ class AuthController extends GetxController {
         final user = response['user'];
         final id = user['_id'];
 
-        // Here i want to get id directly and print the response
-
         if (token != null && token.isNotEmpty) {
-          // log('Response:-> $response');
-          log('--------------------------------------------');
-          log('Token:-> $token');
-          log('Id:-> $id');
+          // log('--------------------------------------------');
+          // log('Token:-> $token');
+          // log('Id:-> $id');
 
           Get.to(() => EmailVerification(
                 email: '$email',
@@ -72,10 +106,7 @@ class AuthController extends GetxController {
                 token: token,
               ));
         }
-
-        // Get.to(() => ClientCompleteProfile());
       }
-      log("global called");
       hideLoadingDialog();
     } catch (e) {
       hideLoadingDialog();
@@ -143,14 +174,6 @@ class AuthController extends GetxController {
 
         showLoadingDialog();
 
-        // Map<String, dynamic> body = {
-        //   'fullName': fullNameController.text,
-        //   'phoneNumber': FullPhoneNumber,
-        //   'dob': DateFormatorService.instance.getDateIsoFormat(dob.value!),
-        //   'gender': selectedGenderValue.value.toLowerCase(),
-        //   'bio': BioController.text,
-        // };
-
         UserModel model = UserModel(
           fullName: fullNameController.text.trim(),
           phoneNumber: FullPhoneNumber,
@@ -191,20 +214,60 @@ class AuthController extends GetxController {
         displayToast(msg: 'Please add all information');
         log('Fields are empty');
       }
-
-      // -------- OLD CODE -----------
     } catch (e) {
       hideLoadingDialog();
       log('Error:-> $e');
     }
   }
 
-  // --- Setup Profile ---
+  //  --- Get Current User Information Method ---
+  // This function is used when a user logs in or signs up for an account. After that, if the user closes the app and opens it again later, they won't need to authenticate to log in.
 
-  Future<void> SetupProfile() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.setBool('isProfileSetup', true);
+  Future<void> getCurrentUserDataMethod() async {
+    log("Called Get Current User");
+    try {
+      showLoadingDialog();
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // final id = await prefs.getString('id');
+      final id = await getStringSharedPrefMethod(key: 'id');
+      if (id.isNotEmpty) {
+        log('id is Not null -> ${id}');
+
+        final url = getClientByIDUrl + id;
+        final response =
+            await apiService.get(url, true, showResult: true, successCode: 200);
+        hideLoadingDialog();
+
+        if (response != null) {
+          final user = response['user'];
+          UserModel userModel = UserModel.fromJson(user);
+          log('user name -> ${userModel.username}');
+
+          Get.to(() => ClientNavBar());
+        }
+      }
+
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error:-> $e');
+    }
   }
+
+  // --- getString From Shared Pref ---
+
+  Future<String> getStringSharedPrefMethod({required String key}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final value = await prefs.getString('$key');
+
+    if (value != null) {
+      return value;
+    } else {
+      return '';
+    }
+  }
+
+  // --- Reset Controllers values ---
 
   resetValues() {
     fullNameController.clear();
