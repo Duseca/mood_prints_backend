@@ -311,8 +311,8 @@ class Assets {
   static const String imagesFork = "assets/images/fork.png";
 
   /// Assets for imagesGetStarted
-  /// assets/images/get_started.png
-  static const String imagesGetStarted = "assets/images/get_started.png";
+  /// assets/images/get_started.PNG
+  static const String imagesGetStarted = "assets/images/get_started.PNG";
 
   /// Assets for imagesGift
   /// assets/images/gift.png
@@ -409,6 +409,10 @@ class Assets {
   /// Assets for imagesLightGreen
   /// assets/images/light_green.png
   static const String imagesLightGreen = "assets/images/light_green.png";
+
+  /// Assets for imagesLineBar
+  /// assets/images/line_bar.png
+  static const String imagesLineBar = "assets/images/line_bar.png";
 
   /// Assets for imagesListingsIcon
   /// assets/images/listings_icon.png

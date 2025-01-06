@@ -1,20 +1,26 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/auth/auth_client_controller.dart';
 import 'package:mood_prints/main.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/fill_therapist_details.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/phone_verification.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
+import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
+import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 class ClientCompleteProfile extends StatelessWidget {
-  const ClientCompleteProfile({super.key});
+  ClientCompleteProfile({super.key});
+
+  final ctrl = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +28,12 @@ class ClientCompleteProfile extends StatelessWidget {
       appBar: simpleAppBar(
         title: 'Profile Completion',
         actions: [
-          Center(
-            child: MyText(
-              text: 'SKip',
-              color: kSecondaryColor,
-            ),
-          ),
+          // Center(
+          //   child: MyText(
+          //     text: 'SKip',
+          //     color: kSecondaryColor,
+          //   ),
+          // ),
           SizedBox(
             width: 20,
           ),
@@ -42,6 +48,7 @@ class ClientCompleteProfile extends StatelessWidget {
               padding: AppSizes.DEFAULT,
               physics: BouncingScrollPhysics(),
               children: [
+                //TODO: Profile Image Upload to firebase-storage than get link/URL of the image
                 Center(
                   child: Stack(
                     children: [
@@ -84,8 +91,10 @@ class ClientCompleteProfile extends StatelessWidget {
                   height: 30,
                 ),
                 MyTextField(
+                  controller: ctrl.fullNameController,
                   marginBottom: 6.0,
                   labelText: 'Username',
+                  hintText: 'Username',
                 ),
                 MyText(
                   text: 'Note: Username can’t be changed once created.',
@@ -94,34 +103,73 @@ class ClientCompleteProfile extends StatelessWidget {
                   weight: FontWeight.w500,
                   paddingBottom: 16,
                 ),
-                PhoneField(),
-                CustomDropDown(
-                  labelText: 'Gender',
-                  hint: 'Select',
-                  items: [
-                    'Select',
-                    'Male',
-                    'Female',
-                  ],
-                  selectedValue: 'Select',
-                  onChanged: (v) {},
+                PhoneField(
+                  controller: ctrl.phoneNumberController,
+                  onPhoneNumberChanged: (value) {
+                    ctrl.FullPhoneNumber = value;
+                    log("Full Phone Number: ${ctrl.FullPhoneNumber}");
+                  },
                 ),
-                MyTextField(
-                  labelText: 'Date of Birth',
-                  suffix: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        Assets.imagesCalendarA,
-                        height: 20,
-                        color: kSecondaryColor,
-                      ),
-                    ],
+                Obx(
+                  () => CustomDropDown(
+                    labelText: 'Gender',
+                    hint: '${ctrl.selectedGenderValue.value}',
+                    items: ctrl.gender,
+                    selectedValue: '${ctrl.selectedGenderValue.value}',
+                    onChanged: (value) {
+                      ctrl.selectedGenderValue.value = value;
+                    },
                   ),
                 ),
-                MyTextField(
-                  labelText: 'Therapist Account Number (Optional)',
+                Obx(
+                  () => MyTextField(
+                    isReadOnly: true,
+                    labelText: 'Date of Birth',
+                    hintText: (ctrl.dob.value != null)
+                        ? DateFormatorService.instance
+                            .getDateUsFormat(ctrl.dob.value!)
+                        : "Select date",
+                    suffix: InkWell(
+                      onTap: () {
+                        Get.bottomSheet(
+                          isScrollControlled: true,
+                          CustomBottomSheet(
+                            height: Get.height * 0.49,
+                            child: DobPicker(
+                              initialDateTime: ctrl.dob.value,
+                              onDateTimeChanged: (dateTime) {
+                                ctrl.dob.value = dateTime;
+
+                                log("date: ${ctrl.dob.value}");
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            Assets.imagesCalendarA,
+                            height: 20,
+                            color: kSecondaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+                // MyTextField(
+
+                //   labelText: 'City',
+                // ),
+                MyTextField(
+                  controller: ctrl.BioController,
+                  labelText: 'Bio',
+                ),
+                // MyTextField(
+                //   labelText: 'Therapist Account Number (Optional)',
+                // ),
               ],
             ),
           ),
@@ -130,7 +178,8 @@ class ClientCompleteProfile extends StatelessWidget {
             child: MyButton(
               buttonText: 'Continue',
               onTap: () {
-                Get.to(() => FillTherapistDetails());
+                ctrl.profileCompletionMethod();
+                // Get.to(() => FillTherapistDetails());
               },
             ),
           ),

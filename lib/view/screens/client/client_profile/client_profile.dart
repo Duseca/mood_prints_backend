@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/auth/auth_client_controller.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/view/screens/client/client_profile/edit_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
@@ -163,7 +166,15 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesLogout,
             title: 'Logout',
             onTap: () {
-              Get.dialog(_LogoutDialog());
+              Get.dialog(_LogoutDialog(
+                onCancelTap: () {
+                  Get.back();
+                },
+                onLogoutTap: () {
+                  log('work logout');
+                  Get.find<AuthController>().logOutMethod();
+                },
+              ));
             },
             mBottom: 0,
           ),
@@ -224,8 +235,13 @@ class _ProfileTile extends StatelessWidget {
 }
 
 class _LogoutDialog extends StatelessWidget {
+  final VoidCallback onCancelTap;
+  final VoidCallback onLogoutTap;
+
   const _LogoutDialog({
     super.key,
+    required this.onCancelTap,
+    required this.onLogoutTap,
   });
 
   @override
@@ -269,7 +285,7 @@ class _LogoutDialog extends StatelessWidget {
                         textColor: kTertiaryColor,
                         bgColor: kWhiteColor,
                         buttonText: 'Cancel',
-                        onTap: () {},
+                        onTap: onCancelTap,
                       ),
                     ),
                     SizedBox(
@@ -279,7 +295,7 @@ class _LogoutDialog extends StatelessWidget {
                       child: MyButton(
                         bgColor: kRedColor,
                         buttonText: 'Logout',
-                        onTap: () {},
+                        onTap: onLogoutTap,
                       ),
                     ),
                   ],
