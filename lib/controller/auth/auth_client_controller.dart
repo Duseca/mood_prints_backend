@@ -9,6 +9,7 @@ import 'package:mood_prints/model/user_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
+import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
@@ -254,8 +255,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // --- getString From Shared Pref ---
-
+  // --- Logout ---
   Future<String> getStringSharedPrefMethod({required String key}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final value = await prefs.getString('$key');
@@ -265,6 +265,27 @@ class AuthController extends GetxController {
     } else {
       return '';
     }
+  }
+
+  // --- getString From Shared Pref ---
+
+  Future<void> logOutMethod() async {
+    showLoadingDialog();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final id = await prefs.remove('id');
+    final token = await prefs.remove('token');
+    log("Id removed from shared pref: $id");
+    log("Token removed from shared pref: $token");
+    Get.offAll(() => GetStarted());
+    hideLoadingDialog();
+  }
+
+  // --- getString From Shared Pref ---
+
+  Future<void> setStringSharedPrefMethod(
+      {required String key, required String value}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('$key', '$value');
   }
 
   // --- Reset Controllers values ---

@@ -154,7 +154,10 @@ class Profile extends StatelessWidget {
             icon: Assets.imagesLogout,
             title: 'Logout',
             onTap: () {
-              Get.dialog(_LogoutDialog());
+              Get.dialog(_LogoutDialog(
+                onCancelTap: () {},
+                onLogoutTap: () {},
+              ));
             },
             mBottom: 0,
           ),
@@ -215,8 +218,12 @@ class _ProfileTile extends StatelessWidget {
 }
 
 class _LogoutDialog extends StatelessWidget {
+  final VoidCallback onCancelTap;
+  final VoidCallback onLogoutTap;
   const _LogoutDialog({
     super.key,
+    required this.onCancelTap,
+    required this.onLogoutTap,
   });
 
   @override
@@ -257,11 +264,10 @@ class _LogoutDialog extends StatelessWidget {
                   children: [
                     Expanded(
                       child: MyButton(
-                        textColor: kTertiaryColor,
-                        bgColor: kWhiteColor,
-                        buttonText: 'Cancel',
-                        onTap: () {},
-                      ),
+                          textColor: kTertiaryColor,
+                          bgColor: kWhiteColor,
+                          buttonText: 'Cancel',
+                          onTap: onCancelTap),
                     ),
                     SizedBox(
                       width: 10,
@@ -270,7 +276,7 @@ class _LogoutDialog extends StatelessWidget {
                       child: MyButton(
                         bgColor: kRedColor,
                         buttonText: 'Logout',
-                        onTap: () {},
+                        onTap: onLogoutTap,
                       ),
                     ),
                   ],

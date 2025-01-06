@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -6,11 +7,14 @@ import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_comp
 import 'package:mood_prints/view/screens/auth/sign_up/sign_up.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 // ignore: must_be_immutable
 class GetStarted extends StatefulWidget {
-  GetStarted({super.key});
+  GetStarted({
+    super.key,
+  });
 
   @override
   State<GetStarted> createState() => _GetStartedState();
@@ -21,10 +25,37 @@ class _GetStartedState extends State<GetStarted> {
 
   int _index = 0;
 
-  void _onChanged(int index) {
+  @override
+  void initState() {
+    // TODO: OnBoarding display only once
+    super.initState();
+    checkingOnBoardingPage();
+  }
+
+  void checkingOnBoardingPage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final isCompleted = await prefs.getBool('isOnBoardingCompleted');
+    if (isCompleted == true) {
+      _index = 3;
+      log('Checking OnBoarding Page $_index');
+      log('Checking OnBoarding Value $isCompleted');
+    } else {
+      _index = 0;
+      log('Checking OnBoarding Page $_index');
+      log('Checking OnBoarding Value $isCompleted');
+    }
+  }
+
+  void _onChanged(int index) async {
     setState(() {
+      // Here i want to call
+
       _index = index;
     });
+    if (_index == 3) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isOnBoardingCompleted', true);
+    }
   }
 
   @override
