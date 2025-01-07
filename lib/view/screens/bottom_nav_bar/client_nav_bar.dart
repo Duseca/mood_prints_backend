@@ -9,7 +9,7 @@ import 'package:mood_prints/view/screens/chat/chat_head.dart';
 import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
-import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
+import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -76,7 +76,8 @@ class _ClientNavBarState extends State<ClientNavBar> {
         child: FloatingActionButton(
           elevation: 3,
           onPressed: () {
-            Get.to(() => CustomizeRecording());
+            // Get.to(() => CustomizeRecording());
+            Get.to(() => ModeManager());
           },
           backgroundColor: Color(0xffFFD6A5),
           child: Icon(

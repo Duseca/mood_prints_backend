@@ -7,7 +7,7 @@ import 'my_text_widget.dart';
 class MyButton extends StatelessWidget {
   MyButton({
     required this.buttonText,
-    required this.onTap,
+    this.onTap,
     this.height = 48,
     this.textSize,
     this.weight,
@@ -18,7 +18,7 @@ class MyButton extends StatelessWidget {
   });
 
   final String buttonText;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   double? height, textSize, radius;
   FontWeight? weight;
   Widget? customChild;

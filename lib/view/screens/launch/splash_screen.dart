@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:mood_prints/constants/app_colors.dart';
-import 'package:mood_prints/controller/auth/auth_client_controller.dart';
+import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:flutter/material.dart';

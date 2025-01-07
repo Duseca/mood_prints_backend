@@ -3,8 +3,8 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/main.dart';
+import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
-
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
@@ -62,7 +62,10 @@ class EditProfile extends StatelessWidget {
                                   textSize: 12,
                                   weight: FontWeight.w600,
                                   buttonText: 'Change',
-                                  onTap: () {},
+                                  onTap: () {
+                                    ImagePickerService().pickMedia(
+                                        isImage: true, fromGallery: true);
+                                  },
                                 ),
                               ),
                             ],

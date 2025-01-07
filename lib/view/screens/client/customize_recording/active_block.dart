@@ -1,10 +1,14 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
-import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
+import 'package:mood_prints/constants/common_maps.dart';
+import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
+import 'package:mood_prints/model/mood_widget_model.dart/block_model.dart';
+import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/alert_dialogs/delete_dialog.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_card_widget.dart';
@@ -12,10 +16,18 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class ActiveBlock extends StatelessWidget {
+class ActiveBlock extends StatefulWidget {
   const ActiveBlock({
     super.key,
   });
+
+  @override
+  State<ActiveBlock> createState() => _ActiveBlockState();
+}
+
+class _ActiveBlockState extends State<ActiveBlock> {
+  int selectedFeeling = 0;
+  final modeCtrl = Get.find<ModeManagerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +62,51 @@ class ActiveBlock extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // ----------> Create New Block <----------
+
                 onTap: () {
                   Get.bottomSheet(
-                    _CreateNewBlockBottomSheet(),
+                    _CreateNewBlockBottomSheet(
+                      textController: modeCtrl.createNewBlockController,
+
+                      // ----------> On Bottom sheet Done button Tap <----------
+
+                      onTap: () {
+                        // ----------> Add new block into Local storage using getStorage <----------
+
+                        String uniqueId =
+                            DateTime.now().millisecondsSinceEpoch.toString();
+
+                        modeCtrl.addBlock(BlockModel(
+                          id: uniqueId,
+                          type: modeCtrl.createNewBlockController.text.trim(),
+                          title: modeCtrl.createNewBlockController.text
+                              .trim()
+                              .toString(),
+                        ));
+
+                        modeCtrl.createNewBlockController.clear();
+                        Get.back();
+
+                        log('work');
+                      },
+                    ),
                     isScrollControlled: true,
                   );
+
+                  //   String uniqueId =
+                  // DateTime.now().millisecondsSinceEpoch.toString();
+
+                  // modeCtrl.addWidget(BlockModel(
+                  //     id: uniqueId,
+                  //     type: "emotions",
+                  //     title: 'Emotions',
+                  //     data: [
+                  //       {'emoji': '😁', 'text': 'Proud'},
+                  //       {'emoji': '😢', 'text': 'Sad'},
+                  //       {'emoji': '😡', 'text': 'Fear'},
+                  //     ]));
                 },
               ),
               SizedBox(
@@ -80,22 +132,21 @@ class ActiveBlock extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        9,
+                        feelingItems.length,
                         (index) {
-                          final List<String> _items = [
-                            Assets.imagesExtremeCrying,
-                            Assets.imagesLittleCrying,
-                            Assets.imagesSad,
-                            Assets.imagesSad1,
-                            Assets.imagesLittleSad,
-                            Assets.imagesHappy,
-                            Assets.imagesSmile,
-                            Assets.imagesLittleSmiling,
-                            Assets.imagesLaughing,
-                          ];
-                          return Image.asset(
-                            _items[index],
-                            height: 44,
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedFeeling = index;
+                              });
+                            },
+                            child: (selectedFeeling == index)
+                                ? Image.asset(feelingItems[index]['iconA']!,
+                                    height: 44)
+                                : Image.asset(
+                                    feelingItems[index]['iconB']!,
+                                    height: 44,
+                                  ),
                           );
                         },
                       ),
@@ -110,7 +161,7 @@ class ActiveBlock extends StatelessWidget {
                 title: 'Emotions*',
                 onEdit: () {
                   Get.bottomSheet(
-                    _EditBottomSheet(),
+                    EditBottomSheet(),
                     isScrollControlled: true,
                   );
                 },
@@ -132,36 +183,47 @@ class ActiveBlock extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             physics: BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
-                            itemCount: 10,
+                            itemCount: emotionsItems.length + 1,
                             itemBuilder: (context, index) {
-                              return SizedBox(
-                                height: Get.height,
-                                width: 44,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 44,
-                                      width: 44,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: kLightGreyColor,
-                                      ),
-                                      child: Center(
-                                        child: MyText(
-                                          text: '😁',
-                                          size: 24,
+                              // ---------- Add more emojis button ------------
+
+                              if (index == emotionsItems.length) {
+                                return AddMoreEmojiButton(
+                                  onTap: () {},
+                                );
+                              } else {
+                                // ---------- Emojis & Text ------------
+
+                                return SizedBox(
+                                  height: Get.height,
+                                  // width: 44,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        height: 44,
+                                        width: 44,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: kLightGreyColor,
+                                        ),
+                                        child: Center(
+                                          child: MyText(
+                                            text:
+                                                '${emotionsItems[index]['emoji']}',
+                                            size: 24,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    MyText(
-                                      text: 'Proud',
-                                      size: 12,
-                                    ),
-                                  ],
-                                ),
-                              );
+                                      MyText(
+                                        text: '${emotionsItems[index]['text']}',
+                                        size: 12,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                             },
                           ),
                         ),
@@ -175,8 +237,7 @@ class ActiveBlock extends StatelessWidget {
               ),
               CustomCard(
                 title: 'Today’s note*',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: MyTextField2(
@@ -190,8 +251,7 @@ class ActiveBlock extends StatelessWidget {
               ),
               CustomCard(
                 title: 'Today’s Photo',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -212,8 +272,7 @@ class ActiveBlock extends StatelessWidget {
               ),
               CustomCard(
                 title: 'Sleep',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: MyButton(
@@ -242,88 +301,216 @@ class ActiveBlock extends StatelessWidget {
               SizedBox(
                 height: 12,
               ),
-              CustomCard(
-                title: 'New',
-                onEdit: () {},
-                onMore: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 62,
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) {
-                              return SizedBox(
-                                width: 16,
-                              );
-                            },
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 2,
-                            itemBuilder: (context, index) {
-                              if (index == 1) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Get.bottomSheet(
-                                      _IconNameBottomSheet(),
-                                      isScrollControlled: true,
-                                    );
-                                  },
-                                  child: Image.asset(
-                                    Assets.imagesAddIconRounded,
-                                    height: 62,
-                                  ),
-                                );
-                              }
-                              return SizedBox(
-                                height: Get.height,
-                                width: 44,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 44,
-                                      width: 44,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: kLightGreyColor,
-                                      ),
-                                      child: Center(
-                                        child: MyText(
-                                          text: '🍇',
-                                          size: 24,
+
+              // CustomCard(
+              //   title: 'New',
+              //   onEdit: () {},
+              //   onMore: () {},
+              //   child: Padding(
+              //     padding: const EdgeInsets.only(top: 16),
+              //     child: Row(
+              //       children: [
+              //         Expanded(
+              //           child: SizedBox(
+              //             height: 62,
+              //             child: ListView.separated(
+              //               separatorBuilder: (context, index) {
+              //                 return SizedBox(
+              //                   width: 16,
+              //                 );
+              //               },
+              //               shrinkWrap: true,
+              //               padding: EdgeInsets.zero,
+              //               physics: BouncingScrollPhysics(),
+              //               scrollDirection: Axis.horizontal,
+              //               itemCount: 2,
+              //               itemBuilder: (context, index) {
+              //                 if (index == 1) {
+              //                   return GestureDetector(
+              //                     onTap: () {
+              //                       Get.bottomSheet(
+              //                         _IconNameBottomSheet(),
+              //                         isScrollControlled: true,
+              //                       );
+              //                     },
+              //                     child: Image.asset(
+              //                       Assets.imagesAddIconRounded,
+              //                       height: 62,
+              //                     ),
+              //                   );
+              //                 }
+              //                 return SizedBox(
+              //                   height: Get.height,
+              //                   width: 44,
+              //                   child: Column(
+              //                     mainAxisAlignment:
+              //                         MainAxisAlignment.spaceBetween,
+              //                     children: [
+              //                       Container(
+              //                         height: 44,
+              //                         width: 44,
+              //                         decoration: BoxDecoration(
+              //                           shape: BoxShape.circle,
+              //                           color: kLightGreyColor,
+              //                         ),
+              //                         child: Center(
+              //                           child: MyText(
+              //                             text: '🍇',
+              //                             size: 24,
+              //                           ),
+              //                         ),
+              //                       ),
+              //                       MyText(
+              //                         text: 'Grape',
+              //                         size: 12,
+              //                       ),
+              //                     ],
+              //                   ),
+              //                 );
+              //               },
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+
+              // ------------------ Mode Indicator -------------------
+
+              Container(
+                  child: Obx(
+                () => (modeCtrl.activeWidgets.isNotEmpty)
+                    ? Column(
+                        children: List.generate(modeCtrl.activeWidgets.length,
+                            (index) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 12),
+                            child: CustomCard(
+                                title: '${modeCtrl.activeWidgets[index].title}',
+                                onEdit: () {
+                                  // ------- Crud Operations -------
+                                  Get.bottomSheet(EditBottomSheet(
+                                    onHideORUnHideTap: () {
+                                      modeCtrl.hideBlock(index);
+                                    },
+                                    onDeleteTap: () {
+                                      modeCtrl.deleteBlock(index);
+                                      Get.back();
+                                    },
+                                  ));
+                                },
+                                onMore: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 62,
+                                          child: ListView.separated(
+                                            separatorBuilder: (context, index) {
+                                              return SizedBox(
+                                                width: 16,
+                                              );
+                                            },
+                                            shrinkWrap: true,
+                                            padding: EdgeInsets.zero,
+                                            physics: BouncingScrollPhysics(),
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: 2,
+                                            itemBuilder: (context, index) {
+                                              if (index == 1) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    Get.bottomSheet(
+                                                      _IconNameBottomSheet(),
+                                                      isScrollControlled: true,
+                                                    );
+                                                  },
+                                                  child: Image.asset(
+                                                    Assets.imagesAddIconRounded,
+                                                    height: 62,
+                                                  ),
+                                                );
+                                              }
+                                              return SizedBox(
+                                                height: Get.height,
+                                                width: 44,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      height: 44,
+                                                      width: 44,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: kLightGreyColor,
+                                                      ),
+                                                      child: Center(
+                                                        child: MyText(
+                                                          text: '🍇',
+                                                          size: 24,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    MyText(
+                                                      text: 'Grape',
+                                                      size: 12,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    MyText(
-                                      text: 'Grape',
-                                      size: 12,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                                    ],
+                                  ),
+                                )),
+                          );
+                        }),
+                      )
+                    : Container(
+                        height: 10,
+                        color: Colors.blue,
                       ),
-                    ],
-                  ),
-                ),
-              ),
+              ))
             ],
           ),
         ),
+
+        // -------------- Save Changes Button -----------------
+
         Padding(
           padding: AppSizes.DEFAULT,
           child: MyButton(
             buttonText: 'Save Changes',
             onTap: () {
-              Get.to(() => CustomizeRecording());
+              // Get.to(() => CustomizeRecording());
+              //
+              String uniqueId =
+                  DateTime.now().millisecondsSinceEpoch.toString();
+
+              // modeCtrl.addWidget(BlockModel(
+              //     id: uniqueId,
+              //     type: "emotions",
+              //     title: 'Emotions',
+              //     data: [
+              //       {'emoji': '😁', 'text': 'Proud'},
+              //       {'emoji': '😢', 'text': 'Sad'},
+              //       {'emoji': '😡', 'text': 'Fear'},
+              //     ]));
+
+              // modeCtrl.addWidget(BlockModel(
+              //     id: uniqueId,
+              //     type: "sleep",
+              //     title: 'Sleep',
+              //     data: 'Sleep data time and duration'));
+
+              log('active length: ${modeCtrl.activeWidgets.length}');
             },
           ),
         ),
@@ -449,7 +636,9 @@ class _IconNameBottomSheet extends StatelessWidget {
 }
 
 class _CreateNewBlockBottomSheet extends StatelessWidget {
-  const _CreateNewBlockBottomSheet({super.key});
+  final VoidCallback? onTap;
+  TextEditingController? textController = TextEditingController();
+  _CreateNewBlockBottomSheet({super.key, this.onTap, this.textController});
 
   @override
   Widget build(BuildContext context) {
@@ -502,6 +691,7 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
                   height: 20,
                 ),
                 MyTextField2(
+                  controller: textController,
                   hintText: '14 characters max.',
                   marginBottom: 6,
                 ),
@@ -517,10 +707,9 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
             height: 16,
           ),
           MyButton(
-            buttonText: 'Done',
-            onTap: () {
-              // Get.to(() => NewBlockAdded());
-            },
+            buttonText: 'Done', onTap: onTap,
+
+            // Get.to(() => NewBlockAdded());
           ),
         ],
       ),
@@ -528,13 +717,24 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
   }
 }
 
-class _EditBottomSheet extends StatelessWidget {
-  const _EditBottomSheet({super.key});
+class EditBottomSheet extends StatelessWidget {
+  final VoidCallback? onHideORUnHideTap;
+  final VoidCallback? onDeleteTap;
+  final String? commonButtonText;
+  final String? title;
+
+  EditBottomSheet({
+    super.key,
+    this.onHideORUnHideTap,
+    this.commonButtonText,
+    this.title,
+    this.onDeleteTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 260,
+      height: 200,
       padding: AppSizes.DEFAULT,
       decoration: BoxDecoration(
         color: kWhiteColor,
@@ -553,7 +753,7 @@ class _EditBottomSheet extends StatelessWidget {
                 height: 20,
               ),
               MyText(
-                text: 'Edit',
+                text: title ?? 'Catagory Name',
                 weight: FontWeight.w600,
                 size: 16,
               ),
@@ -570,49 +770,36 @@ class _EditBottomSheet extends StatelessWidget {
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 20,
           ),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: BouncingScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                MyText(
-                  onTap: () {
-                    Get.back();
-                    Get.bottomSheet(
-                      _EditBlockNameBottomSheet(),
-                      isScrollControlled: true,
-                    );
-                  },
-                  text: 'Edit block name',
-                  paddingBottom: 20,
-                ),
-                MyText(
-                  text: 'Unhide',
-                  paddingBottom: 20,
-                ),
-                MyText(
-                  onTap: () {
-                    Get.dialog(DeleteDialog());
-                  },
-                  text: 'Delete',
-                  paddingBottom: 20,
-                  color: kRedColor,
-                ),
-              ],
-            ),
+          MyText(
+            onTap: () {
+              Get.back();
+              Get.bottomSheet(
+                _EditBlockNameBottomSheet(),
+                isScrollControlled: true,
+              );
+            },
+            text: 'Edit block name',
+            paddingBottom: 20,
+          ),
+          MyText(
+            onTap: onHideORUnHideTap,
+            text: commonButtonText ?? 'Hide from recording page',
+            paddingBottom: 20,
+          ),
+          MyText(
+            onTap: () {
+              Get.dialog(DeleteDialog(
+                onDeleteTap: onDeleteTap,
+              ));
+            },
+            text: 'Delete',
+            paddingBottom: 20,
+            color: kRedColor,
           ),
           SizedBox(
             height: 16,
-          ),
-          MyButton(
-            buttonText: 'Done',
-            onTap: () {},
           ),
         ],
       ),
