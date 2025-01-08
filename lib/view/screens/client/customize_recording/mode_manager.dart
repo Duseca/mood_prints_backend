@@ -348,49 +348,13 @@ class _ModeManagerState extends State<ModeManager> {
             child: MyButton(
               buttonText: 'Save Changes',
               onTap: () {
-                // Get.to(() => CustomizeRecording());
-                Get.bottomSheet(
-                  EmojiCustomWidget(),
-                  isScrollControlled: true,
-                );
+                // Get.bottomSheet(
+                //   EmojiCustomWidget(),
+                //   isScrollControlled: true,
+                // );
               },
             ),
           ),
-          // Container(
-          //     child: EmojiPicker(
-          //   onEmojiSelected: (Category? category, Emoji emoji) {
-          //     // Do something when emoji is tapped (optional)
-          //     log(
-          //       'e: ${emoji.toString()}',
-          //     );
-          //   },
-          //   onBackspacePressed: () {
-          //     // Do something when the user taps the backspace button (optional)
-          //     // Set it to null to hide the Backspace-Button
-          //   },
-          //   // textEditingController: textEditingController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
-          //   config: Config(
-          //     height: 256,
-          //     //  bgColor: const Color(0xFFF2F2F2),
-          //     checkPlatformCompatibility: true,
-          //     emojiViewConfig: EmojiViewConfig(
-          //         // Issue: https://github.com/flutter/flutter/issues/28894
-          //         //emojiSizeMax: 28 *
-          //         // (foundation.defaultTargetPlatform == TargetPlatform.iOS
-          //         //     ?  1.20
-          //         //     :  1.0),
-          //         ),
-          //     viewOrderConfig: const ViewOrderConfig(
-          //       top: EmojiPickerItem.categoryBar,
-          //       middle: EmojiPickerItem.emojiView,
-          //       bottom: EmojiPickerItem.searchBar,
-          //     ),
-          //     skinToneConfig: const SkinToneConfig(),
-          //     categoryViewConfig: const CategoryViewConfig(),
-          //     bottomActionBarConfig: const BottomActionBarConfig(),
-          //     searchViewConfig: const SearchViewConfig(),
-          //   ),
-          // ))
         ],
       ),
     );

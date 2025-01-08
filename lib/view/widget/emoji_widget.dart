@@ -5,7 +5,11 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 
 class EmojiCustomWidget extends StatelessWidget {
-  const EmojiCustomWidget({super.key});
+  void Function(Category?, Emoji)? onEmojiSelected;
+  EmojiCustomWidget({
+    super.key,
+    required this.onEmojiSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +39,19 @@ class EmojiCustomWidget extends StatelessWidget {
           // ----------> Emoji Picker <----------
 
           EmojiPicker(
-              onEmojiSelected: (Category? category, Emoji emoji) {
-                // Do something when emoji is tapped (optional)
-                log(
-                  'e: ${emoji.toString()}',
-                );
-              },
+              onEmojiSelected: onEmojiSelected,
+              //  (Category? category, Emoji emoji) {
+              //   String SelectedEmoji = emoji.emoji;
+
+              //   // Do something when emoji is tapped (optional)
+              //   // log(
+              //   //   'e: ${emoji.toString()}',
+              //   // );
+
+              //   log(
+              //     'emoji: ${SelectedEmoji}',
+              //   );
+              // },
               onBackspacePressed: () {
                 // Do something when the user taps the backspace button (optional)
                 // Set it to null to hide the Backspace-Button

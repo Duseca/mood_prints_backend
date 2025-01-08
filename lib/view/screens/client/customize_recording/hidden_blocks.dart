@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -20,123 +22,131 @@ class HiddenBlocks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-              padding: AppSizes.DEFAULT,
-              child: Obx(
-                () => (modeCtrl.hiddenWidgets.isNotEmpty)
-                    ? Column(
-                        children: List.generate(modeCtrl.hiddenWidgets.length,
-                            (index) {
-                          return Padding(
-                            padding: EdgeInsets.only(top: 12),
-                            child: CustomCard(
-                                title: '${modeCtrl.hiddenWidgets[index].title}',
-                                onEdit: () {
-                                  // ------- Crud Operations -------
-                                  Get.bottomSheet(EditBottomSheet(
-                                    title: modeCtrl.hiddenWidgets[index].title
-                                        .toString(),
-                                    commonButtonText: 'UnHide',
-                                    onHideORUnHideTap: () {
-                                      modeCtrl.unhideBlock(index);
-                                    },
-                                    onDeleteTap: () {
-                                      modeCtrl.deleteBlock(index);
-                                      Get.back();
-                                    },
-                                  ));
+      body: Container(
+          padding: AppSizes.DEFAULT,
+          child: Obx(
+            () => (modeCtrl.hiddenWidgets.isNotEmpty)
+                ? Column(
+                    children:
+                        List.generate(modeCtrl.hiddenWidgets.length, (index) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 12),
+                        child: CustomCard(
+                            title: '${modeCtrl.hiddenWidgets[index].title}',
+                            onEdit: () {
+                              // ------- Crud Operations -------
+                              Get.bottomSheet(EditBottomSheet(
+                                title: modeCtrl.hiddenWidgets[index].title
+                                    .toString(),
+                                commonButtonText: 'UnHide',
+                                onHideORUnHideTap: () {
+                                  modeCtrl.unhideBlock(index);
+                                  Get.back();
                                 },
-                                onMore: () {},
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: SizedBox(
-                                          height: 62,
-                                          child: ListView.separated(
-                                            separatorBuilder: (context, index) {
-                                              return SizedBox(
-                                                width: 16,
-                                              );
-                                            },
-                                            shrinkWrap: true,
-                                            padding: EdgeInsets.zero,
-                                            physics: BouncingScrollPhysics(),
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: 2,
-                                            itemBuilder: (context, index) {
-                                              if (index == 1) {
-                                                return GestureDetector(
-                                                  onTap: () {
-                                                    // Get.bottomSheet(
-                                                    //   _IconNameBottomSheet(),
-                                                    //   isScrollControlled: true,
-                                                    // );
-                                                  },
-                                                  child: Image.asset(
-                                                    Assets.imagesAddIconRounded,
-                                                    height: 62,
+                                onDeleteTap: () {
+                                  modeCtrl.deleteBlock(index);
+                                  Get.close(2);
+                                },
+                              ));
+                            },
+                            onMore: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 62,
+                                      child: ListView.separated(
+                                        separatorBuilder: (context, index) {
+                                          return SizedBox(
+                                            width: 16,
+                                          );
+                                        },
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
+                                        physics: BouncingScrollPhysics(),
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: 2,
+                                        itemBuilder: (context, index) {
+                                          if (index == 1) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                // Get.bottomSheet(
+                                                //   _IconNameBottomSheet(),
+                                                //   isScrollControlled: true,
+                                                // );
+                                              },
+                                              child: Image.asset(
+                                                Assets.imagesAddIconRounded,
+                                                height: 62,
+                                              ),
+                                            );
+                                          }
+                                          return SizedBox(
+                                            height: Get.height,
+                                            width: 44,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                  height: 44,
+                                                  width: 44,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: kLightGreyColor,
                                                   ),
-                                                );
-                                              }
-                                              return SizedBox(
-                                                height: Get.height,
-                                                width: 44,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      height: 44,
-                                                      width: 44,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: kLightGreyColor,
-                                                      ),
-                                                      child: Center(
-                                                        child: MyText(
-                                                          text: '🍇',
-                                                          size: 24,
-                                                        ),
-                                                      ),
+                                                  child: Center(
+                                                    child: MyText(
+                                                      text: '🍇',
+                                                      size: 24,
                                                     ),
-                                                    MyText(
-                                                      text: 'Grape',
-                                                      size: 12,
-                                                    ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                                MyText(
+                                                  text: 'Grape',
+                                                  size: 12,
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                )),
-                          );
-                        }),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: MyText(
-                                text: 'No Hidden Blocks',
+                                ],
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-              ))
+                            )),
+                      );
+                    }),
+                  )
+                : Center(
+                    child: MyText(
+                      text: 'No Hidden Blocks',
+                    ),
+                  ),
+          )),
+      bottomNavigationBar: Padding(
+        padding: AppSizes.DEFAULT,
+        child: MyButton(
+          buttonText: 'Save Changes',
+          onTap: () {
+            modeCtrl.saveBlocks();
+            Get.back();
 
-          // Expanded(
+            // Get.to(() => CustomizeRecording());
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
+
+  // Expanded(
           //   child: ListView(
           //     shrinkWrap: true,
           //     physics: BouncingScrollPhysics(),
@@ -269,18 +279,3 @@ class HiddenBlocks extends StatelessWidget {
           //     ],
           //   ),
           // ),
-          ,
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: AppSizes.DEFAULT,
-        child: MyButton(
-          buttonText: 'Save Changes',
-          onTap: () {
-            Get.to(() => CustomizeRecording());
-          },
-        ),
-      ),
-    );
-  }
-}

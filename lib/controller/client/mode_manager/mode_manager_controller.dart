@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/model/mood_widget_model.dart/block_model.dart';
 
 class ModeManagerController extends GetxController {
@@ -10,6 +11,7 @@ class ModeManagerController extends GetxController {
   TextEditingController createNewBlockController = TextEditingController();
   RxList<BlockModel> activeWidgets = <BlockModel>[].obs;
   RxList<BlockModel> hiddenWidgets = <BlockModel>[].obs;
+  RxString selectedEmoji = RxString('');
 
   void loadBlocks() {
     // Load active and hidden blocks from storage
@@ -31,25 +33,49 @@ class ModeManagerController extends GetxController {
 
   void addBlock(BlockModel block) {
     activeWidgets.add(block);
-    saveBlocks();
+    // saveBlocks();
   }
 
   void hideBlock(int index) {
     hiddenWidgets.add(activeWidgets[index]);
     activeWidgets.removeAt(index);
-    saveBlocks();
+    // saveBlocks();
   }
 
   void unhideBlock(int index) {
     activeWidgets.add(hiddenWidgets[index]);
     hiddenWidgets.removeAt(index);
-    saveBlocks();
+    // saveBlocks();
   }
 
   void deleteBlock(int index) {
     activeWidgets.removeAt(index);
+    // activeWidgets.remove(index);
 
-    saveBlocks();
+    // saveBlocks();
+  }
+
+  void updateBlockTitle(int index, String newTitle) {
+    activeWidgets[index].title = newTitle;
+    update(); // Notify GetBuilder to rebuild
+  }
+
+  void addNewEmojiAndTitleToList(
+      {required String newEmoji,
+      required String newTitle,
+      required int index}) {
+    if (newEmoji.isNotEmpty && newTitle.isNotEmpty) {
+      EmojiWithText model = EmojiWithText(text: newTitle, emoji: newEmoji);
+      activeWidgets[index].data.add(model);
+      log("---> Icon & text added ${activeWidgets[index].data.length}");
+      log("---> Icon & text added ${activeWidgets[index].data.length}");
+      Get.back();
+    } else {
+      displayToast(msg: 'Required icon & text');
+      log("---> Required icon & text");
+    }
+
+    update();
   }
 
   void saveBlocks() async {
