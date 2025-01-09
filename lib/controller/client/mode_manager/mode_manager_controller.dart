@@ -48,11 +48,14 @@ class ModeManagerController extends GetxController {
     // saveBlocks();
   }
 
-  void deleteBlock(int index) {
-    activeWidgets.removeAt(index);
-    // activeWidgets.remove(index);
+  void deleteBlock(int index, {bool removeFromActiveList = true}) {
+    if (removeFromActiveList) {
+      activeWidgets.removeAt(index);
+    } else {
+      hiddenWidgets.removeAt(index);
+    }
 
-    // saveBlocks();
+    update();
   }
 
   void updateBlockTitle(int index, String newTitle) {
@@ -63,16 +66,23 @@ class ModeManagerController extends GetxController {
   void addNewEmojiAndTitleToList(
       {required String newEmoji,
       required String newTitle,
-      required int index}) {
+      required int mainIndex}) {
     if (newEmoji.isNotEmpty && newTitle.isNotEmpty) {
       EmojiWithText model = EmojiWithText(text: newTitle, emoji: newEmoji);
-      activeWidgets[index].data.add(model);
-      log("---> Icon & text added ${activeWidgets[index].data.length}");
-      log("---> Icon & text added ${activeWidgets[index].data.length}");
-      Get.back();
+
+      // Create a modifiable copy of the data list
+      List<EmojiWithText> modifiableList =
+          List.from(activeWidgets[mainIndex].data);
+      modifiableList.add(model);
+
+      // Assign the updated list back
+      activeWidgets[mainIndex].data = modifiableList;
+
+      // log("---> Icon & text added Current Index list length ${modifiableList.length}");
+      // log("Current data: ${activeWidgets[mainIndex].data}");
     } else {
       displayToast(msg: 'Required icon & text');
-      log("---> Required icon & text");
+      // log("---> Required icon & text");
     }
 
     update();

@@ -9,7 +9,6 @@ import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
-import 'package:mood_prints/view/widget/emoji_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
