@@ -40,8 +40,9 @@ class HiddenBlocks extends StatelessWidget {
                                   Get.back();
                                 },
                                 onDeleteTap: () {
-                                  modeCtrl.deleteBlock(headIndex,
-                                      removeFromActiveList: false);
+                                  modeCtrl.deleteBlockFromHidden(
+                                    headIndex,
+                                  );
                                   Get.close(2);
                                 },
                               ));

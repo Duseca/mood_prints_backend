@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:country_picker/country_picker.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';

@@ -1,17 +1,36 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
-import 'package:mood_prints/model/mood_widget_model.dart/block_model.dart';
+import 'package:mood_prints/model/mood_models/block_model.dart';
+import 'package:mood_prints/model/mood_models/feeling_model.dart';
+import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
 
 class ModeManagerController extends GetxController {
   GetStorage storage = GetStorage();
   TextEditingController createNewBlockController = TextEditingController();
   RxList<BlockModel> activeWidgets = <BlockModel>[].obs;
   RxList<BlockModel> hiddenWidgets = <BlockModel>[].obs;
-  RxString selectedEmoji = RxString('');
+  RxString selectedEmoji = ''.obs;
+  Rx<MoodModel> selectedMood = modeIndicatorItems.first.obs;
+  Rx<FeelingModel> selectedFeelingModel = feelingItems.first.obs;
+  final selectedEmojiTextModel = Rxn<EmojiWithText>();
+  Map<int, bool> visibilityDisplayCustomCards = {};
+  int selectedCustomItem = 100;
+
+  void selectCustomItems(int index) async {
+    selectedCustomItem = index;
+    update();
+  }
+
+  // Toggle visibility for a specific widget
+  void toggleVisibility(int index) {
+    visibilityDisplayCustomCards[index] =
+        !(visibilityDisplayCustomCards[index] ?? false);
+    update();
+  }
 
   void loadBlocks() {
     // Load active and hidden blocks from storage
@@ -48,12 +67,14 @@ class ModeManagerController extends GetxController {
     // saveBlocks();
   }
 
-  void deleteBlock(int index, {bool removeFromActiveList = true}) {
-    if (removeFromActiveList) {
-      activeWidgets.removeAt(index);
-    } else {
-      hiddenWidgets.removeAt(index);
-    }
+  void deleteBlockFromActive(int index) {
+    activeWidgets.removeAt(index);
+
+    update();
+  }
+
+  void deleteBlockFromHidden(int index) {
+    hiddenWidgets.removeAt(index);
 
     update();
   }
@@ -93,6 +114,8 @@ class ModeManagerController extends GetxController {
         'activeBlocks', activeWidgets.map((e) => e.toJson()).toList());
     await storage.write(
         'hiddenBlocks', hiddenWidgets.map((e) => e.toJson()).toList());
+
+    update();
   }
 
   // ----------------- Active Block -----------------

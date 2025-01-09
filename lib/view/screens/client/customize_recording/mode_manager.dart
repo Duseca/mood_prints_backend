@@ -6,6 +6,7 @@ import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
+import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
@@ -23,10 +24,11 @@ class ModeManager extends StatefulWidget {
 }
 
 class _ModeManagerState extends State<ModeManager> {
-  int currentModeIndex = 0;
+  // int currentModeIndex = 0;
   int selectedFeeling = 0;
   bool haveEmotionsVisible = false;
 
+  final modeCtrl = Get.find<ModeManagerController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +62,12 @@ class _ModeManagerState extends State<ModeManager> {
                   decoration: AppStyling.CUSTOM_CARD,
                   child: Column(
                     children: [
+                      MyText(
+                        paddingBottom: 16,
+                        text: "How is your mood today?*",
+                        size: 16,
+                        weight: FontWeight.w600,
+                      ),
                       CommonImageView(imagePath: Assets.imagesColorPallet),
 
                       // Mode Selector Tap
@@ -70,49 +78,59 @@ class _ModeManagerState extends State<ModeManager> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(
                           modeIndicatorItems.length,
-                          (index) => Column(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {});
-                                  currentModeIndex = index;
-                                  log(currentModeIndex.toString());
-                                },
-                                child: Icon(
-                                  (index == currentModeIndex)
-                                      ? Icons.radio_button_on_rounded
-                                      : Icons.circle,
-                                  color: modeIndicatorItems[index]['color'],
+                          (index) => Obx(
+                            () => Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    modeCtrl.selectedMood.value =
+                                        modeIndicatorItems[index];
+
+                                    log('selected Model:=> ${modeCtrl.selectedMood.value.toMap().toString()} ');
+                                    // currentModeIndex = index;
+                                    // log(currentModeIndex.toString());
+                                  },
+                                  child: Icon(
+                                    ((modeCtrl.selectedMood.value ==
+                                            modeIndicatorItems[index]))
+                                        ? Icons.radio_button_on_rounded
+                                        : Icons.circle,
+                                    color: modeIndicatorItems[index].color,
+                                  ),
                                 ),
-                              ),
-                              MyText(
-                                text: '${modeIndicatorItems[index]['text']}',
-                                size: 12,
-                                weight: FontWeight.w600,
-                                color: Colors.black54,
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                                MyText(
+                                  text: '${modeIndicatorItems[index].text}',
+                                  size: 12,
+                                  weight: FontWeight.w600,
+                                  color: Colors.black54,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
 
-                      Container(
-                        margin: EdgeInsets.only(top: 16),
-                        height: 35,
-                        width: 150,
-                        decoration: BoxDecoration(
+                      Obx(
+                        () => Container(
+                          margin: EdgeInsets.only(top: 16),
+                          height: 35,
+                          width: 150,
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color: modeIndicatorItems[currentModeIndex]
-                                ['color']),
-                        child: Center(
-                          child: MyText(
-                            text:
-                                "${modeIndicatorItems[currentModeIndex]['mode']} Mode",
-                            size: 14,
-                            weight: FontWeight.w600,
-                            color: kWhiteColor,
-                            textAlign: TextAlign.center,
+                            // color: modeIndicatorItems[currentModeIndex].color,
+                            color: modeCtrl.selectedMood.value.color,
+                          ),
+                          child: Center(
+                            child: MyText(
+                              text:
+                                  // "${modeIndicatorItems[currentModeIndex].mode} Mode",
+                                  "${modeCtrl.selectedMood.value.mode} Mode",
+                              size: 14,
+                              weight: FontWeight.w600,
+                              color: kWhiteColor,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),
@@ -143,19 +161,21 @@ class _ModeManagerState extends State<ModeManager> {
                         spacing: 10,
                         runSpacing: 10,
                         children: List.generate(
-                          9,
+                          feelingItems.length,
                           (index) {
-                            return InkWell(
-                              onTap: () {
-                                setState(() {
-                                  selectedFeeling = index;
-                                });
-                              },
-                              child: Image.asset(
-                                (selectedFeeling == index)
-                                    ? feelingItems[index]['iconA']!
-                                    : feelingItems[index]['iconB']!,
-                                height: 44,
+                            return Obx(
+                              () => InkWell(
+                                onTap: () {
+                                  modeCtrl.selectedFeelingModel.value =
+                                      feelingItems[index];
+                                },
+                                child: Image.asset(
+                                  (modeCtrl.selectedFeelingModel.value ==
+                                          feelingItems[index])
+                                      ? feelingItems[index].iconA
+                                      : feelingItems[index].iconB,
+                                  height: 44,
+                                ),
                               ),
                             );
                           },
@@ -169,85 +189,201 @@ class _ModeManagerState extends State<ModeManager> {
                 ),
 
                 // ------- Emotions --------
+                // ------- Active Widgets ----------
 
-                _CustomCard(
-                  title: 'Emotions*',
-                  visiblity: haveEmotionsVisible,
-                  onMore: () {
-                    setState(() {});
-                    if (haveEmotionsVisible == true) {
-                      haveEmotionsVisible = false;
-                    } else {
-                      haveEmotionsVisible = true;
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 62,
-                            child: ListView.separated(
-                              separatorBuilder: (context, index) {
-                                return SizedBox(
-                                  width: 16,
-                                );
-                              },
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              physics: BouncingScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: emotionsItems.length + 1,
-                              itemBuilder: (context, index) {
-                                // ---------- Add more emojis button ------------
+                (modeCtrl.activeWidgets.isNotEmpty)
+                    ? Column(
+                        children: List.generate(modeCtrl.activeWidgets.length,
+                            (headIndex) {
+                          return GetBuilder<ModeManagerController>(
+                            init: ModeManagerController(),
+                            builder: (ctrl) {
+                              bool cardVisiblity =
+                                  ctrl.visibilityDisplayCustomCards[
+                                          headIndex] ??
+                                      false;
 
-                                if (index == emotionsItems.length) {
-                                  return AddMoreEmojiButton(
-                                    onTap: () {},
-                                  );
-                                } else {
-                                  // ---------- Emojis & Text ------------
+                              return _CustomCard(
+                                title:
+                                    '${ctrl.activeWidgets[headIndex].title}*',
+                                visiblity: cardVisiblity,
+                                onMore: () {
+                                  ctrl.toggleVisibility(headIndex);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 62,
+                                          child: ListView.separated(
+                                            separatorBuilder: (context, index) {
+                                              return SizedBox(
+                                                width: 16,
+                                              );
+                                            },
+                                            shrinkWrap: true,
+                                            padding: EdgeInsets.zero,
+                                            physics: BouncingScrollPhysics(),
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: ctrl
+                                                .activeWidgets[headIndex]
+                                                .data
+                                                .length,
+                                            itemBuilder: (context, index) {
+                                              return SizedBox(
+                                                height: Get.height,
+                                                // width: 44,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        ctrl.selectedEmojiTextModel
+                                                                .value =
+                                                            ctrl
+                                                                .activeWidgets[
+                                                                    headIndex]
+                                                                .data[index];
 
-                                  return SizedBox(
-                                    height: Get.height,
-                                    // width: 44,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          height: 44,
-                                          width: 44,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: kLightGreyColor,
-                                          ),
-                                          child: Center(
-                                            child: MyText(
-                                              text:
-                                                  '${emotionsItems[index]['emoji']}',
-                                              size: 24,
-                                            ),
+                                                        // ctrl.selectCustomItems(
+                                                        //     index);
+
+                                                        log('Selected Emoji Model: ${ctrl.selectedEmojiTextModel.value?.toJson().toString()}');
+                                                      },
+                                                      child: Obx(
+                                                        () => Container(
+                                                          height: 44,
+                                                          width: 44,
+                                                          decoration: BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color:
+                                                                  kLightGreyColor,
+                                                              border: Border.all(
+                                                                  color: (ctrl.selectedEmojiTextModel
+                                                                              .value ==
+                                                                          ctrl.activeWidgets[headIndex].data[
+                                                                              index])
+                                                                      ? kSecondaryColor
+                                                                      : Colors
+                                                                          .transparent,
+                                                                  width: 1)),
+                                                          child: Center(
+                                                            child: MyText(
+                                                              text:
+                                                                  '${ctrl.activeWidgets[headIndex].data[index].emoji}',
+                                                              size: 24,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    MyText(
+                                                      text:
+                                                          '${ctrl.activeWidgets[headIndex].data[index].text}',
+                                                      size: 12,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ),
-                                        MyText(
-                                          text:
-                                              '${emotionsItems[index]['text']}',
-                                          size: 12,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                      )
+                    : SizedBox.shrink(),
+
+                // -------- Static Front-end Widget -------
+
+                // _CustomCard(
+                //   title: 'Emotions*',
+                //   visiblity: haveEmotionsVisible,
+                //   onMore: () {
+                //     setState(() {});
+                //     if (haveEmotionsVisible == true) {
+                //       haveEmotionsVisible = false;
+                //     } else {
+                //       haveEmotionsVisible = true;
+                //     }
+                //   },
+                //   child: Padding(
+                //     padding: const EdgeInsets.only(top: 16),
+                //     child: Row(
+                //       children: [
+                //         Expanded(
+                //           child: SizedBox(
+                //             height: 62,
+                //             child: ListView.separated(
+                //               separatorBuilder: (context, index) {
+                //                 return SizedBox(
+                //                   width: 16,
+                //                 );
+                //               },
+                //               shrinkWrap: true,
+                //               padding: EdgeInsets.zero,
+                //               physics: BouncingScrollPhysics(),
+                //               scrollDirection: Axis.horizontal,
+                //               itemCount: emotionsItems.length + 1,
+                //               itemBuilder: (context, index) {
+                //                 // ---------- Add more emojis button ------------
+
+                //                 if (index == emotionsItems.length) {
+                //                   return AddMoreEmojiButton(
+                //                     onTap: () {},
+                //                   );
+                //                 } else {
+                //                   // ---------- Emojis & Text ------------
+
+                //                   return SizedBox(
+                //                     height: Get.height,
+                //                     // width: 44,
+                //                     child: Column(
+                //                       mainAxisAlignment:
+                //                           MainAxisAlignment.spaceBetween,
+                //                       children: [
+                //                         Container(
+                //                           height: 44,
+                //                           width: 44,
+                //                           decoration: BoxDecoration(
+                //                             shape: BoxShape.circle,
+                //                             color: kLightGreyColor,
+                //                           ),
+                //                           child: Center(
+                //                             child: MyText(
+                //                               text:
+                //                                   '${emotionsItems[index]['emoji']}',
+                //                               size: 24,
+                //                             ),
+                //                           ),
+                //                         ),
+                //                         MyText(
+                //                           text:
+                //                               '${emotionsItems[index]['text']}',
+                //                           size: 12,
+                //                         ),
+                //                       ],
+                //                     ),
+                //                   );
+                //                 }
+                //               },
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
 
                 SizedBox(
                   height: 12,

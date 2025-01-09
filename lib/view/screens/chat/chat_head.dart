@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/view/screens/chat/chat_screen.dart';
 import 'package:mood_prints/view/widget/chat_head_tiles_widget.dart';
