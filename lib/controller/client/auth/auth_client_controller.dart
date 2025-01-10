@@ -178,7 +178,7 @@ class AuthController extends GetxController {
         UserModel model = UserModel(
           fullName: fullNameController.text.trim(),
           phoneNumber: FullPhoneNumber,
-          dob: DateFormatorService.instance.getDateIsoFormat(dob.value!),
+          dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
           gender: selectedGenderValue.value.toLowerCase(),
           bio: BioController.text,
         );

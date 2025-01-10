@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
@@ -8,18 +9,24 @@ class DobPicker extends StatelessWidget {
   final Function(dynamic) onDateTimeChanged;
   final DateTime? initialDateTime;
   var mode;
-  DobPicker(
-      {super.key,
-      required this.onDateTimeChanged,
-      this.initialDateTime,
-      this.mode = CupertinoDatePickerMode.date});
+  VoidCallback? onTap;
+
+  double? dobWidgetheight;
+  DobPicker({
+    super.key,
+    required this.onDateTimeChanged,
+    this.initialDateTime,
+    this.mode = CupertinoDatePickerMode.date,
+    this.dobWidgetheight,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         SizedBox(
-          height: Get.height * 0.30,
+          height: dobWidgetheight ?? Get.height * 0.30,
           child: CupertinoDatePicker(
               minimumYear: 1995,
               maximumYear: 2080,
@@ -29,14 +36,11 @@ class DobPicker extends StatelessWidget {
               initialDateTime: initialDateTime,
               onDateTimeChanged: onDateTimeChanged),
         ),
-        Spacer(),
+        // Spacer(),
+
         Padding(
-          padding: AppSizes.DEFAULT,
-          child: MyButton(
-              buttonText: 'Done',
-              onTap: () {
-                Get.back();
-              }),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: MyButton(buttonText: 'Done', onTap: onTap),
         )
       ],
     );

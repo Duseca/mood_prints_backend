@@ -126,7 +126,7 @@ class ClientCompleteProfile extends StatelessWidget {
                     isReadOnly: true,
                     labelText: 'Date of Birth',
                     hintText: (ctrl.dob.value != null)
-                        ? DateFormatorService.instance
+                        ? DateTimeService.instance
                             .getDateUsFormat(ctrl.dob.value!)
                         : "Select date",
                     suffix: InkWell(

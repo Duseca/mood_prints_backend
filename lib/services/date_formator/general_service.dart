@@ -2,14 +2,27 @@ import 'dart:developer';
 
 import 'package:intl/intl.dart';
 
-class DateFormatorService {
-  DateFormatorService._privateConstructor();
+class DateTimeService {
+  DateTimeService._privateConstructor();
 
-  static DateFormatorService? _instance;
+  static DateTimeService? _instance;
 
-  static DateFormatorService get instance {
-    _instance ??= DateFormatorService._privateConstructor();
+  static DateTimeService get instance {
+    _instance ??= DateTimeService._privateConstructor();
     return _instance!;
+  }
+
+  // simple format date picker
+  // 10 jan 2025
+  String getSimpleUSDateFormat(DateTime date) {
+    // Formatting the day
+    String day = DateFormat('d').format(date);
+    // Formatting the month as a three-letter abbreviation
+    String month = DateFormat('MMM').format(date);
+    // Formatting the year
+    String year = DateFormat('yyyy').format(date);
+
+    return '$day $month $year';
   }
 
   // Date in US format
@@ -54,7 +67,7 @@ class DateFormatorService {
 
   // Time in AM & PM format
 
-  String getTimeFormator(time) {
+  String formatTimeToAMPM(time) {
     if (time != null) {
       final finalTime = DateFormat('hh:mm a').format(time);
       return finalTime;

@@ -70,7 +70,7 @@ class _ActiveBlockState extends State<ActiveBlock> {
                 onTap: () {
                   Get.bottomSheet(
                     _CreateNewBlockBottomSheet(
-                      textController: modeCtrl.createNewBlockController,
+                      textController: modeCtrl.commonTextController,
 
                       // ----------> On Bottom sheet Done button Tap <----------
 
@@ -82,13 +82,13 @@ class _ActiveBlockState extends State<ActiveBlock> {
 
                         modeCtrl.addBlock(BlockModel(
                           id: uniqueId,
-                          type: modeCtrl.createNewBlockController.text.trim(),
-                          title: modeCtrl.createNewBlockController.text
+                          type: modeCtrl.commonTextController.text.trim(),
+                          title: modeCtrl.commonTextController.text
                               .trim()
                               .toString(),
                         ));
 
-                        modeCtrl.createNewBlockController.clear();
+                        modeCtrl.commonTextController.clear();
                         Get.back();
 
                         log('work');
@@ -137,11 +137,6 @@ class _ActiveBlockState extends State<ActiveBlock> {
                         feelingItems.length,
                         (index) {
                           return InkWell(
-                            // onTap: () {
-                            //   setState(() {
-                            //     selectedFeeling = index;
-                            //   });
-                            // },
                             child: Image.asset(
                               feelingItems[index].iconB,
                               height: 44,
@@ -181,8 +176,7 @@ class _ActiveBlockState extends State<ActiveBlock> {
 
                                           onEditBlockNameTap: () {
                                             log('work');
-                                            modeCtrl.createNewBlockController
-                                                    .text =
+                                            modeCtrl.commonTextController.text =
                                                 modeCtrl
                                                     .activeWidgets[headIndex]
                                                     .title;
@@ -193,16 +187,16 @@ class _ActiveBlockState extends State<ActiveBlock> {
                                                   modeCtrl.updateBlockTitle(
                                                       headIndex,
                                                       modeCtrl
-                                                          .createNewBlockController
+                                                          .commonTextController
                                                           .text);
                                                   Get.close(2);
 
-                                                  modeCtrl
-                                                      .createNewBlockController
+                                                  modeCtrl.commonTextController
                                                       .clear();
                                                 },
-                                                editBlockNameController: modeCtrl
-                                                    .createNewBlockController,
+                                                editBlockNameController:
+                                                    modeCtrl
+                                                        .commonTextController,
                                               ),
                                               isScrollControlled: true,
                                             );
@@ -575,7 +569,7 @@ class _IconNameBottomSheet extends StatelessWidget {
                   height: 16,
                 ),
                 MyTextField2(
-                  controller: modeCtrl.createNewBlockController,
+                  controller: modeCtrl.commonTextController,
                   hintText: '14 characters max.',
                   marginBottom: 6,
                 ),
@@ -595,11 +589,11 @@ class _IconNameBottomSheet extends StatelessWidget {
             onTap: () {
               modeCtrl.addNewEmojiAndTitleToList(
                   newEmoji: modeCtrl.selectedEmoji.value,
-                  newTitle: modeCtrl.createNewBlockController.text.trim(),
+                  newTitle: modeCtrl.commonTextController.text.trim(),
                   mainIndex: index);
               Get.back();
               modeCtrl.selectedEmoji.value = '';
-              modeCtrl.createNewBlockController.clear();
+              modeCtrl.commonTextController.clear();
 
               log('My Done Button WOrks');
             },
