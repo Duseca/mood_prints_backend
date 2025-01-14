@@ -25,15 +25,15 @@ class _ClientNavBarState extends State<ClientNavBar> {
         _currentIndex = index;
       });
 
-  void v() async {
-    final pref = await SharedPreferences.getInstance();
-    log("Autherisation Token Key: ${pref.getString('token')}");
-    log("id --->: ${pref.getString('id')}");
-  }
+  // void v() async {
+  //   final pref = await SharedPreferences.getInstance();
+  //   // log("Autherization Token Key: ${pref.getString('token')}");
+  //   // log("id --->: ${pref.getString('id')}");
+  // }
 
   @override
   Widget build(BuildContext context) {
-    v();
+    // v();
     final List<Map<String, dynamic>> _items = [
       {
         'icon': Assets.imagesHome,

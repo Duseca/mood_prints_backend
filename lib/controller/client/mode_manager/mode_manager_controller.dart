@@ -1,11 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
+import 'package:mood_prints/model/board_model/board_model.dart';
 import 'package:mood_prints/model/mood_models/block_model.dart';
 import 'package:mood_prints/model/mood_models/feeling_model.dart';
 import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
@@ -19,7 +20,11 @@ class ModeManagerController extends GetxController {
   Map<int, bool> visibilityDisplayCustomCards = {};
   // Values selector
   Rx<MoodModel> selectedMood = modeIndicatorItems.first.obs;
-  Rx<FeelingModel> selectedFeelingModel = feelingItems.first.obs;
+  // Feeling
+  // Rx<FeelingModel> selectedFeelingModel = feelingItems.first.obs;
+  RxList<FeelingModel> selectedFeelingList = <FeelingModel>[].obs;
+  List<String> feelingListofText = [];
+
   final selectedEmojiTextModel = Rxn<EmojiWithText>();
   TextEditingController todayNoteController = TextEditingController();
   RxList<String> todayPhotos = <String>[].obs;
@@ -29,6 +34,90 @@ class ModeManagerController extends GetxController {
   DateTime? dateTime;
   RxBool isStartingSleepRecordSelected = true.obs;
 
+  // -------------------------------------------------------------------------
+  /* 
+  Posting Data throught Api "Creating Board"
+  */
+
+  void createBoard() async {
+    log("Try Called Create Board");
+    // log("Email ${email}");
+    // log("Password ${password}");
+    try {
+      if (todayNoteController.text.isNotEmpty &&
+          selectedFeelingList.isNotEmpty &&
+          endSleepDuration.value != null &&
+          startSleepDuration.value != null) {
+        showLoadingDialog();
+
+        Sleep sleep = Sleep(
+            dozeOffTime: endSleepDuration.value.toString(),
+            wakeupTime: startSleepDuration.value.toString());
+
+        BoardModel body = BoardModel(
+          note: todayNoteController.text.trim(),
+          stressLevel: selectedMood.value.stressLevel,
+          emotions: feelingListofText,
+          date: datePicker.value,
+          createdAt: datePicker.value,
+          sleep: sleep,
+        );
+
+        final response = await apiService.post(
+            createBoardUrl, body.toJson(), false,
+            showResult: true, successCode: 201);
+
+        hideLoadingDialog();
+
+        if (response != null) {
+          final status = response['status'];
+          final data = response['data'];
+
+          if (status != null && status.isNotEmpty) {
+            BoardModel boardModel = BoardModel.fromJson(data);
+            log("Data After Board Created: ${boardModel.toString()}");
+          }
+        }
+        clearBoardEntries();
+      } else {
+        displayToast(msg: 'Please fill data');
+      }
+
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error:-> $e');
+    }
+  }
+
+  // ----- Clear create board data ------
+  void clearBoardEntries() {
+    todayNoteController.clear();
+    startSleepDuration.value == null;
+    endSleepDuration.value == null;
+    selectedFeelingList.clear();
+    feelingListofText.clear();
+  }
+
+  // ------ Select multiple values -------
+
+  void selectMultiplesValuesOfFeeling(
+    index,
+  ) {
+    if (selectedFeelingList.contains(feelingItems[index])) {
+      selectedFeelingList.remove(feelingItems[index]);
+      log("Removed: ${feelingItems[index].text}");
+    } else {
+      selectedFeelingList.add(feelingItems[index]);
+      feelingListofText.add(feelingItems[index].text);
+      log("Added: ${feelingItems[index].text}");
+      log("feeling list of String: ${feelingListofText}");
+    }
+
+    update();
+  }
+
+  // -------------------------------------------------------------------------
   /*
   The code below for the 'Mode Manager Page' handles posting data through APIs 
   and collects images, sleep records, and other mode indicators from the user.  

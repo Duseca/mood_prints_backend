@@ -31,6 +31,13 @@ class ModeManager extends StatefulWidget {
 class _ModeManagerState extends State<ModeManager> {
   final modeCtrl = Get.find<ModeManagerController>();
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    modeCtrl.clearBoardEntries();
+  }
+
   void showDatePickerOnTitleTap() {
     log('work');
 
@@ -213,14 +220,26 @@ class _ModeManagerState extends State<ModeManager> {
                               return Obx(
                                 () => InkWell(
                                   onTap: () {
-                                    modeCtrl.selectedFeelingModel.value =
-                                        feelingItems[index];
+                                    modeCtrl
+                                        .selectMultiplesValuesOfFeeling(index);
+                                    // if (modeCtrl.selectedFeelingList
+                                    //     .contains(feelingItems[index])) {
+                                    //   modeCtrl.selectedFeelingList
+                                    //       .remove(feelingItems[index]);
+                                    //   log("Removed: ${feelingItems[index].text}");
+                                    // } else {
+                                    //   modeCtrl.selectedFeelingList
+                                    //       .add(feelingItems[index]);
+                                    //   log("Added: ${feelingItems[index].text}");
+                                    // }
                                   },
                                   child: Image.asset(
-                                    (modeCtrl.selectedFeelingModel.value ==
-                                            feelingItems[index])
-                                        ? feelingItems[index].iconA
-                                        : feelingItems[index].iconB,
+                                    modeCtrl.selectedFeelingList
+                                            .contains(feelingItems[index])
+                                        ? feelingItems[index]
+                                            .iconA // Highlighted icon
+                                        : feelingItems[index]
+                                            .iconB, // Normal icon
                                     height: 44,
                                   ),
                                 ),
@@ -723,6 +742,7 @@ class _ModeManagerState extends State<ModeManager> {
               child: MyButton(
                 buttonText: 'Save Changes',
                 onTap: () {
+                  modeCtrl.createBoard();
                   // Get.bottomSheet(
                   //   EmojiCustomWidget(),
                   //   isScrollControlled: true,

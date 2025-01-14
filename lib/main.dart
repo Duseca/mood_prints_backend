@@ -1,13 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:mood_prints/core/binding/binding.dart';
+import 'package:mood_prints/firebase_options.dart';
 import 'config/routes/routes.dart';
 import 'config/theme/light_theme.dart';
 
 void main() async {
   await GetStorage.init();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 

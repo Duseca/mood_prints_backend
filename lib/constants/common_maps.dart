@@ -53,15 +53,15 @@ List<FeelingModel> feelingItems = [
 ];
 
 List<MoodModel> modeIndicatorItems = [
-  MoodModel(text: '-4', color: kN4Color, mode: 'Terrible'),
-  MoodModel(text: '-3', color: kN3Color, mode: 'Awful'),
-  MoodModel(text: '-2', color: kN2Color, mode: 'Bad'),
-  MoodModel(text: '-1', color: kN1Color, mode: 'Poor'),
-  MoodModel(text: '0', color: k0Color, mode: 'Neutral'),
-  MoodModel(text: '1', color: kP1Color, mode: 'Fair'),
-  MoodModel(text: '2', color: kP2Color, mode: 'Good'),
-  MoodModel(text: '3', color: kP3Color, mode: 'Great'),
-  MoodModel(text: '4', color: kP4Color, mode: 'Excellent'),
+  MoodModel(text: '-4', color: kN4Color, mode: 'Terrible', stressLevel: -4),
+  MoodModel(text: '-3', color: kN3Color, mode: 'Awful', stressLevel: -3),
+  MoodModel(text: '-2', color: kN2Color, mode: 'Bad', stressLevel: -2),
+  MoodModel(text: '-1', color: kN1Color, mode: 'Poor', stressLevel: -1),
+  MoodModel(text: '0', color: k0Color, mode: 'Neutral', stressLevel: 0),
+  MoodModel(text: '1', color: kP1Color, mode: 'Fair', stressLevel: 1),
+  MoodModel(text: '2', color: kP2Color, mode: 'Good', stressLevel: 2),
+  MoodModel(text: '3', color: kP3Color, mode: 'Great', stressLevel: 3),
+  MoodModel(text: '4', color: kP4Color, mode: 'Excellent', stressLevel: 4),
 ];
 
 

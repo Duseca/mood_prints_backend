@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "830689119309",
+    "project_id": "mode-print-cd976",
+    "storage_bucket": "mode-print-cd976.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830689119309:android:18cad2e3a9196854f0e004",
+        "android_client_info": {
+          "package_name": "com.example.mood_prints"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc2_GUhopWi4Qr0kjQ0INnVawWRrDiLkc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
