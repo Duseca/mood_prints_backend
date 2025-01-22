@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 
 // ignore: must_be_immutable

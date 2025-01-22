@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/services/user/user_services.dart';
+
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void splashScreenHandler() {
     Timer(Duration(seconds: 2), () async {
       checkUserStatus();
-      // Get.offAll(() => GetStarted()
-      //     // ClientCompleteProfile(),
-
-      //     );
     });
   }
 
@@ -34,8 +34,11 @@ class _SplashScreenState extends State<SplashScreen> {
         await Get.find<AuthController>().getStringSharedPrefMethod(key: 'id');
 
     if (checkingID.isNotEmpty) {
-      await Get.find<AuthController>().getCurrentUserDataMethod();
-      Get.to(() => ClientNavBar());
+      // await Get.put(AuthController()).getCurrentUserDataMethod();
+      await UserService.instance.getUserInformation();
+      await Get.find<ClientHomeController>().getAllBoard();
+
+      Get.offAll(() => ClientNavBar());
     } else {
       Get.offAll(() => GetStarted());
     }

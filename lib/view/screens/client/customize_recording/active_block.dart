@@ -603,6 +603,7 @@ class _IconNameBottomSheet extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _CreateNewBlockBottomSheet extends StatelessWidget {
   final VoidCallback? onTap;
   TextEditingController? textController = TextEditingController();
@@ -771,6 +772,7 @@ class EditBottomSheet extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _EditBlockNameBottomSheet extends StatelessWidget {
   TextEditingController? editBlockNameController = TextEditingController();
   final VoidCallback? onTap;

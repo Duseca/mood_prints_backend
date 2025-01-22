@@ -122,6 +122,7 @@ class _MyTextFieldState extends State<MyTextField> {
   }
 }
 
+// ignore: must_be_immutable
 class MyTextField2 extends StatefulWidget {
   MyTextField2({
     Key? key,
@@ -384,6 +385,8 @@ class _MyTextField2State extends State<MyTextField2> {
 // }
 
 //-----------------------------------------
+
+// ignore: must_be_immutable
 
 class PhoneField extends StatefulWidget {
   PhoneField({

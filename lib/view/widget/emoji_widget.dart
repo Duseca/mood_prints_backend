@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 
+// ignore: must_be_immutable
 class EmojiCustomWidget extends StatelessWidget {
   void Function(Category?, Emoji)? onEmojiSelected;
   EmojiCustomWidget({

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -11,7 +10,6 @@ import 'package:mood_prints/view/screens/client/client_profile/client_profile.da
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class ClientNavBar extends StatefulWidget {

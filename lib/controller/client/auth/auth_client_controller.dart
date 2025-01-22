@@ -224,36 +224,37 @@ class AuthController extends GetxController {
   //  --- Get Current User Information Method ---
   // This function is used when a user logs in or signs up for an account. After that, if the user closes the app and opens it again later, they won't need to authenticate to log in.
 
-  Future<void> getCurrentUserDataMethod() async {
-    log("Called Get Current User");
-    try {
-      showLoadingDialog();
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
-      // final id = await prefs.getString('id');
-      final id = await getStringSharedPrefMethod(key: 'id');
-      if (id.isNotEmpty) {
-        log('id is Not null -> ${id}');
+  // Future<void> getCurrentUserDataMethod() async {
+  //   log("Called Get Current User");
+  //   try {
+  //     showLoadingDialog();
+  //     // SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     // final id = await prefs.getString('id');
+  //     final id = await getStringSharedPrefMethod(key: 'id');
+  //     if (id.isNotEmpty) {
+  //       log('id is Not null -> ${id}');
 
-        final url = getClientByIDUrl + id;
-        final response =
-            await apiService.get(url, true, showResult: true, successCode: 200);
-        hideLoadingDialog();
+  //       final url = getClientByIDUrl + id;
+  //       final response =
+  //           await apiService.get(url, true, showResult: true, successCode: 200);
+  //       hideLoadingDialog();
 
-        if (response != null) {
-          final user = response['user'];
-          UserModel userModel = UserModel.fromJson(user);
-          log('user name -> ${userModel.username}');
+  //       if (response != null) {
+  //         final user = response['user'];
+  //         UserModel userModel = UserModel.fromJson(user);
+  //         log('user name -> ${userModel.username}');
+  //         log('User Model -> ${userModel.toJson()}');
 
-          Get.to(() => ClientNavBar());
-        }
-      }
+  //         // Get.to(() => ClientNavBar());
+  //       }
+  //     }
 
-      hideLoadingDialog();
-    } catch (e) {
-      hideLoadingDialog();
-      log('Error:-> $e');
-    }
-  }
+  //     hideLoadingDialog();
+  //   } catch (e) {
+  //     hideLoadingDialog();
+  //     log('Error:-> $e');
+  //   }
+  // }
 
   // --- Logout ---
   Future<String> getStringSharedPrefMethod({required String key}) async {

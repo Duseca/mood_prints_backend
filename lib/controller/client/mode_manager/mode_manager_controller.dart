@@ -5,11 +5,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
+import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/model/board_model/board_model.dart';
 import 'package:mood_prints/model/mood_models/block_model.dart';
 import 'package:mood_prints/model/mood_models/feeling_model.dart';
 import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 
 class ModeManagerController extends GetxController {
   GetStorage storage = GetStorage();
@@ -28,11 +31,14 @@ class ModeManagerController extends GetxController {
   final selectedEmojiTextModel = Rxn<EmojiWithText>();
   TextEditingController todayNoteController = TextEditingController();
   RxList<String> todayPhotos = <String>[].obs;
+  List<String> downloadTodayPhotosUrl = <String>[];
   Rx<DateTime?> startSleepDuration = Rx<DateTime?>(null);
   Rx<DateTime?> endSleepDuration = Rx<DateTime?>(null);
   Rx<DateTime> datePicker = DateTime.now().obs;
   DateTime? dateTime;
   RxBool isStartingSleepRecordSelected = true.obs;
+  // list of patient images
+  // RxList<String> patientImages = <String>[].obs;
 
   // -------------------------------------------------------------------------
   /* 
@@ -50,18 +56,24 @@ class ModeManagerController extends GetxController {
           startSleepDuration.value != null) {
         showLoadingDialog();
 
+        uploadPhotosTOSorage();
+
         Sleep sleep = Sleep(
-            dozeOffTime: endSleepDuration.value.toString(),
-            wakeupTime: startSleepDuration.value.toString());
+            // dozeOffTime: endSleepDuration.value.toString(),
+            dozeOffTime: DateTimeService.instance
+                .formatTimeToAMPM(endSleepDuration.value),
+            wakeupTime: DateTimeService.instance
+                .formatTimeToAMPM(startSleepDuration.value));
+        // startSleepDuration.value.toString());
 
         BoardModel body = BoardModel(
-          note: todayNoteController.text.trim(),
-          stressLevel: selectedMood.value.stressLevel,
-          emotions: feelingListofText,
-          date: datePicker.value,
-          createdAt: datePicker.value,
-          sleep: sleep,
-        );
+            note: todayNoteController.text.trim(),
+            stressLevel: selectedMood.value.stressLevel,
+            emotions: feelingListofText,
+            date: datePicker.value,
+            createdAt: datePicker.value,
+            sleep: sleep,
+            photos: downloadTodayPhotosUrl);
 
         final response = await apiService.post(
             createBoardUrl, body.toJson(), false,
@@ -76,8 +88,11 @@ class ModeManagerController extends GetxController {
           if (status != null && status.isNotEmpty) {
             BoardModel boardModel = BoardModel.fromJson(data);
             log("Data After Board Created: ${boardModel.toString()}");
+
+            Get.find<ClientHomeController>().getAllBoard();
           }
         }
+        Get.close(1);
         clearBoardEntries();
       } else {
         displayToast(msg: 'Please fill data');
@@ -90,13 +105,35 @@ class ModeManagerController extends GetxController {
     }
   }
 
+  void uploadPhotosTOSorage() async {
+    log("---> Storage function called <---");
+    if (todayPhotos.isNotEmpty) {
+      for (int i = 0; todayPhotos.length > i; i++) {
+        final url = await FirebaseStorageService.instance.uploadImage(
+            imagePath: todayPhotos[i], storageFolderPath: 'client_Images');
+
+        // Download urls of uploaded photos and assign to the list
+        if (url != null) {
+          downloadTodayPhotosUrl.add(url);
+        }
+      }
+
+      log(" Today photos download urls from Storage -> ${downloadTodayPhotosUrl.length}");
+    }
+  }
+
   // ----- Clear create board data ------
+
   void clearBoardEntries() {
     todayNoteController.clear();
     startSleepDuration.value == null;
     endSleepDuration.value == null;
     selectedFeelingList.clear();
     feelingListofText.clear();
+    todayPhotos.clear();
+    downloadTodayPhotosUrl.clear();
+    datePicker.value = DateTime.now();
+    isStartingSleepRecordSelected.value = true;
   }
 
   // ------ Select multiple values -------
@@ -106,12 +143,13 @@ class ModeManagerController extends GetxController {
   ) {
     if (selectedFeelingList.contains(feelingItems[index])) {
       selectedFeelingList.remove(feelingItems[index]);
-      log("Removed: ${feelingItems[index].text}");
+      feelingListofText.remove(feelingItems[index].text);
+      // log("Removed: ${feelingItems[index].text}");
     } else {
       selectedFeelingList.add(feelingItems[index]);
       feelingListofText.add(feelingItems[index].text);
-      log("Added: ${feelingItems[index].text}");
-      log("feeling list of String: ${feelingListofText}");
+      // log("Added: ${feelingItems[index].text}");
+      // log("feeling list of String: ${feelingListofText}");
     }
 
     update();

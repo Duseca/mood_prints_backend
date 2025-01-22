@@ -12,6 +12,20 @@ class DateTimeService {
     return _instance!;
   }
 
+  // Month Year e.g ("January 2024")
+
+  String getMonthYearFormat(DateTime date) {
+    String month = DateFormat('MMMM').format(date);
+    String year = DateFormat('yyyy').format(date);
+    return '$month $year';
+  }
+
+  // Format date as "dd EEEE" (e.g., "16 Tue")
+
+  String formatDateWithDay(DateTime dateTime) {
+    return DateFormat('dd E').format(dateTime);
+  }
+
   // simple format date picker
   // 10 jan 2025
   String getSimpleUSDateFormat(DateTime date) {

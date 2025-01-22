@@ -35,6 +35,7 @@ class _ModeManagerState extends State<ModeManager> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    log('---- Dispose called -----');
     modeCtrl.clearBoardEntries();
   }
 
@@ -484,6 +485,8 @@ class _ModeManagerState extends State<ModeManager> {
                       () => (modeCtrl.todayPhotos.length <= 2)
                           ? InkWell(
                               onTap: () {
+                                // ------ Add Image into list ------
+
                                 log('work');
                                 modeCtrl.captureClientPhotos();
                               },
@@ -743,10 +746,7 @@ class _ModeManagerState extends State<ModeManager> {
                 buttonText: 'Save Changes',
                 onTap: () {
                   modeCtrl.createBoard();
-                  // Get.bottomSheet(
-                  //   EmojiCustomWidget(),
-                  //   isScrollControlled: true,
-                  // );
+                  // modeCtrl.uploadPhotosTOSorage();
                 },
               ),
             ),
@@ -773,6 +773,7 @@ class _Divider extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _DisplayTime extends StatelessWidget {
   String time;
   VoidCallback? onTap;

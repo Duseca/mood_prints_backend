@@ -118,6 +118,10 @@ class Assets {
   /// assets/images/bill_a.png
   static const String imagesBillA = "assets/images/bill_a.png";
 
+  /// Assets for imagesBinIcon
+  /// assets/images/bin_icon.png
+  static const String imagesBinIcon = "assets/images/bin_icon.png";
+
   /// Assets for imagesBlueCheck
   /// assets/images/blue_check.png
   static const String imagesBlueCheck = "assets/images/blue_check.png";
@@ -274,6 +278,10 @@ class Assets {
   /// assets/images/edit.png
   static const String imagesEdit = "assets/images/edit.png";
 
+  /// Assets for imagesEditIcon
+  /// assets/images/edit_icon.png
+  static const String imagesEditIcon = "assets/images/edit_icon.png";
+
   /// Assets for imagesEditRounded
   /// assets/images/edit_rounded.png
   static const String imagesEditRounded = "assets/images/edit_rounded.png";
@@ -345,6 +353,10 @@ class Assets {
   /// Assets for imagesGuidelines
   /// assets/images/guidelines.png
   static const String imagesGuidelines = "assets/images/guidelines.png";
+
+  /// Assets for imagesHalfMoon
+  /// assets/images/half_moon.png
+  static const String imagesHalfMoon = "assets/images/half_moon.png";
 
   /// Assets for imagesHappy
   /// assets/images/happy.png
@@ -637,6 +649,10 @@ class Assets {
   /// Assets for imagesShare
   /// assets/images/share.png
   static const String imagesShare = "assets/images/share.png";
+
+  /// Assets for imagesShareIcon
+  /// assets/images/share_icon.png
+  static const String imagesShareIcon = "assets/images/share_icon.png";
 
   /// Assets for imagesSlide
   /// assets/images/slide.png
