@@ -8,14 +8,17 @@ class CustomCard extends StatelessWidget {
   const CustomCard({
     super.key,
     required this.title,
-    required this.onEdit,
-    required this.onMore,
+    this.onEdit,
+    this.onMore,
     required this.child,
+    this.haveEditButton = true,
   });
+
   final String title;
   final Widget child;
-  final VoidCallback onEdit;
-  final VoidCallback onMore;
+  final VoidCallback? onEdit;
+  final VoidCallback? onMore;
+  final bool haveEditButton;
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +38,27 @@ class CustomCard extends StatelessWidget {
                       weight: FontWeight.w600,
                       paddingRight: 8,
                     ),
-                    GestureDetector(
-                      onTap: onEdit,
-                      child: Image.asset(
-                        Assets.imagesPencil,
-                        height: 20,
+                    Visibility(
+                      visible: haveEditButton,
+                      child: GestureDetector(
+                        onTap: onEdit,
+                        child: Image.asset(
+                          Assets.imagesPencil,
+                          height: 20,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: onMore,
-                child: Image.asset(
-                  Assets.imagesMoreHorizontal,
-                  height: 20,
+              Visibility(
+                visible: haveEditButton,
+                child: GestureDetector(
+                  onTap: onMore,
+                  child: Image.asset(
+                    Assets.imagesMoreHorizontal,
+                    height: 20,
+                  ),
                 ),
               ),
             ],

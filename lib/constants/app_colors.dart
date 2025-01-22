@@ -15,3 +15,15 @@ const kGreyColor3 = Color(0xffD8D8D8);
 const kLightGreyColor = Color(0xffECECEC);
 const kRedColor = Color(0xffFF0000);
 const kLightGreenColor = Color(0xffD7E9E5);
+
+// Mode Colors
+
+const kN4Color = Color(0xff9D2A32);
+const kN3Color = Color(0xffBB5644);
+const kN2Color = Color(0xffD07452);
+const kN1Color = Color(0xffF4A460);
+const k0Color = Color(0xffF5DEB3);
+const kP1Color = Color(0xffFFD700);
+const kP2Color = Color(0xff98FB98);
+const kP3Color = Color(0xffAFEEEE);
+const kP4Color = Color(0xff7EBED3);
