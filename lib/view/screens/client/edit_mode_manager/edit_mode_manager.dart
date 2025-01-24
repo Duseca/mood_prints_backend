@@ -9,8 +9,10 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
+import 'package:mood_prints/model/board_model/all_%20board.dart';
+import 'package:mood_prints/model/board_model/board_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
-import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
+import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
@@ -19,27 +21,25 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class ModeManager extends StatefulWidget {
-  const ModeManager({
-    super.key,
-  });
+class EditModeManager extends StatefulWidget {
+  BoardEntry model;
+
+  EditModeManager({super.key, required this.model});
 
   @override
-  State<ModeManager> createState() => _ModeManagerState();
+  State<EditModeManager> createState() => _EditModeManagerState();
 }
 
-class _ModeManagerState extends State<ModeManager> {
-  final modeCtrl = Get.find<ModeManagerController>();
+class _EditModeManagerState extends State<EditModeManager> {
+  final ctrl = Get.find<ModeManagerController>();
 
   @override
   void dispose() {
     super.dispose();
-    modeCtrl.clearBoardEntries();
+    ctrl.clearBoardEntries();
   }
 
   void showDatePickerOnTitleTap() {
-    log('work');
-
     Get.bottomSheet(
       isScrollControlled: true,
       CustomBottomSheet(
@@ -54,13 +54,13 @@ class _ModeManagerState extends State<ModeManager> {
                 children: [
                   DobPicker(
                     mode: CupertinoDatePickerMode.date,
-                    initialDateTime: modeCtrl.datePicker.value,
+                    initialDateTime: ctrl.datePicker.value,
                     onDateTimeChanged: (dateTime) {
-                      modeCtrl.dateTime = dateTime;
+                      ctrl.dateTime = dateTime;
                     },
                     onTap: () {
-                      if (modeCtrl.dateTime != null) {
-                        modeCtrl.datePicker.value = modeCtrl.dateTime!;
+                      if (ctrl.dateTime != null) {
+                        ctrl.datePicker.value = ctrl.dateTime!;
                       }
 
                       Get.back();
@@ -78,26 +78,20 @@ class _ModeManagerState extends State<ModeManager> {
 
   @override
   Widget build(BuildContext context) {
+    ctrl.datePicker.value = widget.model.date;
+    ctrl.stressIconHandler.value = 0;
+    ctrl.stressLevel = widget.model.stressLevel;
+    ctrl.todayNoteController.text = widget.model.note;
+    ctrl.todayPhotos.value = widget.model.photos!;
+    log("photo Length: ${ctrl.todayPhotos.length}");
+
     return Obx(
       () => Scaffold(
         appBar: simpleAppBar(
-            title:
-                '${DateTimeService.instance.getSimpleUSDateFormat(modeCtrl.datePicker.value)}',
-            onTitleTap: showDatePickerOnTitleTap,
-            actions: [
-              InkWell(
-                onTap: () {
-                  Get.to(() => CustomizeRecording());
-                },
-                child: Center(
-                  child: CommonImageView(
-                    height: 25,
-                    imagePath: Assets.imagesSettingIcon,
-                  ),
-                ),
-              ),
-              SizedBox(width: 20),
-            ]),
+          title:
+              '${DateTimeService.instance.getSimpleUSDateFormat(ctrl.datePicker.value)}',
+          onTitleTap: showDatePickerOnTitleTap,
+        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -135,15 +129,15 @@ class _ModeManagerState extends State<ModeManager> {
                                 children: [
                                   InkWell(
                                     onTap: () {
-                                      modeCtrl.selectedMood.value =
+                                      ctrl.selectedMood.value =
                                           modeIndicatorItems[index];
 
-                                      log('selected Model:=> ${modeCtrl.selectedMood.value.toMap().toString()} ');
+                                      log('selected Model:=> ${ctrl.selectedMood.value.toMap().toString()} ');
                                       // currentModeIndex = index;
                                       // log(currentModeIndex.toString());
                                     },
                                     child: Icon(
-                                      ((modeCtrl.selectedMood.value ==
+                                      ((ctrl.selectedMood.value ==
                                               modeIndicatorItems[index]))
                                           ? Icons.radio_button_on_rounded
                                           : Icons.circle,
@@ -172,13 +166,13 @@ class _ModeManagerState extends State<ModeManager> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(8)),
                               // color: modeIndicatorItems[currentModeIndex].color,
-                              color: modeCtrl.selectedMood.value.color,
+                              color: ctrl.selectedMood.value.color,
                             ),
                             child: Center(
                               child: MyText(
                                 text:
                                     // "${modeIndicatorItems[currentModeIndex].mode} Mode",
-                                    "${modeCtrl.selectedMood.value.mode} Mode",
+                                    "${ctrl.selectedMood.value.mode} Mode",
                                 size: 14,
                                 weight: FontWeight.w600,
                                 color: kWhiteColor,
@@ -219,13 +213,20 @@ class _ModeManagerState extends State<ModeManager> {
                           children: List.generate(
                             feelingItems.length,
                             (index) {
+                              ctrl.stressIconHandler.value =
+                                  feelingItems.indexWhere((item) =>
+                                      item.stressLevel == ctrl.stressLevel);
+
+                              // log("finding Index: ${stressLevelIndex}");
+
                               return Obx(
                                 () => InkWell(
                                   onTap: () {
-                                    modeCtrl.emotionSelector(index);
+                                    ctrl.emotionSelector(index);
+                                    // stressLevelIndex = index;
                                   },
                                   child: Image.asset(
-                                    (modeCtrl.stressIconHandler.value == index)
+                                    (ctrl.stressIconHandler.value == index)
                                         ? feelingItems[index]
                                             .iconA // Highlighted icon
                                         : feelingItems[index]
@@ -247,9 +248,9 @@ class _ModeManagerState extends State<ModeManager> {
                   // ------- Emotions --------
                   // ------- Active Widgets ----------
 
-                  (modeCtrl.activeWidgets.isNotEmpty)
+                  (ctrl.activeWidgets.isNotEmpty)
                       ? Column(
-                          children: List.generate(modeCtrl.activeWidgets.length,
+                          children: List.generate(ctrl.activeWidgets.length,
                               (headIndex) {
                             return GetBuilder<ModeManagerController>(
                               init: ModeManagerController(),
@@ -306,9 +307,6 @@ class _ModeManagerState extends State<ModeManager> {
                                                                       headIndex]
                                                                   .data[index];
 
-                                                          // ctrl.selectCustomItems(
-                                                          //     index);
-
                                                           log('Selected Emoji Model: ${ctrl.selectedEmojiTextModel.value?.toJson().toString()}');
                                                         },
                                                         child: Obx(
@@ -360,87 +358,6 @@ class _ModeManagerState extends State<ModeManager> {
                         )
                       : SizedBox.shrink(),
 
-                  // -------- Static Front-end Widget -------
-
-                  // _CustomCard(
-                  //   title: 'Emotions*',
-                  //   visiblity: haveEmotionsVisible,
-                  //   onMore: () {
-                  //     setState(() {});
-                  //     if (haveEmotionsVisible == true) {
-                  //       haveEmotionsVisible = false;
-                  //     } else {
-                  //       haveEmotionsVisible = true;
-                  //     }
-                  //   },
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.only(top: 16),
-                  //     child: Row(
-                  //       children: [
-                  //         Expanded(
-                  //           child: SizedBox(
-                  //             height: 62,
-                  //             child: ListView.separated(
-                  //               separatorBuilder: (context, index) {
-                  //                 return SizedBox(
-                  //                   width: 16,
-                  //                 );
-                  //               },
-                  //               shrinkWrap: true,
-                  //               padding: EdgeInsets.zero,
-                  //               physics: BouncingScrollPhysics(),
-                  //               scrollDirection: Axis.horizontal,
-                  //               itemCount: emotionsItems.length + 1,
-                  //               itemBuilder: (context, index) {
-                  //                 // ---------- Add more emojis button ------------
-
-                  //                 if (index == emotionsItems.length) {
-                  //                   return AddMoreEmojiButton(
-                  //                     onTap: () {},
-                  //                   );
-                  //                 } else {
-                  //                   // ---------- Emojis & Text ------------
-
-                  //                   return SizedBox(
-                  //                     height: Get.height,
-                  //                     // width: 44,
-                  //                     child: Column(
-                  //                       mainAxisAlignment:
-                  //                           MainAxisAlignment.spaceBetween,
-                  //                       children: [
-                  //                         Container(
-                  //                           height: 44,
-                  //                           width: 44,
-                  //                           decoration: BoxDecoration(
-                  //                             shape: BoxShape.circle,
-                  //                             color: kLightGreyColor,
-                  //                           ),
-                  //                           child: Center(
-                  //                             child: MyText(
-                  //                               text:
-                  //                                   '${emotionsItems[index]['emoji']}',
-                  //                               size: 24,
-                  //                             ),
-                  //                           ),
-                  //                         ),
-                  //                         MyText(
-                  //                           text:
-                  //                               '${emotionsItems[index]['text']}',
-                  //                           size: 12,
-                  //                         ),
-                  //                       ],
-                  //                     ),
-                  //                   );
-                  //                 }
-                  //               },
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-
                   SizedBox(
                     height: 12,
                   ),
@@ -455,7 +372,7 @@ class _ModeManagerState extends State<ModeManager> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16),
                       child: MyTextField2(
-                        controller: modeCtrl.todayNoteController,
+                        controller: ctrl.todayNoteController,
                         hintText: 'Write here...',
                         marginBottom: 0,
                       ),
@@ -471,13 +388,13 @@ class _ModeManagerState extends State<ModeManager> {
                     title: 'Today’s Photo',
                     visiblity: true,
                     traillingWidget: Obx(
-                      () => (modeCtrl.todayPhotos.length <= 2)
+                      () => (ctrl.todayPhotos.length <= 2)
                           ? InkWell(
                               onTap: () {
                                 // ------ Add Image into list ------
 
                                 log('work');
-                                modeCtrl.captureClientPhotos();
+                                ctrl.captureClientPhotos();
                               },
                               child: Image.asset(
                                 Assets.imagesAddIcon,
@@ -493,12 +410,11 @@ class _ModeManagerState extends State<ModeManager> {
                         SizedBox(
                           height: 16,
                         ),
-
                         Obx(
-                          () => (modeCtrl.todayPhotos.isNotEmpty)
+                          () => (ctrl.todayPhotos.isNotEmpty)
                               ? Column(
                                   children: List.generate(
-                                      modeCtrl.todayPhotos.length, (index) {
+                                      ctrl.todayPhotos.length, (index) {
                                   return Padding(
                                     padding: EdgeInsets.only(
                                         top: (index == 0) ? 0 : 8),
@@ -509,9 +425,8 @@ class _ModeManagerState extends State<ModeManager> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           image: DecorationImage(
-                                              image: FileImage(File(
-                                                  modeCtrl.todayPhotos[index])),
-                                              fit: BoxFit.cover)),
+                                              image: NetworkImage(
+                                                  ctrl.todayPhotos[index]))),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
@@ -520,9 +435,7 @@ class _ModeManagerState extends State<ModeManager> {
 
                                           InkWell(
                                             onTap: () {
-                                              modeCtrl
-                                                  .removeCaptureClientPhotos(
-                                                      index);
+                                              ctrl.todayPhotos.removeAt(index);
                                             },
                                             child: Container(
                                                 padding: EdgeInsets.all(5),
@@ -543,24 +456,7 @@ class _ModeManagerState extends State<ModeManager> {
                                         ],
                                       ),
                                     ),
-                                    // CommonImageView(
-                                    //   file: ,
-                                    //   height: 200,
-                                    //   width: Get.width,
-                                    //   radius: 12,
-                                    //   fit: BoxFit.cover,
-                                    // ),
                                   );
-
-                                  // (index == 0)
-                                  //     ?
-                                  //     : CommonImageView(
-                                  //         file: File(modeCtrl.todayPhotos[index]),
-                                  //         height: 100,
-                                  //         width: Get.width,
-                                  //         radius: 12,
-                                  //         fit: BoxFit.cover,
-                                  //       );
                                 }))
                               : CommonImageView(
                                   imagePath: Assets.imagesImagePlaceHolder2,
@@ -569,12 +465,6 @@ class _ModeManagerState extends State<ModeManager> {
                                   fit: BoxFit.cover,
                                 ),
                         )
-                        // : CommonImageView(
-                        //     imagePath: Assets.imagesImagePlaceHolder2,
-                        //     height: 300,
-                        //     radius: 12,
-                        //     fit: BoxFit.cover,
-                        //   ),
                       ],
                     ),
                   ),
@@ -655,50 +545,47 @@ class _ModeManagerState extends State<ModeManager> {
                                           child: Row(
                                             children: [
                                               DisplayTime(
-                                                width: (modeCtrl
+                                                width: (ctrl
                                                         .isStartingSleepRecordSelected
                                                         .value)
                                                     ? 2
                                                     : 0.5,
-                                                borderColor: (modeCtrl
+                                                borderColor: (ctrl
                                                         .isStartingSleepRecordSelected
                                                         .value)
                                                     ? kSecondaryColor
                                                     : kGreyColor2,
-                                                time: (modeCtrl
-                                                            .startSleepDuration
+                                                time: (ctrl.startSleepDuration
                                                             .value !=
                                                         null)
-                                                    ? "${DateTimeService.instance.formatTimeToAMPM(modeCtrl.startSleepDuration.value)}"
+                                                    ? "${DateTimeService.instance.formatTimeToAMPM(ctrl.startSleepDuration.value)}"
                                                     : '-',
                                                 onTap: () {
-                                                  modeCtrl
-                                                      .isStartingSleepRecordSelected
+                                                  ctrl.isStartingSleepRecordSelected
                                                       .value = true;
                                                 },
                                               ),
                                               _Divider(),
                                               DisplayTime(
-                                                width: (modeCtrl
-                                                            .isStartingSleepRecordSelected
-                                                            .value ==
-                                                        false)
-                                                    ? 2
-                                                    : 0.5,
-                                                borderColor: (modeCtrl
-                                                            .isStartingSleepRecordSelected
-                                                            .value ==
-                                                        false)
-                                                    ? kSecondaryColor
-                                                    : kGreyColor2,
-                                                time: (modeCtrl.endSleepDuration
+                                                width:
+                                                    (ctrl.isStartingSleepRecordSelected
+                                                                .value ==
+                                                            false)
+                                                        ? 2
+                                                        : 0.5,
+                                                borderColor:
+                                                    (ctrl.isStartingSleepRecordSelected
+                                                                .value ==
+                                                            false)
+                                                        ? kSecondaryColor
+                                                        : kGreyColor2,
+                                                time: (ctrl.endSleepDuration
                                                             .value !=
                                                         null)
-                                                    ? "${DateTimeService.instance.formatTimeToAMPM(modeCtrl.endSleepDuration.value)}"
+                                                    ? "${DateTimeService.instance.formatTimeToAMPM(ctrl.endSleepDuration.value)}"
                                                     : '-',
                                                 onTap: () {
-                                                  modeCtrl
-                                                      .isStartingSleepRecordSelected
+                                                  ctrl.isStartingSleepRecordSelected
                                                       .value = false;
                                                 },
                                               ),
@@ -707,23 +594,22 @@ class _ModeManagerState extends State<ModeManager> {
                                         ),
                                         DobPicker(
                                           mode: CupertinoDatePickerMode.time,
-                                          initialDateTime: (modeCtrl
+                                          initialDateTime: (ctrl
                                                   .isStartingSleepRecordSelected
                                                   .value)
-                                              ? modeCtrl
-                                                  .startSleepDuration.value
-                                              : modeCtrl.endSleepDuration.value,
+                                              ? ctrl.startSleepDuration.value
+                                              : ctrl.endSleepDuration.value,
                                           onDateTimeChanged: (dateTime) {
-                                            if (modeCtrl
+                                            if (ctrl
                                                 .isStartingSleepRecordSelected
                                                 .value) {
-                                              modeCtrl.startSleepDuration
-                                                  .value = dateTime;
-                                              log("Starting Duration: ${modeCtrl.startSleepDuration.value}");
-                                            } else {
-                                              modeCtrl.endSleepDuration.value =
+                                              ctrl.startSleepDuration.value =
                                                   dateTime;
-                                              log("End Duration: ${modeCtrl.endSleepDuration.value}");
+                                              log("Starting Duration: ${ctrl.startSleepDuration.value}");
+                                            } else {
+                                              ctrl.endSleepDuration.value =
+                                                  dateTime;
+                                              log("End Duration: ${ctrl.endSleepDuration.value}");
                                             }
                                           },
                                           onTap: () {
@@ -754,10 +640,9 @@ class _ModeManagerState extends State<ModeManager> {
             Padding(
               padding: AppSizes.DEFAULT,
               child: MyButton(
-                buttonText: 'Save Changes',
+                buttonText: 'Update Changes',
                 onTap: () {
-                  modeCtrl.createBoard();
-                  // modeCtrl.uploadPhotosTOSorage();
+                  // modeCtrl.createBoard();
                 },
               ),
             ),
@@ -780,43 +665,6 @@ class _Divider extends StatelessWidget {
       color: kTertiaryColor,
       height: 1,
       width: 10,
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class DisplayTime extends StatelessWidget {
-  String time;
-  VoidCallback? onTap;
-  Color borderColor;
-  double width;
-  DisplayTime(
-      {super.key,
-      this.time = '-',
-      this.onTap,
-      this.borderColor = kGreyColor2,
-      this.width = 0.5});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          height: 47,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(width: width, color: borderColor)),
-          child: Center(
-            child: MyText(
-              text: '$time',
-              size: 14,
-              weight: FontWeight.w400,
-              color: kTertiaryColor,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

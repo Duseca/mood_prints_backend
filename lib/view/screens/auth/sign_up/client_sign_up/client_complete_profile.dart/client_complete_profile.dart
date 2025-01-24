@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
@@ -52,12 +54,54 @@ class ClientCompleteProfile extends StatelessWidget {
                 Center(
                   child: Stack(
                     children: [
-                      CommonImageView(
-                        height: 128,
-                        width: 128,
-                        radius: 100.0,
-                        url: dummyImg,
+                      // Obx(() => InkWell(
+                      //       onTap: () async {
+                      //         await ctrl.profileImagePicker();
+                      //       },
+                      //       child:
+
+                      //     )),
+
+                      // InkWell(onTap: () {
+                      //   ctrl.profileImagePicker();
+                      // }, child: Obx(() {
+                      //   return (ctrl.selectedProfileImage.value != null)
+                      //       ? CommonImageView(
+                      //           height: 128,
+                      //           width: 128,
+                      //           radius: 100.0,
+                      //           file: File(ctrl.selectedProfileImage.value!),
+                      //         )
+                      //       : CommonImageView(
+                      //           height: 128,
+                      //           width: 128,
+                      //           radius: 100.0,
+                      //           url: dummyImg,
+                      //         );
+                      // })),
+
+                      InkWell(
+                        onTap: () async {
+                          await ctrl.profileImagePicker();
+                        },
+                        child: Obx(() {
+                          return (ctrl.selectedProfileImage.value != null &&
+                                  ctrl.selectedProfileImage.value!.isNotEmpty)
+                              ? CommonImageView(
+                                  height: 128,
+                                  width: 128,
+                                  radius: 100.0,
+                                  file: File(ctrl.selectedProfileImage.value!),
+                                )
+                              : CommonImageView(
+                                  height: 128,
+                                  width: 128,
+                                  radius: 100.0,
+                                  url: dummyImg,
+                                );
+                        }),
                       ),
+
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -141,6 +185,9 @@ class ClientCompleteProfile extends StatelessWidget {
                                 ctrl.dob.value = dateTime;
 
                                 log("date: ${ctrl.dob.value}");
+                              },
+                              onTap: () {
+                                Get.back();
                               },
                             ),
                           ),

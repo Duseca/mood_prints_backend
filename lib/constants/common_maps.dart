@@ -56,46 +56,55 @@ List<FeelingModel> feelingItems = [
   FeelingModel(
     iconB: Assets.imagesExtremeCrying,
     iconA: Assets.imagesExtremeCryingA,
+    stressLevel: -4,
     text: 'extreme_crying',
   ),
   FeelingModel(
     iconB: Assets.imagesLittleCrying,
     iconA: Assets.imagesLittleCryingA,
+    stressLevel: -3,
     text: 'little_crying',
   ),
   FeelingModel(
     iconB: Assets.imagesSad,
     iconA: Assets.imagesSadA,
+    stressLevel: -2,
     text: 'sad',
   ),
   FeelingModel(
     iconB: Assets.imagesSad1,
     iconA: Assets.imagesSad1A,
+    stressLevel: -1,
     text: 'sad_1',
   ),
   FeelingModel(
     iconB: Assets.imagesLittleSad,
     iconA: Assets.imagesLittleSadA,
+    stressLevel: 0,
     text: 'little_sad',
   ),
   FeelingModel(
     iconB: Assets.imagesHappy,
     iconA: Assets.imagesHappyA,
+    stressLevel: 1,
     text: 'happy',
   ),
   FeelingModel(
     iconB: Assets.imagesSmile,
     iconA: Assets.imagesSmileA,
+    stressLevel: 2,
     text: 'smile',
   ),
   FeelingModel(
     iconB: Assets.imagesLittleSmiling,
     iconA: Assets.imagesLittleSmilingA,
+    stressLevel: 3,
     text: 'little_smiling',
   ),
   FeelingModel(
     iconB: Assets.imagesLaughing,
     iconA: Assets.imagesLaughingA,
+    stressLevel: 4,
     text: 'laughing',
   ),
 ];

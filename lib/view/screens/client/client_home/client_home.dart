@@ -7,11 +7,12 @@ import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
+import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/view/screens/client/edit_mode_manager/edit_mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
-import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -64,34 +65,27 @@ class _ClientHomeState extends State<ClientHome> {
                       List.generate(homeCtrl.allBoardsData.length, (headIndex) {
                     final model = homeCtrl.allBoardsData[headIndex];
 
+                    // Loop for getting emotion icon
+
+                    int? _iconIndex;
+                    for (int i = 0; i < feelingItems.length; i++) {
+                      if (model.stressLevel == feelingItems[i].stressLevel) {
+                        _iconIndex = i;
+                        break;
+                      }
+                    }
                     return DetailCard(
-                      emotionWidget: Column(
-                        children: List.generate(
-                            homeCtrl.allBoardsData[headIndex].emotions.length,
-                            (index) {
-                          // var containsAny = model.emotions.any((searchValue) =>
-                          //     feelingItems
-                          //         .any((map) => map.text == searchValue));
-
-                          // log('Map list contains any value from search list: $containsAny');
-                          return Padding(
-                              padding: EdgeInsets.only(bottom: 10),
-                              child: MyText(
-                                text:
-                                    '${homeCtrl.allBoardsData[headIndex].emotions[index]}',
-                              )
-
-                              // model.emotions.any((searchValue) =>
-                              //         feelingItems
-                              //             .any((map) => map.text == searchValue))
-                              //     ? CommonImageView(
-                              //         height: 44,
-                              //         width: 44,
-                              //         imagePath: feelingItems[index].iconA)
-                              //     : SizedBox.shrink(),
-                              );
-                        }),
-                      ),
+                      emotionWidget: Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: (_iconIndex != null)
+                              ? CommonImageView(
+                                  height: 44,
+                                  width: 44,
+                                  imagePath: feelingItems[_iconIndex].iconA)
+                              : CommonImageView(
+                                  height: 44,
+                                  width: 44,
+                                  imagePath: feelingItems[0].iconA)),
                       imageList: (model.photos != null) ? model.photos! : [],
                       headIndex: headIndex,
                       note: model.note,
@@ -103,7 +97,9 @@ class _ClientHomeState extends State<ClientHome> {
                         log('Board ID: ${model.id}');
                         homeCtrl.deleteBoard(model.id);
                       },
-                      onEditTap: () {},
+                      onEditTap: () {
+                        Get.to(() => EditModeManager(model: model));
+                      },
                     );
                   }),
                 ),
@@ -113,13 +109,18 @@ class _ClientHomeState extends State<ClientHome> {
                 height: 100,
               ),
 
-              MyButton(
-                buttonText: 'Hit',
-                onTap: () {
-                  homeCtrl.getModeWeeklyStats();
-                  // Get.find<ClientHomeController>().getAllBoard();
-                },
-              ),
+              // MyButton(
+              //   buttonText: 'Hit',
+              //   onTap: () {
+              //     homeCtrl.calledStats();
+              //     // homeCtrl.getEmotionStats();
+              //     // homeCtrl.getModeWeeklyStats();
+              //     // homeCtrl.getSleepWeeklyStats();
+              //     //homeCtrl.getSleepWeeklyStats();
+              //     // homeCtrl.getModeWeeklyStats();
+              //     // Get.find<ClientHomeController>().getAllBoard();
+              //   },
+              // ),
               SizedBox(height: 200),
             ],
           ),
@@ -260,8 +261,6 @@ class _ClientHomeState extends State<ClientHome> {
 
 // ignore: must_be_immutable
 class DetailCard extends StatelessWidget {
-  // final List<String> emotionIcons;
-  // final List<FeelingModel> emotionIcons;
   final List<String> imageList;
   final String? note;
   final int headIndex;
@@ -271,10 +270,10 @@ class DetailCard extends StatelessWidget {
   final VoidCallback onDeleteTap;
   final VoidCallback onEditTap;
   final Widget emotionWidget;
+  // final int stressLevel;
 
   DetailCard({
     this.note,
-    // required this.emotionIcons,
     required this.imageList,
     required this.headIndex,
     required this.bedTime,
@@ -283,21 +282,17 @@ class DetailCard extends StatelessWidget {
     required this.onDeleteTap,
     required this.onEditTap,
     required this.emotionWidget,
+    // required this.stressLevel,
   });
 
   List<String> icons = [
-    Assets.imagesShareIcon,
+    // Assets.imagesShareIcon,
     Assets.imagesEditIcon,
     Assets.imagesBinIcon,
   ];
 
   @override
   Widget build(BuildContext context) {
-    // for (int i = 0; i < emotionIcons.length; i++) {
-    // log("Emotion Icons:   ${emotionIcons.toString()}");
-    // }
-    // log("Emotion Icons:   ${emotionIcons}");
-    // DateTime bedTimeLocal = DateTime(year);
     return Padding(
       padding: EdgeInsets.only(top: 24),
       child: Column(
@@ -306,13 +301,13 @@ class DetailCard extends StatelessWidget {
           Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: List.generate(
-                  3,
+                  2,
                   (index) => Padding(
                         padding: EdgeInsets.only(left: 30),
                         child: InkWell(
                           child: CommonImageView(
                               imagePath: icons[index], height: 20),
-                          onTap: (index == 2) ? onDeleteTap : onEditTap,
+                          onTap: (index == 1) ? onDeleteTap : onEditTap,
                         ),
                       ))),
           Container(
@@ -327,21 +322,14 @@ class DetailCard extends StatelessWidget {
                     Container(
                       child: emotionWidget,
                     ),
-                    // ...List.generate(
-                    //   emotionIcons.length,
-                    //   (index) => Padding(
-                    //     padding: EdgeInsets.only(bottom: 10),
-                    //     child: (emotionIcons.isNotEmpty &&
-                    //             emotionIcons.contains(feelingItems[index]
-                    //                 .text
-                    //                 .trim()
-                    //                 .toLowerCase()))
-                    //         ? CommonImageView(
-                    //             height: 44,
-                    //             width: 44,
-                    //             imagePath: feelingItems[index].iconA)
-                    //         : SizedBox.shrink(),
-                    //   ),
+                    // Padding(
+                    //   padding: EdgeInsets.only(bottom: 10),
+                    //   child: (feelingItems.contains(stressLevel))
+                    //       ? CommonImageView(
+                    //           height: 44,
+                    //           width: 44,
+                    //           imagePath: feelingItems[stressLevel].iconA)
+                    //       : SizedBox.shrink(),
                     // ),
                     MyText(
                       text:

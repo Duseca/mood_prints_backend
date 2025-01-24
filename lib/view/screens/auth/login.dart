@@ -84,6 +84,7 @@ class Login extends StatelessWidget {
               ctrl.loginMethod(
                   email: ctrl.emailController.text.trim(),
                   password: ctrl.passwordController.text.trim());
+
               // Get.to(() => TherapistNavBar());
             },
             buttonText: 'Login',

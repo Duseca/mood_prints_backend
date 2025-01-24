@@ -29,6 +29,13 @@ class _ClientNavBarState extends State<ClientNavBar> {
   //   // log("id --->: ${pref.getString('id')}");
   // }
 
+  final List<Widget> _screens = [
+    ClientHome(),
+    ClientStats(),
+    ChatHead(),
+    ClientProfile(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     // v();
@@ -53,13 +60,6 @@ class _ClientNavBarState extends State<ClientNavBar> {
         'iconA': Assets.imagesProfileA,
         'label': 'Profile',
       },
-    ];
-
-    final List<Widget> _screens = [
-      ClientHome(),
-      ClientStats(),
-      ChatHead(),
-      ClientProfile(),
     ];
 
     return Scaffold(

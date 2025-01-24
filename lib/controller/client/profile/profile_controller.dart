@@ -18,26 +18,21 @@ class ProfileController extends GetxController {
   TextEditingController bioController = TextEditingController();
   RxString selectedGenderValue = 'Male'.obs;
   RxList<String> genderList = <String>['Male', 'Female'].obs;
-  Rx<String?> selectedProfileImage = Rx<String?>(null);
+  var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
   Rx<DateTime?> dob = Rx<DateTime?>(null);
 
   // Image Picker
 
   void profileImagePicker() async {
-    ImagePickerService().pickMedia(isImage: true, fromGallery: true);
-    String activeImage = await ImagePickerService().activeMedia.value;
+    await ImagePickerService().pickMedia(isImage: true, fromGallery: true);
+    String activeImage = ImagePickerService().activeMedia.value;
     if (activeImage.isNotEmpty) {
       selectedProfileImage.value = activeImage;
       log('Selected Profile Image:-> ${selectedProfileImage.value}');
     }
     // log('Active Image Path:-> $activeImage');
   }
-
-  // Upload Image to Firebase Storage
-  // Future<void> uploadProfileImageToStorage() async {
-
-  // }
 
   // Update user profile information
   Future<void> updateUserProfile(

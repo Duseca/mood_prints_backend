@@ -5,8 +5,11 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
+import 'package:mood_prints/main.dart';
 import 'package:mood_prints/model/user_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
+import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
@@ -28,6 +31,9 @@ class AuthController extends GetxController {
   final TextEditingController BioController = TextEditingController();
   final TextEditingController TherapistAccountNumberController =
       TextEditingController();
+  // Rx<String?> selectedProfileImage = Rx<String?>(null);
+  var selectedProfileImage = Rxn<String>();
+  String? downloadImageUrl;
 
   //  --- Login Method ---
 
@@ -86,6 +92,7 @@ class AuthController extends GetxController {
         'password': password,
         'userType': userType,
         'fullName': fullName,
+        'authProvider': 'email'
       };
       final response = await apiService.post(signUpUrl, body, true,
           showResult: true, successCode: 201);
@@ -163,7 +170,17 @@ class AuthController extends GetxController {
     }
   }
 
-  // // --- Profile Completion ---
+  // // ------ Profile Completion ---------
+
+  Future<void> profileImagePicker() async {
+    await ImagePickerService().pickMedia(isImage: true, fromGallery: true);
+    String activeImage = ImagePickerService().activeMedia.value;
+
+    if (activeImage.isNotEmpty) {
+      selectedProfileImage.value = activeImage;
+      log('Selected Profile Image:-> ${selectedProfileImage.value}');
+    }
+  }
 
   Future<void> profileCompletionMethod() async {
     try {
@@ -175,13 +192,19 @@ class AuthController extends GetxController {
 
         showLoadingDialog();
 
+        if (selectedProfileImage.value != null) {
+          downloadImageUrl = await FirebaseStorageService.instance.uploadImage(
+              imagePath: selectedProfileImage.value!,
+              storageFolderPath: 'profile_images');
+        }
+
         UserModel model = UserModel(
-          fullName: fullNameController.text.trim(),
-          phoneNumber: FullPhoneNumber,
-          dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-          gender: selectedGenderValue.value.toLowerCase(),
-          bio: BioController.text,
-        );
+            fullName: fullNameController.text.trim(),
+            phoneNumber: FullPhoneNumber,
+            dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+            gender: selectedGenderValue.value.toLowerCase(),
+            bio: BioController.text,
+            image: (downloadImageUrl != null) ? downloadImageUrl : dummyImg);
 
         final updateTherapistURL = updateClientUrl + newUserTempId.toString();
 

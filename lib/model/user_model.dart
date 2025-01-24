@@ -12,6 +12,7 @@ class UserModel {
   String? dob; // Change to String
   String? phoneNumber;
   String? gender;
+  String? authProvider;
 
   UserModel({
     this.stripeCustomerId,
@@ -27,6 +28,7 @@ class UserModel {
     this.dob,
     this.phoneNumber,
     this.gender,
+    this.authProvider,
   });
 
   // Factory method to create a UserModel from a JSON map
@@ -35,6 +37,7 @@ class UserModel {
       stripeCustomerId: json['stripeCustomerId'],
       id: json['_id'],
       email: json['email'],
+      authProvider: json['authProvider'],
       userType: json['userType'],
       fullName: json['fullName'],
       username: json['username'],
@@ -66,6 +69,7 @@ class UserModel {
       'dob': dob, // Keep as String
       'phoneNumber': phoneNumber,
       'gender': gender,
+      'authProvider': authProvider ?? 'email',
     };
   }
 }

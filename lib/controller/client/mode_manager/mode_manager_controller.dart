@@ -9,7 +9,6 @@ import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/model/board_model/board_model.dart';
 import 'package:mood_prints/model/mood_models/block_model.dart';
-import 'package:mood_prints/model/mood_models/feeling_model.dart';
 import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
@@ -21,12 +20,9 @@ class ModeManagerController extends GetxController {
   RxList<BlockModel> hiddenWidgets = <BlockModel>[].obs;
   RxString selectedEmoji = ''.obs;
   Map<int, bool> visibilityDisplayCustomCards = {};
-  // Values selector
   Rx<MoodModel> selectedMood = modeIndicatorItems.first.obs;
-  // Feeling
-  // Rx<FeelingModel> selectedFeelingModel = feelingItems.first.obs;
-  RxList<FeelingModel> selectedFeelingList = <FeelingModel>[].obs;
-  List<String> feelingListofText = [];
+  Rx<int?> stressIconHandler = Rx<int?>(null);
+  int? stressLevel;
 
   final selectedEmojiTextModel = Rxn<EmojiWithText>();
   TextEditingController todayNoteController = TextEditingController();
@@ -37,8 +33,6 @@ class ModeManagerController extends GetxController {
   Rx<DateTime> datePicker = DateTime.now().obs;
   DateTime? dateTime;
   RxBool isStartingSleepRecordSelected = true.obs;
-  // list of patient images
-  // RxList<String> patientImages = <String>[].obs;
 
   // -------------------------------------------------------------------------
   /* 
@@ -47,16 +41,15 @@ class ModeManagerController extends GetxController {
 
   void createBoard() async {
     log("Try Called Create Board");
-    // log("Email ${email}");
-    // log("Password ${password}");
     try {
       if (todayNoteController.text.isNotEmpty &&
-          selectedFeelingList.isNotEmpty &&
+          // selectedFeelingList.isNotEmpty &&
+          stressLevel != null &&
           endSleepDuration.value != null &&
           startSleepDuration.value != null) {
         showLoadingDialog();
 
-        uploadPhotosTOSorage();
+        await uploadPhotosTOSorage();
 
         Sleep sleep = Sleep(
             // dozeOffTime: endSleepDuration.value.toString(),
@@ -68,8 +61,9 @@ class ModeManagerController extends GetxController {
 
         BoardModel body = BoardModel(
             note: todayNoteController.text.trim(),
-            stressLevel: selectedMood.value.stressLevel,
-            emotions: feelingListofText,
+            stressLevel: stressLevel,
+            // selectedMood.value.stressLevel,
+            // emotions: feelingListofText,
             date: datePicker.value,
             createdAt: datePicker.value,
             sleep: sleep,
@@ -105,7 +99,7 @@ class ModeManagerController extends GetxController {
     }
   }
 
-  void uploadPhotosTOSorage() async {
+  Future<void> uploadPhotosTOSorage() async {
     log("---> Storage function called <---");
     if (todayPhotos.isNotEmpty) {
       for (int i = 0; todayPhotos.length > i; i++) {
@@ -128,31 +122,22 @@ class ModeManagerController extends GetxController {
     todayNoteController.clear();
     startSleepDuration.value == null;
     endSleepDuration.value == null;
-    selectedFeelingList.clear();
-    feelingListofText.clear();
+    stressIconHandler.value == null;
+    stressLevel == null;
     todayPhotos.clear();
     downloadTodayPhotosUrl.clear();
     datePicker.value = DateTime.now();
     isStartingSleepRecordSelected.value = true;
   }
 
-  // ------ Select multiple values -------
+  // ------ Emotion Selector -------
 
-  void selectMultiplesValuesOfFeeling(
+  void emotionSelector(
     index,
   ) {
-    if (selectedFeelingList.contains(feelingItems[index])) {
-      selectedFeelingList.remove(feelingItems[index]);
-      feelingListofText.remove(feelingItems[index].text);
-      // log("Removed: ${feelingItems[index].text}");
-    } else {
-      selectedFeelingList.add(feelingItems[index]);
-      feelingListofText.add(feelingItems[index].text);
-      // log("Added: ${feelingItems[index].text}");
-      // log("feeling list of String: ${feelingListofText}");
-    }
-
-    update();
+    stressIconHandler.value = index;
+    stressLevel = feelingItems[index].stressLevel;
+    log("Stress Level: ${stressLevel}");
   }
 
   // -------------------------------------------------------------------------
