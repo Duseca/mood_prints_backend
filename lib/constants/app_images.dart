@@ -594,6 +594,10 @@ class Assets {
   /// assets/images/profile_icon.png
   static const String imagesProfileIcon = "assets/images/profile_icon.png";
 
+  /// Assets for imagesProfileImageUser
+  /// assets/images/profile_image_user.jpg
+  static const String imagesProfileImageUser = "assets/images/profile_image_user.jpg";
+
   /// Assets for imagesRemove
   /// assets/images/remove.png
   static const String imagesRemove = "assets/images/remove.png";

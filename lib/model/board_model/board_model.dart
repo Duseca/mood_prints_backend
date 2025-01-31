@@ -1,8 +1,9 @@
 class BoardModel {
   final String? userId;
   final DateTime? date;
+  final int? mood;
   final int? stressLevel;
-  final List<String>? emotions;
+  // final List<String>? emotions;
   final String? note;
   final List<String>? photos;
   final Sleep? sleep;
@@ -15,8 +16,9 @@ class BoardModel {
   BoardModel({
     this.userId,
     this.date,
+    this.mood,
     this.stressLevel,
-    this.emotions,
+    // this.emotions,
     this.note,
     this.photos,
     this.sleep,
@@ -31,9 +33,10 @@ class BoardModel {
     return BoardModel(
       userId: json['userId'],
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
+      mood: json['mood'],
       stressLevel: json['stressLevel'],
-      emotions:
-          json['emotions'] != null ? List<String>.from(json['emotions']) : null,
+      // emotions:
+      //     json['emotions'] != null ? List<String>.from(json['emotions']) : null,
       note: json['note'],
       photos: json['photos'] != null ? List<String>.from(json['photos']) : null,
       sleep: json['sleep'] != null ? Sleep.fromJson(json['sleep']) : null,
@@ -55,8 +58,9 @@ class BoardModel {
     return {
       'userId': userId,
       'date': date?.toIso8601String(),
+      'mood': mood,
       'stressLevel': stressLevel,
-      'emotions': emotions,
+      // 'emotions': emotions,
       'note': note,
       'photos': photos,
       'sleep': sleep?.toJson(),

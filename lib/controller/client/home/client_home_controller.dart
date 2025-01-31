@@ -4,17 +4,25 @@ import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/model/board_model/all_%20board.dart';
-import 'package:mood_prints/model/mode_stats_model.dart';
+import 'package:mood_prints/model/stats/mode_flow_stats_model.dart';
 import 'package:mood_prints/model/stats/emotion_stats_model.dart';
-import 'package:mood_prints/model/stats/sleep_model.dart';
+import 'package:mood_prints/model/stats/mood_by_sleep.dart';
+import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
 
 class ClientHomeController extends GetxController {
   var allBoardsData = <BoardEntry>[].obs;
   var allboardDates = <DateTime>[].obs;
-  List<DateWiseStressStats>? moodFlowStats = <DateWiseStressStats>[];
-  List<DateWiseSleepStats>? sleepStats = <DateWiseSleepStats>[];
+  List<MoodFlowModel>? moodFlowStats = <MoodFlowModel>[];
+  Rx<SleepAnalysisModel?> sleepAnalysisModel = Rx<SleepAnalysisModel?>(null);
+
+  // List<SleepAnalysisModel>? sleepStats = <SleepAnalysisModel>[];
+  RxList<SleepData> sleepStats = <SleepData>[].obs;
+  RxList<MoodSleepStats> moodBySleepStats = <MoodSleepStats>[].obs;
+
   List<StressLevelPercentage>? emotionPercentageStats =
       <StressLevelPercentage>[];
+  RxInt weekIndex = 1.obs;
+  RxInt weekFrontUpdate = 0.obs;
 
   // ------- Get All Boards ------------
 
@@ -103,64 +111,70 @@ class ClientHomeController extends GetxController {
 
   // ------- Stats Functions --------
 
-  Future<void> getModeWeeklyStats() async {
+  Future<void> getModeFlowWeeklyStats() async {
     moodFlowStats?.clear();
     // showLoadingDialog();
 
+    log("Mode Flow Stats Hit ------------------------");
+
     final response = await apiService.get(
-        buildModeStatsUrl(week: 1, year: 2025), false,
+        buildMoodFlowStatsUrl(week: weekIndex.value, year: 2025), false,
         showResult: false, successCode: 200);
 
     if (response != null) {
-      final report = response['report'];
+      final List<dynamic>? data = response['data'];
 
-      if (report != null && report.isNotEmpty) {
-        ModeStatsModel model = ModeStatsModel.fromJson(report);
+      if (data != null && data.isNotEmpty) {
+        List<MoodFlowModel> moodList =
+            data.map((item) => MoodFlowModel.fromJson(item)).toList();
+        moodFlowStats?.addAll(moodList);
 
-        if (model.dateWiseStressStats != null) {
-          moodFlowStats?.addAll(model.dateWiseStressStats!.toList());
-
-          log("Report length:-> ${moodFlowStats?.length}");
-        }
-        log("Mode - Stats - Model :-> ${report['dateWiseStressStats']}");
+        log("Report length:-> ${moodFlowStats?.length}");
+        log("Mode - Stats - Model :-> ${moodList.map((e) => e.toJson()).toList()}");
       }
     }
     // hideLoadingDialog();
   }
 
+////////////////////////////////
+////////////////////////////////
+////////////////////////////////
+////////////////////////////////
+////////////////////////////////
+////////////////////////////////
+////////////////////////////////
+  ///
   Future<void> getSleepWeeklyStats() async {
-    sleepStats?.clear();
-    // showLoadingDialog();
+    sleepStats.clear();
 
     final response = await apiService.get(
-        buildSleepStatsUrl(week: 1, year: 2025), false,
-        showResult: false, successCode: 200);
+      buildSleepAnalysisStatsUrl(week: weekIndex.value, year: 2025),
+      false,
+      showResult: false,
+      successCode: 200,
+    );
 
     if (response != null) {
       final report = response['report'];
-
-      if (report != null && report.isNotEmpty) {
-        SleepModel model = SleepModel.fromJson(report);
-
-        if (model.dateWiseSleepStats.isNotEmpty ||
-            model.dateWiseSleepStats != null) {
-          sleepStats?.addAll(model.dateWiseSleepStats.toList());
-          log("Sleep Report length:-> ${model.dateWiseSleepStats.length}");
+      if (report != null) {
+        SleepAnalysisModel model = SleepAnalysisModel.fromJson(report);
+        sleepAnalysisModel.value = model;
+        if (model.dateWiseSleepStats != null &&
+            model.dateWiseSleepStats!.isNotEmpty) {
+          sleepStats.addAll(model.dateWiseSleepStats!);
+          log("Sleep Report length:-> ${sleepStats.length}");
         }
-        // log("Sleep - Stats - Model :-> ${model.dateWiseSleepStats}");
       }
     }
-    // hideLoadingDialog();
   }
 
   //---------- Emotion Stats -----------
 
   Future<void> getEmotionStats() async {
     emotionPercentageStats?.clear();
-    // showLoadingDialog();
 
     final response = await apiService.get(
-        buildMoodBarStatsUrl(week: 1, year: 2025), false,
+        buildMoodBarStatsUrl(week: weekIndex.value, year: 2025), false,
         showResult: false, successCode: 200);
 
     if (response != null) {
@@ -173,23 +187,47 @@ class ClientHomeController extends GetxController {
               ?.addAll(model.stressLevelPercentages!.toList());
         }
         log("emotion Percentage Stats length :-> ${emotionPercentageStats?.length}");
-        // log("emotion Percentage  :-> ${report['stressLevelPercentages']}");
       }
     }
-    // hideLoadingDialog();
+  }
+
+  // ---------- Get Mode By Sleep --------------
+
+  Future<void> getMoodBySleepStats() async {
+    moodBySleepStats.clear();
+
+    final response = await apiService.get(
+      buildMoodBySleepStatsUrl(week: weekIndex.value, year: 2025),
+      false,
+      showResult: false,
+      successCode: 200,
+    );
+
+    if (response != null) {
+      final report = response['report'];
+      if (report != null) {
+        MoodBySleepModel model = MoodBySleepModel.fromJson(report);
+
+        if (model.dateWiseMoodStats.isNotEmpty) {
+          moodBySleepStats.addAll(model.dateWiseMoodStats);
+          log("Mood By Sleep stats:-> ${moodBySleepStats.length}");
+        }
+      }
+    }
   }
 
   Future<void> calledStats() async {
     log('Common Stats Called');
-    await getModeWeeklyStats();
+    await getModeFlowWeeklyStats();
     await getSleepWeeklyStats();
     await getEmotionStats();
+    await getMoodBySleepStats();
     hideLoadingDialog();
   }
 
   @override
   void onInit() {
-    // TODO: implement onInit
+    // TODO: Put Function When User Login Called
     super.onInit();
     getAllBoard();
     calledStats();

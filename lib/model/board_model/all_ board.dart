@@ -72,6 +72,7 @@ class BoardEntry {
   final String userId;
   final DateTime date;
   final int stressLevel;
+  // final int mode;
   // final List<String> emotions;
   final String note;
   final List<String>? photos;
@@ -86,6 +87,7 @@ class BoardEntry {
     required this.userId,
     required this.date,
     required this.stressLevel,
+    // required this.mode,
     // required this.emotions,
     required this.note,
     this.photos,
@@ -102,6 +104,7 @@ class BoardEntry {
       userId: json['userId'],
       date: DateTime.parse(json['date']),
       stressLevel: json['stressLevel'],
+      // mode: json['mode'],
       // emotions: List<String>.from(json['emotions']),
       note: json['note'],
       photos: json.containsKey('photos') && json['photos'] != null
@@ -114,7 +117,7 @@ class BoardEntry {
               : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      version: json['__v'],
+      version: json['__v'] ?? 0,
     );
   }
 
@@ -125,6 +128,7 @@ class BoardEntry {
       'userId': userId,
       'date': date.toIso8601String(),
       'stressLevel': stressLevel,
+      // 'mode': mode,
       // 'emotions': emotions,
       'note': note,
       'photos': photos,

@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +9,6 @@ import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
 import 'package:mood_prints/model/board_model/all_%20board.dart';
-import 'package:mood_prints/model/board_model/board_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -21,6 +19,7 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
+// ignore: must_be_immutable
 class EditModeManager extends StatefulWidget {
   BoardEntry model;
 
@@ -76,8 +75,11 @@ class _EditModeManagerState extends State<EditModeManager> {
     );
   }
 
+  String boardID = '';
   @override
   Widget build(BuildContext context) {
+    boardID = widget.model.id;
+    // ctrl.selectedMood.value = widget.model.mode;
     ctrl.datePicker.value = widget.model.date;
     ctrl.stressIconHandler.value = 0;
     ctrl.stressLevel = widget.model.stressLevel;
@@ -642,7 +644,7 @@ class _EditModeManagerState extends State<EditModeManager> {
               child: MyButton(
                 buttonText: 'Update Changes',
                 onTap: () {
-                  // modeCtrl.createBoard();
+                  ctrl.updateBoard(boardID: boardID);
                 },
               ),
             ),

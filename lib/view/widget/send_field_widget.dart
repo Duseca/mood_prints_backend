@@ -13,6 +13,7 @@ class SendField extends StatelessWidget {
     this.validator,
     this.onAttachmentTap,
     this.onEmojiTap,
+    this.haveSendButton = false,
     this.onSendTap,
   }) : super(key: key);
   final String? hintText;
@@ -21,6 +22,7 @@ class SendField extends StatelessWidget {
   final GestureTapCallback? onTap;
   final FormFieldValidator<String>? validator;
   final VoidCallback? onEmojiTap, onAttachmentTap, onSendTap;
+  final bool haveSendButton;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class SendField extends StatelessWidget {
               borderRadius: BorderRadius.circular(50),
               child: TextFormField(
                 cursorColor: Colors.black,
-                textAlignVertical: TextAlignVertical.center,
+                // textAlignVertical: TextAlignVertical.center,
                 controller: controller,
                 onTap: onTap,
                 onChanged: onChanged,
@@ -85,19 +87,19 @@ class SendField extends StatelessWidget {
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 15,
                   ),
-                  suffixIcon: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: onAttachmentTap,
-                        child: Image.asset(
-                          Assets.imagesMic,
-                          height: 23.99,
-                          color: kSecondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // suffixIcon: Column(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     GestureDetector(
+                  //       onTap: onAttachmentTap,
+                  //       child: Image.asset(
+                  //         Assets.imagesMic,
+                  //         height: 23.99,
+                  //         color: kSecondaryColor,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
@@ -107,6 +109,50 @@ class SendField extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            width: 8,
+          ),
+          (haveSendButton)
+              ? GestureDetector(
+                  onTap: onSendTap,
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: kWhiteColor,
+                    ),
+                    child: Center(
+                        child: Icon(
+                      Icons.send,
+                      color: kSecondaryColor,
+                    )
+                        //  Image.asset(
+                        //   Assets.imagesMic,
+                        //   height: 23.99,
+                        //   color: kSecondaryColor,
+                        // ),
+                        ),
+                  ),
+                )
+              : GestureDetector(
+                  onTap: onAttachmentTap,
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: kWhiteColor,
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        Assets.imagesMic,
+                        height: 23.99,
+                        color: kSecondaryColor,
+                      ),
+                    ),
+                  ),
+                ),
         ],
       ),
     );

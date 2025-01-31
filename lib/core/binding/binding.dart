@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:mood_prints/controller/chat/chat_controller.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
@@ -11,5 +12,6 @@ class InitialBindings implements Bindings {
     Get.put<ModeManagerController>(ModeManagerController());
     Get.put<ClientHomeController>(ClientHomeController());
     Get.put<ProfileController>(ProfileController());
+    Get.put<ChatController>(ChatController());
   }
 }

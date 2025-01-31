@@ -20,7 +20,7 @@ class ChatHead extends StatelessWidget {
         shrinkWrap: true,
         padding: EdgeInsets.fromLTRB(20, 16, 20, 100),
         physics: BouncingScrollPhysics(),
-        itemCount: 10,
+        itemCount: 2,
         itemBuilder: (context, index) {
           return ChatHeadTiles(
             profileImage: dummyImg,

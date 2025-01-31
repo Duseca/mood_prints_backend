@@ -20,6 +20,7 @@ class MyTextField extends StatefulWidget {
     this.suffix,
     this.isReadOnly,
     this.onTap,
+    this.validator,
   }) : super(key: key);
 
   String? labelText, hintText;
@@ -31,6 +32,7 @@ class MyTextField extends StatefulWidget {
   double? labelSize;
   Widget? prefix, suffix;
   final VoidCallback? onTap;
+  String? Function(String?)? validator;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -63,6 +65,7 @@ class _MyTextFieldState extends State<MyTextField> {
               },
               child: TextFormField(
                 onTap: widget.onTap,
+                validator: widget.validator,
                 textAlignVertical:
                     widget.prefix != null || widget.suffix != null
                         ? TextAlignVertical.center

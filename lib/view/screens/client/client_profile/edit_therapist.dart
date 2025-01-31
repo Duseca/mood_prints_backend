@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
+import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/view/screens/client/client_profile/add_new_therapist.dart';
+import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
-import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 class EditTherapist extends StatelessWidget {
-  const EditTherapist({super.key});
+  bool haveTherapist;
+
+  EditTherapist({super.key, this.haveTherapist = false});
+
+  final ctrl = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {
@@ -19,46 +25,75 @@ class EditTherapist extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              padding: AppSizes.DEFAULT,
-              physics: BouncingScrollPhysics(),
-              children: [
-                MyTextField(
-                  labelText: 'Therapist First Name',
+          SizedBox(height: 15),
+          (haveTherapist)
+              ? Column(
+                  children: [
+                    CommonImageView(
+                      height: 100,
+                      width: 100,
+                      radius: 100,
+                      imagePath: Assets.imagesProfileImageUser,
+                    ),
+                    SizedBox(height: 15),
+                    MyText(
+                      text: 'Asclad son of ola',
+                      size: 15,
+                      weight: FontWeight.w600,
+                    ),
+                    MyText(
+                      paddingTop: 5,
+                      text: 'example@gmail.com',
+                      size: 15,
+                      // weight: FontWeight.w600,
+                    ),
+                    MyText(
+                      paddingBottom: 20,
+                      paddingTop: 5,
+                      text: '03150965522',
+                      size: 15,
+                      // weight: FontWeight.w600,
+                    ),
+                  ],
+                )
+              : Column(
+                  children: [
+                    Icon(
+                      Icons.new_releases_rounded,
+                      color: kHintColor,
+                      size: 70,
+                    ),
+                    MyText(
+                      paddingTop: 15,
+                      text: 'No Therapist found.',
+                      size: 15,
+                      weight: FontWeight.w600,
+                      color: kHintColor,
+                    ),
+                  ],
                 ),
-                MyTextField(
-                  labelText: 'Therapist Last Name',
+          SizedBox(height: 25),
+          (haveTherapist)
+              ? Padding(
+                  padding: AppSizes.DEFAULT,
+                  child: MyButton(
+                    buttonText: 'Edit Therapist',
+                    onTap: () {
+                      Get.to(() => AddNewTherapist());
+                    },
+                  ),
+                )
+              : Padding(
+                  padding: AppSizes.DEFAULT,
+                  child: MyButton(
+                    buttonText: 'Add New Therapist',
+                    onTap: () {
+                      // ctrl.getAllTherapist();
+
+                      Get.to(() => AddNewTherapist());
+                    },
+                  ),
                 ),
-                MyTextField(
-                  labelText: 'Country',
-                ),
-                MyTextField(
-                  labelText: 'State',
-                ),
-                MyTextField(
-                  labelText: 'City',
-                ),
-                MyButton(
-                  bgColor: kRedColor,
-                  buttonText: 'Remove Therapist',
-                  onTap: () {
-                    Get.dialog(_DeleteTherapist());
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: AppSizes.DEFAULT,
-            child: MyButton(
-              buttonText: 'Add New Therapist',
-              onTap: () {
-                Get.to(() => AddNewTherapist());
-              },
-            ),
-          ),
         ],
       ),
     );
@@ -134,3 +169,40 @@ class _DeleteTherapist extends StatelessWidget {
     );
   }
 }
+
+
+
+ // ----------- Front-end Code -------------
+
+          // Expanded(
+          //   child: ListView(
+          //     shrinkWrap: true,
+          //     padding: AppSizes.DEFAULT,
+          //     physics: BouncingScrollPhysics(),
+          //     children: [
+
+          //       // MyTextField(
+          //       //   labelText: 'Therapist First Name',
+          //       // ),
+          //       // MyTextField(
+          //       //   labelText: 'Therapist Last Name',
+          //       // ),
+          //       // MyTextField(
+          //       //   labelText: 'Country',
+          //       // ),
+          //       // MyTextField(
+          //       //   labelText: 'State',
+          //       // ),
+          //       // MyTextField(
+          //       //   labelText: 'City',
+          //       // ),
+          //       // MyButton(
+          //       //   bgColor: kRedColor,
+          //       //   buttonText: 'Remove Therapist',
+          //       //   onTap: () {
+          //       //     Get.dialog(_DeleteTherapist());
+          //       //   },
+          //       // ),
+          //     ],
+          //   ),
+          // ),

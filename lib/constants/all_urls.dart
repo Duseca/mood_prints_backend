@@ -6,27 +6,44 @@ String updateClientUrl = "${baseUrl}user/update/";
 String getClientByIDUrl = "${baseUrl}/user?userId=";
 String createBoardUrl = "${baseUrl}board";
 String getAllBoardUrl = "${baseUrl}board";
+String updateBoardUrl = "${baseUrl}board/";
+String getAllTherapistUrl = "${baseUrl}/user/getAllUsers?userType=therapist";
+String getChangePasswordUrl = "${baseUrl}user/change-password";
 
-// Stats Urls
-String modeStatsUrl = "${baseUrl}stats/stress-stats";
-// ?week=1&year=2025&reportType=weekly
-String buildModeStatsUrl(
-    {required int week, required int year, String reportType = 'weekly'}) {
-  return "$modeStatsUrl?week=$week&year=$year&reportType=$reportType";
+// ------------ Stats Urls ----------------
+
+String modeFlow = "${baseUrl}stats/mood-flow";
+String buildMoodFlowStatsUrl(
+    {required int week,
+    required int year,
+    int month = 1,
+    String reportType = 'weekly'}) {
+  return "$modeFlow?week=$week&year=$year&reportType=weekly&month=$month";
 }
 
-// }/stats/sleep-stats?week=1&year=2025&reportType=weekly
-
-String sleepStatsUrl = "${baseUrl}stats/sleep-stats";
-String buildSleepStatsUrl(
-    {required int week, required int year, String reportType = 'weekly'}) {
-  return "$sleepStatsUrl?week=$week&year=$year&reportType=$reportType";
-}
-
-// /stats/emotion-stats?week=1&year=2025&reportType=weekly
-
-String moodBarStatsUrl = "${baseUrl}stats/emotion-stats";
+String modeBar = "${baseUrl}stats/emotion-stats";
 String buildMoodBarStatsUrl(
-    {required int week, required int year, String reportType = 'weekly'}) {
-  return "$moodBarStatsUrl?week=$week&year=$year&reportType=$reportType";
+    {required int week,
+    required int year,
+    int month = 1,
+    String reportType = 'weekly'}) {
+  return "$modeBar?week=$week&year=$year&reportType=weekly&month=$month";
+}
+
+String sleepAnalysis = "${baseUrl}stats/sleep-stats";
+String buildSleepAnalysisStatsUrl(
+    {required int week,
+    required int year,
+    int month = 1,
+    String reportType = 'weekly'}) {
+  return "$sleepAnalysis?week=$week&year=$year&reportType=weekly&month=$month";
+}
+
+String moodBySleep = "${baseUrl}stats/mood-sleep-stats";
+String buildMoodBySleepStatsUrl(
+    {required int week,
+    required int year,
+    int month = 1,
+    String reportType = 'weekly'}) {
+  return "$moodBySleep?week=$week&year=$year&reportType=weekly&month=$month";
 }

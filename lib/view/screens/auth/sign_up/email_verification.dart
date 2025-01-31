@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -166,6 +167,8 @@ class _EmailVerificationState extends State<EmailVerification> {
                           token: widget.token.toString(),
                           id: widget.id.toString(),
                           widget: _SuccessDialog());
+
+                      // UserService.instance.getUserInformation();
                       log('OTP value not null');
                     } else {
                       log('OTP value is null');
@@ -227,9 +230,11 @@ class _SuccessDialog extends StatelessWidget {
                 ),
                 MyButton(
                   buttonText: 'Done',
-                  onTap: () {
+                  onTap: () async {
+                    await UserService.instance.getUserInformation();
                     Get.back();
                     Get.to(() => ClientCompleteProfile());
+
                     // Get.to(() => CompleteProfile());
                   },
                 ),

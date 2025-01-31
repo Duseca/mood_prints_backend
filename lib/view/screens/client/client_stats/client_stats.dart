@@ -8,15 +8,18 @@ import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
-import 'package:mood_prints/model/mode_stats_model.dart';
+import 'package:mood_prints/model/stats/mode_flow_stats_model.dart';
 import 'package:mood_prints/model/stats/emotion_stats_model.dart';
+import 'package:mood_prints/model/stats/mood_by_sleep.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
+import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:mood_prints/model/stats/sleep_model.dart';
+import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
 
 class ClientStats extends StatefulWidget {
   ClientStats({super.key});
@@ -32,11 +35,11 @@ class _ClientStatsState extends State<ClientStats> {
   @override
   Widget build(BuildContext context) {
     final List<String> _items = [
+      'Weekly',
       'Monthly',
-      'Annual',
     ];
     final List<Widget> _tabBarView = [
-      _Monthly(),
+      _Weekly(),
       Container(),
     ];
     return DefaultTabController(
@@ -216,11 +219,33 @@ class _ExportData extends StatelessWidget {
 }
 
 // ----------- Weekly ------------
-class _Monthly extends StatelessWidget {
-  _Monthly({super.key});
+class _Weekly extends StatefulWidget {
+  _Weekly({super.key});
 
+  @override
+  State<_Weekly> createState() => _WeeklyState();
+}
+
+class _WeeklyState extends State<_Weekly> {
   // EmotionStatsModel? model;
   EmotionStatsModel? stats;
+
+  List<String> weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+
+  // List<Month> months = [
+  //   Month(name: "January", number: 1),
+  //   Month(name: "February", number: 2),
+  //   Month(name: "March", number: 3),
+  //   Month(name: "April", number: 4),
+  //   Month(name: "May", number: 5),
+  //   Month(name: "June", number: 6),
+  //   Month(name: "July", number: 7),
+  //   Month(name: "August", number: 8),
+  //   Month(name: "September", number: 9),
+  //   Month(name: "October", number: 10),
+  //   Month(name: "November", number: 11),
+  //   Month(name: "December", number: 12),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +255,60 @@ class _Monthly extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, 16, 20, 120),
       physics: BouncingScrollPhysics(),
       children: [
+        // ----- Week Selector Button ----------
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(
+            4,
+            (index) => GestureDetector(
+              onTap: () async {
+                ctrl.weekFrontUpdate.value = index;
+                ctrl.weekIndex.value = index + 1;
+                log("${ctrl.weekIndex.value}");
+                // ctrl.getModeFlowWeeklyStats();
+
+                showLoadingDialog();
+                await ctrl.calledStats();
+                hideLoadingDialog();
+                setState(() {});
+              },
+              child: Obx(
+                () => Container(
+                  height: 40,
+                  width: 70,
+                  decoration: BoxDecoration(
+                      color: kWhiteColor,
+                      border: Border.all(
+                          color: (ctrl.weekFrontUpdate == index)
+                              ? kSecondaryColor
+                              : kWhiteColor),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(child: MyText(text: '${weeks[index]}')),
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 15),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            MyText(
+              text: 'Select Month',
+              paddingBottom: 15,
+            ),
+            // SizedBox(
+            //   width: 100,
+            //   child: CustomDropDown(
+            //       hint: 'Month',
+            //       items: months,
+            //       selectedValue: 'Jan',
+            //       onChanged: (v) {}),
+            // )
+          ],
+        ),
 // ----------- Mode Flow Card ------------
 
         Container(
@@ -715,9 +794,12 @@ class _Monthly extends StatelessWidget {
                             size: 12,
                             color: kGreyColor,
                           ),
+
+                          // ------ Average Bed Time -------
                           MyText(
                             paddingTop: 4,
-                            text: '01:51 AM',
+                            text:
+                                '${ctrl.sleepAnalysisModel.value?.averageBedtime}',
                             size: 16,
                             weight: FontWeight.w600,
                           ),
@@ -748,7 +830,8 @@ class _Monthly extends StatelessWidget {
                           ),
                           MyText(
                             paddingTop: 4,
-                            text: '09:48 AM',
+                            text:
+                                '${ctrl.sleepAnalysisModel.value?.averageWakeupTime}',
                             size: 16,
                             weight: FontWeight.w600,
                           ),
@@ -764,122 +847,122 @@ class _Monthly extends StatelessWidget {
               // --------- Sleep Duration Graph ------------
 
               SleepAnalysis(
-                sleepStats: ctrl.sleepStats,
-              ),
+                  // sleepStats: ctrl.sleepStats,
+                  ),
               SizedBox(
                 height: 20,
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    width: 1.0,
-                    color: kBorderColor,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          Assets.imagesOrange,
-                          height: 16,
-                        ),
-                        Expanded(
-                          child: MyText(
-                            paddingLeft: 8,
-                            text: 'Less than 6h',
-                            size: 14,
-                            color: kGreyColor,
-                          ),
-                        ),
-                        MyText(
-                          paddingLeft: 8,
-                          text: '65 / 31 days',
-                          size: 14,
-                          color: kGreyColor,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          Assets.imagesLightGreen,
-                          height: 16,
-                        ),
-                        Expanded(
-                          child: MyText(
-                            paddingLeft: 8,
-                            text: '6-8h',
-                            size: 14,
-                            color: kGreyColor,
-                          ),
-                        ),
-                        MyText(
-                          paddingLeft: 8,
-                          text: '194 / 31 days',
-                          size: 14,
-                          color: kGreyColor,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          Assets.imagesDarkGreen,
-                          height: 16,
-                        ),
-                        Expanded(
-                          child: MyText(
-                            paddingLeft: 8,
-                            text: 'Over 8h',
-                            size: 14,
-                            color: kGreyColor,
-                          ),
-                        ),
-                        MyText(
-                          paddingLeft: 8,
-                          text: '83 / 31 days',
-                          size: 14,
-                          color: kGreyColor,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          Assets.imagesNoRecord,
-                          height: 16,
-                        ),
-                        Expanded(
-                          child: MyText(
-                            paddingLeft: 8,
-                            text: 'No record',
-                            size: 14,
-                            color: kGreyColor,
-                          ),
-                        ),
-                        MyText(
-                          paddingLeft: 8,
-                          text: '-311 / 31 days',
-                          size: 14,
-                          color: kGreyColor,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   padding: EdgeInsets.all(10),
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(8),
+              //     border: Border.all(
+              //       width: 1.0,
+              //       color: kBorderColor,
+              //     ),
+              //   ),
+              //   child: Column(
+              //     children: [
+              //       Row(
+              //         children: [
+              //           Image.asset(
+              //             Assets.imagesOrange,
+              //             height: 16,
+              //           ),
+              //           Expanded(
+              //             child: MyText(
+              //               paddingLeft: 8,
+              //               text: 'Less than 6h',
+              //               size: 14,
+              //               color: kGreyColor,
+              //             ),
+              //           ),
+              //           MyText(
+              //             paddingLeft: 8,
+              //             text: '65 / 31 days',
+              //             size: 14,
+              //             color: kGreyColor,
+              //           ),
+              //         ],
+              //       ),
+              //       SizedBox(
+              //         height: 12,
+              //       ),
+              //       Row(
+              //         children: [
+              //           Image.asset(
+              //             Assets.imagesLightGreen,
+              //             height: 16,
+              //           ),
+              //           Expanded(
+              //             child: MyText(
+              //               paddingLeft: 8,
+              //               text: '6-8h',
+              //               size: 14,
+              //               color: kGreyColor,
+              //             ),
+              //           ),
+              //           MyText(
+              //             paddingLeft: 8,
+              //             text: '194 / 31 days',
+              //             size: 14,
+              //             color: kGreyColor,
+              //           ),
+              //         ],
+              //       ),
+              //       SizedBox(
+              //         height: 12,
+              //       ),
+              //       Row(
+              //         children: [
+              //           Image.asset(
+              //             Assets.imagesDarkGreen,
+              //             height: 16,
+              //           ),
+              //           Expanded(
+              //             child: MyText(
+              //               paddingLeft: 8,
+              //               text: 'Over 8h',
+              //               size: 14,
+              //               color: kGreyColor,
+              //             ),
+              //           ),
+              //           MyText(
+              //             paddingLeft: 8,
+              //             text: '83 / 31 days',
+              //             size: 14,
+              //             color: kGreyColor,
+              //           ),
+              //         ],
+              //       ),
+              //       SizedBox(
+              //         height: 12,
+              //       ),
+              //       Row(
+              //         children: [
+              //           Image.asset(
+              //             Assets.imagesNoRecord,
+              //             height: 16,
+              //           ),
+              //           Expanded(
+              //             child: MyText(
+              //               paddingLeft: 8,
+              //               text: 'No record',
+              //               size: 14,
+              //               color: kGreyColor,
+              //             ),
+              //           ),
+              //           MyText(
+              //             paddingLeft: 8,
+              //             text: '-311 / 31 days',
+              //             size: 14,
+              //             color: kGreyColor,
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -1124,7 +1207,7 @@ class _Monthly extends StatelessWidget {
 //   }
 // }
 class _MoodFlowChart extends StatelessWidget {
-  final List<DateWiseStressStats>? stats;
+  final List<MoodFlowModel>? stats;
 
   _MoodFlowChart({this.stats});
 
@@ -1201,19 +1284,19 @@ class _MoodFlowChart extends StatelessWidget {
     );
   }
 
-  List<LineSeries<DateWiseStressStats, String>> graphData(
-      List<DateWiseStressStats>? stats) {
+  List<LineSeries<MoodFlowModel, String>> graphData(
+      List<MoodFlowModel>? stats) {
     return [
-      LineSeries<DateWiseStressStats, String>(
+      LineSeries<MoodFlowModel, String>(
         dataSource: stats,
-        xValueMapper: (DateWiseStressStats data, _) {
+        xValueMapper: (MoodFlowModel data, _) {
           // Format the date as "day/month"
           if (data.date != null) {
             return DateFormat('d/M').format(DateTime.parse(data.date!));
           }
           return '';
         },
-        yValueMapper: (DateWiseStressStats data, _) => data.stressLevel ?? 0,
+        yValueMapper: (MoodFlowModel data, _) => data.mood ?? 0,
         xAxisName: 'xAxis',
         yAxisName: 'yAxis',
         color: kSecondaryColor,
@@ -1226,134 +1309,9 @@ class _MoodFlowChart extends StatelessWidget {
   }
 }
 
-class _MoodBySleep extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: SfCartesianChart(
-        tooltipBehavior: TooltipBehavior(
-          enable: true,
-        ),
-        margin: EdgeInsets.zero,
-        borderWidth: 0,
-        borderColor: Colors.transparent,
-        plotAreaBorderWidth: 0,
-        enableAxisAnimation: true,
-        primaryYAxis: NumericAxis(
-          name: 'yAxis',
-          maximum: 10,
-          minimum: 0,
-          interval: 2,
-          isVisible: false,
-          plotOffset: 10.0,
-          majorGridLines: MajorGridLines(
-            width: 1,
-            color: kBorderColor,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          opposedPosition: false,
-          labelStyle: TextStyle(
-            color: kGreyColor,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-        ),
-        primaryXAxis: CategoryAxis(
-          name: 'xAxis',
-          maximum: 6,
-          minimum: 0,
-          interval: 1,
-          plotOffset: 5,
-          majorGridLines: MajorGridLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-          labelStyle: TextStyle(
-            color: kGreyColor,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-        ),
-        series: graphData(),
-      ),
-    );
-  }
+// class _MoodBySleep extends StatelessWidget {
+//   var ctrl = Get.find<ClientHomeController>();
 
-  dynamic graphData() {
-    final List<_DataModel> _dataSource = [
-      _DataModel(
-        '<5h',
-        3,
-      ),
-      _DataModel(
-        '<6h',
-        4,
-      ),
-      _DataModel(
-        '<7h',
-        6,
-      ),
-      _DataModel(
-        '<8h',
-        5,
-      ),
-      _DataModel(
-        '<9h',
-        7,
-      ),
-      _DataModel(
-        '<10h',
-        6,
-      ),
-      _DataModel(
-        '<11h',
-        8,
-      ),
-    ];
-    return [
-      ColumnSeries<_DataModel, dynamic>(
-        dataSource: _dataSource,
-        xValueMapper: (_DataModel data, _) => data.xValueMapper,
-        yValueMapper: (_DataModel data, _) => data.yValueMapper,
-        xAxisName: 'xAxis',
-        yAxisName: 'yAxis',
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [
-            0.1,
-            0.9,
-          ],
-          colors: [
-            kSecondaryColor,
-            kSecondaryColor.withOpacity(0.33),
-          ],
-        ),
-        color: kSecondaryColor,
-        width: 0.7,
-        spacing: 0,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(4),
-        ),
-      ),
-    ];
-  }
-}
-
-//--------------------- Sleep Analysis Graph ---------------------
-
-// class _SleepAnalysis extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
 //     return SizedBox(
@@ -1369,17 +1327,11 @@ class _MoodBySleep extends StatelessWidget {
 //         enableAxisAnimation: true,
 //         primaryYAxis: NumericAxis(
 //           name: 'yAxis',
-//           maximum: 5000,
+//           maximum: 10,
 //           minimum: 0,
-//           interval: 1000,
-//           isVisible: true,
+//           interval: 2,
+//           isVisible: false,
 //           plotOffset: 10.0,
-//           axisLabelFormatter: (AxisLabelRenderDetails details) {
-//             return ChartAxisLabel(
-//               (details.value ~/ 1000).toString() + 'P',
-//               null,
-//             );
-//           },
 //           majorGridLines: MajorGridLines(
 //             width: 1,
 //             color: kBorderColor,
@@ -1419,197 +1371,262 @@ class _MoodBySleep extends StatelessWidget {
 //           ),
 //         ),
 //         series: graphData(),
-//         onDataLabelRender: (DataLabelRenderArgs dataLabelArgs) {
-//           if (dataLabelArgs.pointIndex == 0) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 1) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 2) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 3) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 4) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 5) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 6) {
-//             dataLabelArgs.text = '';
-//           } else if (dataLabelArgs.pointIndex == 7) {
-//             dataLabelArgs.text = '';
-//           }
-//         },
 //       ),
 //     );
 //   }
 
 //   dynamic graphData() {
-//     final List<_ChartSampleData> _dataSource = [
-//       _ChartSampleData(
-//         x: '8/1',
-//         y: 4700,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//     final List<_DataModel> _dataSource = [
+//       _DataModel(
+//         '<5h',
+//         3,
 //       ),
-//       _ChartSampleData(
-//         x: '8/6',
-//         y: -1100,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<6h',
+//         4,
 //       ),
-//       _ChartSampleData(
-//         x: '8/11',
-//         y: -700,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<7h',
+//         6,
 //       ),
-//       _ChartSampleData(
-//         x: '8/16',
-//         y: 1200,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<8h',
+//         5,
 //       ),
-//       _ChartSampleData(
-//         x: '8/21',
-//         intermediateSumPredicate: true,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<9h',
+//         7,
 //       ),
-//       _ChartSampleData(
-//         x: '8/26',
-//         y: -400,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<10h',
+//         6,
 //       ),
-//       _ChartSampleData(
-//         x: '8/31',
-//         y: -800,
-//         intermediateSumPredicate: false,
-//         totalSumPredicate: false,
+//       _DataModel(
+//         '<11h',
+//         8,
 //       ),
 //     ];
 //     return [
-//       WaterfallSeries<_ChartSampleData, dynamic>(
+//       ColumnSeries<_DataModel, dynamic>(
 //         dataSource: _dataSource,
-//         xValueMapper: (_ChartSampleData data, _) => data.x,
-//         yValueMapper: (_ChartSampleData data, _) => data.y,
-//         intermediateSumPredicate: (_ChartSampleData sales, _) =>
-//             sales.intermediateSumPredicate,
-//         totalSumPredicate: (_ChartSampleData sales, _) =>
-//             sales.totalSumPredicate,
-//         dataLabelSettings: const DataLabelSettings(
-//           isVisible: true,
-//           labelAlignment: ChartDataLabelAlignment.middle,
-//         ),
+//         xValueMapper: (_DataModel data, _) => data.xValueMapper,
+//         yValueMapper: (_DataModel data, _) => data.yValueMapper,
 //         xAxisName: 'xAxis',
 //         yAxisName: 'yAxis',
+//         gradient: LinearGradient(
+//           begin: Alignment.topCenter,
+//           end: Alignment.bottomCenter,
+//           stops: [
+//             0.1,
+//             0.9,
+//           ],
+//           colors: [
+//             kSecondaryColor,
+//             kSecondaryColor.withOpacity(0.33),
+//           ],
+//         ),
+//         color: kSecondaryColor,
 //         width: 0.7,
 //         spacing: 0,
-//         borderRadius: BorderRadius.circular(50),
-//         negativePointsColor: Color(0xffF4A460),
-//         intermediateSumColor: Color(0xff77ACA2),
-//         totalSumColor: Color(0xff468189),
+//         borderRadius: BorderRadius.vertical(
+//           top: Radius.circular(4),
+//         ),
 //       ),
 //     ];
 //   }
 // }
-// ignore: must_be_immutable
-class SleepAnalysis extends StatelessWidget {
-  final List<DateWiseSleepStats>? sleepStats;
 
-  SleepAnalysis({required this.sleepStats});
+class _MoodBySleep extends StatelessWidget {
+  final ctrl = Get.find<ClientHomeController>();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: SfCartesianChart(
-        tooltipBehavior: TooltipBehavior(
-          enable: true,
+    return Obx(() {
+      return SizedBox(
+        height: 200,
+        child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
+          margin: EdgeInsets.zero,
+          borderWidth: 0,
+          borderColor: Colors.transparent,
+          plotAreaBorderWidth: 0,
+          enableAxisAnimation: true,
+          primaryYAxis: NumericAxis(
+            name: 'yAxis',
+            maximum: 4, // Mood range from -4 to +4
+            minimum: -4,
+            interval: 1, // Display each mood value
+            plotOffset: 10.0,
+            majorGridLines: MajorGridLines(width: 1, color: kBorderColor),
+            majorTickLines: MajorTickLines(width: 0),
+            axisLine: AxisLine(width: 0),
+            labelStyle: TextStyle(
+              color: kGreyColor,
+              fontSize: 12.0,
+              fontFamily: AppFonts.URBANIST,
+            ),
+          ),
+          primaryXAxis: CategoryAxis(
+            name: 'xAxis',
+            majorGridLines: MajorGridLines(width: 0),
+            axisLine: AxisLine(width: 0),
+            majorTickLines: MajorTickLines(width: 0),
+            labelStyle: TextStyle(
+              color: kGreyColor,
+              fontSize: 12.0,
+              fontFamily: AppFonts.URBANIST,
+            ),
+          ),
+          series: graphData(ctrl.moodBySleepStats),
         ),
-        margin: EdgeInsets.zero,
-        borderWidth: 0,
-        borderColor: Colors.transparent,
-        plotAreaBorderWidth: 0,
-        enableAxisAnimation: true,
-        primaryYAxis: NumericAxis(
-          name: 'yAxis',
-          maximum: 12,
-          minimum: 0,
-          interval: 2,
-          isVisible: true,
-          axisLabelFormatter: (AxisLabelRenderDetails details) {
-            return ChartAxisLabel(
-              '${details.value.toInt()} hrs',
-              TextStyle(
-                color: Colors.grey,
-                fontSize: 12.0,
-                fontFamily: AppFonts.URBANIST,
-              ),
-            );
-          },
-          majorGridLines: MajorGridLines(
-            width: 1,
-            color: Colors.grey.shade300,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          opposedPosition: false,
-          labelStyle: TextStyle(
-            color: Colors.grey,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-        ),
-        primaryXAxis: CategoryAxis(
-          name: 'xAxis',
-          labelStyle: TextStyle(
-            color: Colors.grey,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-          majorGridLines: MajorGridLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-        ),
-        series: graphData(),
-      ),
-    );
+      );
+    });
   }
 
-  dynamic graphData() {
-    // Handle null or empty list gracefully
-    if (sleepStats == null || sleepStats!.isEmpty) {
-      return <ColumnSeries<_ChartSampleData, String>>[];
+  /// Generate graph data based on `moodBySleepStats` and ensure all 7 categories are displayed
+  List<ColumnSeries<_DataModel, String>> graphData(List<MoodSleepStats> stats) {
+    // Define 7 sleep duration buckets
+    final List<String> sleepBuckets = [
+      "<4h",
+      "<5h",
+      "<6h",
+      "<7h",
+      "<8h",
+      "<9h",
+      "<10h"
+    ];
+
+    // Initialize map with all buckets and no data
+    final Map<String, List<MoodSleepStats>> groupedData = {
+      for (var bucket in sleepBuckets) bucket: []
+    };
+
+    // Populate the map with actual data
+    for (var stat in stats) {
+      String sleepLabel = _getSleepDurationLabel(stat.sleepDuration);
+      groupedData[sleepLabel]?.add(stat);
     }
 
-    // Convert the sleepStats list into chart data
-    final List<_ChartSampleData> _dataSource = sleepStats!
-        .map((data) => _ChartSampleData(
-              x: _formatDate(data.date), // Format date for X-axis
-              y: data.sleepTime,
-              intermediateSumPredicate: false,
-              totalSumPredicate: false,
-            ))
-        .toList();
+    // Create a data source ensuring all 7 buckets exist
+    final List<_DataModel> _dataSource = sleepBuckets.map((bucket) {
+      final List<MoodSleepStats> moods = groupedData[bucket]!;
+      double avgMood = moods.isNotEmpty
+          ? moods.map((e) => e.mood).reduce((a, b) => a + b) / moods.length
+          : 0;
+
+      return _DataModel(bucket, moods.isEmpty ? null : avgMood);
+    }).toList();
+
+    return [
+      ColumnSeries<_DataModel, String>(
+        dataSource: _dataSource,
+        xValueMapper: (_DataModel data, _) => data.xValue,
+        yValueMapper: (_DataModel data, _) => data.yValue,
+        xAxisName: 'xAxis',
+        yAxisName: 'yAxis',
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0.1, 0.9],
+          colors: [kSecondaryColor, kSecondaryColor.withOpacity(0.33)],
+        ),
+        color: kSecondaryColor,
+        width: 0.7,
+        spacing: 0,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+      ),
+    ];
+  }
+
+  /// Function to determine sleep duration bucket
+  String _getSleepDurationLabel(int sleepDuration) {
+    if (sleepDuration < 4) return "<4h";
+    if (sleepDuration < 5) return "<5h";
+    if (sleepDuration < 6) return "<6h";
+    if (sleepDuration < 7) return "<7h";
+    if (sleepDuration < 8) return "<8h";
+    if (sleepDuration < 9) return "<9h";
+    return "<10h";
+  }
+}
+
+/// Data model for chart representation
+class _DataModel {
+  _DataModel(this.xValue, this.yValue);
+  final String xValue; // Sleep duration bucket
+  final double? yValue; // Average Mood (null if no data)
+}
+
+// class _DataModel {
+//   _DataModel(
+//     this.xValueMapper,
+//     this.yValueMapper,
+//   );
+
+//   String? xValueMapper;
+//   int? yValueMapper;
+// }
+
+class SleepAnalysis extends StatelessWidget {
+  final ctrl = Get.find<ClientHomeController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return SizedBox(
+        height: 200,
+        child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
+          margin: EdgeInsets.zero,
+          borderWidth: 0,
+          borderColor: Colors.transparent,
+          plotAreaBorderWidth: 0,
+          enableAxisAnimation: true,
+          primaryYAxis: NumericAxis(
+            name: 'yAxis',
+            maximum: 24, // 24-hour format
+            minimum: 0,
+            interval: 4,
+            isVisible: true,
+            axisLabelFormatter: (AxisLabelRenderDetails details) {
+              return ChartAxisLabel('${details.value.toInt()}h',
+                  TextStyle(color: Colors.grey, fontSize: 12.0));
+            },
+            majorGridLines:
+                MajorGridLines(width: 1, color: Colors.grey.shade300),
+            majorTickLines: MajorTickLines(width: 0),
+            axisLine: AxisLine(width: 0),
+          ),
+          primaryXAxis: CategoryAxis(
+            name: 'xAxis',
+            labelStyle: TextStyle(color: Colors.grey, fontSize: 12.0),
+            majorGridLines: MajorGridLines(width: 0),
+            axisLine: AxisLine(width: 0),
+            majorTickLines: MajorTickLines(width: 0),
+          ),
+          series: graphData(ctrl.sleepStats),
+        ),
+      );
+    });
+  }
+
+  List<ColumnSeries<_ChartSampleData, String>> graphData(
+      List<SleepData> sleepStats) {
+    if (sleepStats.isEmpty) return [];
+
+    final List<_ChartSampleData> _dataSource = sleepStats.map((data) {
+      return _ChartSampleData(
+        x: _formatDateByWeek(data.date ?? ""), // Group dates by weeks
+        y: data.sleepTime?.toDouble() ?? 0,
+      );
+    }).toList();
 
     return [
       ColumnSeries<_ChartSampleData, String>(
         dataSource: _dataSource,
         xValueMapper: (_ChartSampleData data, _) => data.x,
         yValueMapper: (_ChartSampleData data, _) => data.y,
-        dataLabelSettings: const DataLabelSettings(
-          isVisible: true,
-          labelAlignment: ChartDataLabelAlignment.middle,
-        ),
+        dataLabelSettings: const DataLabelSettings(isVisible: true),
         xAxisName: 'xAxis',
         yAxisName: 'yAxis',
         color: Colors.blueAccent,
@@ -1618,67 +1635,40 @@ class SleepAnalysis extends StatelessWidget {
     ];
   }
 
-  // Helper method to format date
-  String _formatDate(String date) {
+  /// Formats date to group by week and show dates accordingly.
+  String _formatDateByWeek(String date) {
+    if (date.isEmpty) return "";
     final parsedDate = DateTime.parse(date);
-    final month = _getMonthAbbreviation(parsedDate.month);
-    return '${parsedDate.day} / $month';
-  }
-
-  // Helper method to get month abbreviation
-  String _getMonthAbbreviation(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
+    return '${parsedDate.day}';
   }
 }
 
 class _ChartSampleData {
   final String x;
-  final double? y;
-  final bool intermediateSumPredicate;
-  final bool totalSumPredicate;
+  final double y;
 
-  _ChartSampleData({
-    required this.x,
-    this.y,
-    this.intermediateSumPredicate = false,
-    this.totalSumPredicate = false,
-  });
+  _ChartSampleData({required this.x, required this.y});
 }
 
-class _DataModel {
-  _DataModel(
-    this.xValueMapper,
-    this.yValueMapper,
-  );
+class Month {
+  final String name;
+  final int number;
 
-  String? xValueMapper;
-  int? yValueMapper;
+  Month({required this.name, required this.number});
+
+  // Factory constructor to create a Month object from a map
+  factory Month.fromMap(Map<String, dynamic> map) {
+    return Month(
+      name: map['name'],
+      number: map['number'],
+    );
+  }
+
+  // Convert a Month object to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'number': number,
+    };
+  }
 }
-
-// class _ChartSampleData {
-//   _ChartSampleData({
-//     this.x,
-//     this.y,
-//     this.intermediateSumPredicate,
-//     this.totalSumPredicate,
-//   });
-
-//   final String? x;
-//   final num? y;
-//   final bool? intermediateSumPredicate;
-//   final bool? totalSumPredicate;
-// }

@@ -12,6 +12,7 @@ import 'package:mood_prints/model/mood_models/block_model.dart';
 import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 
 class ModeManagerController extends GetxController {
   GetStorage storage = GetStorage();
@@ -61,6 +62,7 @@ class ModeManagerController extends GetxController {
 
         BoardModel body = BoardModel(
             note: todayNoteController.text.trim(),
+            mood: selectedMood.value.stressLevel,
             stressLevel: stressLevel,
             // selectedMood.value.stressLevel,
             // emotions: feelingListofText,
@@ -113,6 +115,81 @@ class ModeManagerController extends GetxController {
       }
 
       log(" Today photos download urls from Storage -> ${downloadTodayPhotosUrl.length}");
+    }
+  }
+
+  // ----- Update Board -----------------
+
+  void updateBoard({
+    required String boardID,
+  }
+      //  required DateTime date,
+      //  required int stressLevel,
+      //  required String todayText,
+      //  required String todayText,
+
+      ) async {
+    log("Try Called Update Board");
+    try {
+      if (todayNoteController.text.isNotEmpty &&
+          stressLevel != null &&
+          endSleepDuration.value != null &&
+          startSleepDuration.value != null) {
+        showLoadingDialog();
+
+        await uploadPhotosTOSorage();
+
+        Sleep sleep = Sleep(
+            dozeOffTime: DateTimeService.instance
+                .formatTimeToAMPM(endSleepDuration.value),
+            wakeupTime: DateTimeService.instance
+                .formatTimeToAMPM(startSleepDuration.value));
+
+        BoardModel body = BoardModel(
+            id: boardID,
+            userId: UserService.instance.userModel.value.id,
+            note: todayNoteController.text.trim(),
+            mood: selectedMood.value.stressLevel,
+            stressLevel: stressLevel,
+            date: datePicker.value,
+            createdAt: datePicker.value,
+            sleep: sleep,
+            photos: downloadTodayPhotosUrl);
+
+        String url = updateBoardUrl + boardID;
+        log("Board ID: $boardID");
+        log("User ID: ${UserService.instance.userModel.value.id}");
+
+        final response = await apiService.putWithBody(url, body.toJson(), false,
+            showResult: true, successCode: 200);
+
+        hideLoadingDialog();
+
+        if (response != null) {
+          final status = response['status'];
+          // final data = response['data'];
+
+          if (status != null && status.isNotEmpty) {
+            if (status == 'success') {
+              log("Data Updated Status Code is  -------> : $status");
+              Get.find<ClientHomeController>().getAllBoard();
+            }
+            // BoardModel boardModel = BoardModel.fromJson(data);
+            // log("Data After Board Created: ${boardModel.toString()}");
+
+            log("Status -------> : $status");
+          }
+        }
+        // Get.close(1);
+        // clearBoardEntries();
+      } else {
+        displayToast(msg: 'Please fill data');
+      }
+
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error:-> $e');
     }
   }
 

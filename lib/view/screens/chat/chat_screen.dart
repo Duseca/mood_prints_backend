@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
+import 'package:mood_prints/controller/chat/chat_controller.dart';
 
 import 'package:mood_prints/main.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/therapist/report/report.dart';
 import 'package:mood_prints/view/widget/chat_bubble_widget.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -45,6 +47,8 @@ class _ChatScreenState extends State<ChatScreen> {
       'taskDetail': {},
     },
   ];
+
+  var ctrl = Get.find<ChatController>();
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +154,32 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          SendField(),
+        ],
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SendField(
+            haveSendButton: true,
+            onSendTap: () {
+              // Get.find<ChatController>().sortIds();
+
+              // Get.find<ChatController>().creatingChatThread(
+              //   participants: [
+              //     '${UserService.instance.userModel.value.id}',
+              //     '1234567890'
+              //   ],
+              //   chatThreadId:
+              //       "${UserService.instance.userModel.value.id}-1234567890",
+              // );
+              ctrl.messagesHandler(
+                  type: 'text_msg',
+                  userID: '12345',
+                  senderName: 'sufyan',
+                  senderProfileImage: 'sss',
+                  threadID: '67932e59f0edbdd12d7d605b-1234567890');
+            },
+          ),
         ],
       ),
     );

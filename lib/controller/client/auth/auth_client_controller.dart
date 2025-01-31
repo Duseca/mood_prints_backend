@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,7 @@ import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
+  FirebaseMessaging fcm = FirebaseMessaging.instance;
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -34,6 +36,8 @@ class AuthController extends GetxController {
   // Rx<String?> selectedProfileImage = Rx<String?>(null);
   var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
+  RxBool acceptTermsAndCondition = false.obs;
+  RxBool passwordVisibility = true.obs;
 
   //  --- Login Method ---
 
@@ -46,10 +50,15 @@ class AuthController extends GetxController {
     log("Password ${password}");
     try {
       showLoadingDialog();
+      final fcmToken = await fcm.getToken();
+
       Map<String, dynamic> body = {
         'email': email,
         'password': password,
+        'deviceToken': fcmToken,
       };
+
+      log("FCM TOKEN LOGIN ------ $fcmToken ");
       final response = await apiService.post(loginUrl, body, true,
           showResult: true, successCode: 200);
       hideLoadingDialog();
@@ -87,13 +96,18 @@ class AuthController extends GetxController {
     log("Try Called SignUp");
     try {
       showLoadingDialog();
+      final fcmToken = await fcm.getToken();
+
+      log("FCM TOKEN SignUp ------ $fcmToken ");
       Map<String, dynamic> body = {
         'email': email,
         'password': password,
         'userType': userType,
         'fullName': fullName,
-        'authProvider': 'email'
+        'authProvider': 'email',
+        'deviceToken': fcmToken,
       };
+
       final response = await apiService.post(signUpUrl, body, true,
           showResult: true, successCode: 201);
       hideLoadingDialog();
@@ -244,6 +258,8 @@ class AuthController extends GetxController {
     }
   }
 
+  //
+
   //  --- Get Current User Information Method ---
   // This function is used when a user logs in or signs up for an account. After that, if the user closes the app and opens it again later, they won't need to authenticate to log in.
 
@@ -312,12 +328,28 @@ class AuthController extends GetxController {
     await prefs.setString('$key', '$value');
   }
 
+  void checkBoxValue() {
+    if (acceptTermsAndCondition == true) {
+      acceptTermsAndCondition.value = false;
+    } else {
+      acceptTermsAndCondition.value = true;
+    }
+    update();
+  }
+
+  passwordVisibityMethod() {
+    passwordVisibility.value == true
+        ? passwordVisibility.value = false
+        : passwordVisibility.value = true;
+  }
+
   // --- Reset Controllers values ---
 
   resetValues() {
     fullNameController.clear();
     emailController.clear();
     passwordController.clear();
+    acceptTermsAndCondition.value = false;
     update();
   }
 }
