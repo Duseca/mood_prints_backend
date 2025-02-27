@@ -12,7 +12,20 @@
           "package_name": "com.example.mood_prints"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "830689119309-lq7imkgjpq81h08sgucfttv5kfj0nrpj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mood_prints",
+            "certificate_hash": "01ed19af9d7f569deccf6878ee4b35173de06858"
+          }
+        },
+        {
+          "client_id": "830689119309-jdac14ed70l96kp9otq9ptbk4b2m112j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDc2_GUhopWi4Qr0kjQ0INnVawWRrDiLkc"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "830689119309-jdac14ed70l96kp9otq9ptbk4b2m112j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "830689119309-4q5f714h244m3t342s2t570qv77vhi9f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.moodPrints"
+              }
+            }
+          ]
         }
       }
     }

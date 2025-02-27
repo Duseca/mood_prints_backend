@@ -4,16 +4,21 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
-import 'package:mood_prints/model/all_therapist/all_therapist_model.dart';
-import 'package:mood_prints/model/user_model.dart';
+import 'package:mood_prints/core/enums/notification_type.dart';
+import 'package:mood_prints/core/enums/user_type.dart';
+import 'package:mood_prints/model/client_model/all_therapist/all_therapist_model.dart';
+import 'package:mood_prints/model/client_model/user_model.dart';
+import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
+import 'package:mood_prints/services/user/user_type_service.dart';
+import 'package:mood_prints/view/screens/client/client_profile/add_new_therapist.dart';
 
 class ProfileController extends GetxController {
   TextEditingController fullNameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
+  // TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   String? completePhoneNumber;
   TextEditingController bioController = TextEditingController();
@@ -30,6 +35,9 @@ class ProfileController extends GetxController {
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+  RxBool visiblityOld = false.obs;
+  RxBool visiblityNew = false.obs;
+  RxBool visiblityConfrim = false.obs;
 
   // Image Picker
 
@@ -59,14 +67,14 @@ class ProfileController extends GetxController {
         image:
             (downloadImageUrl != null) ? downloadImageUrl : oldProfileImageUrl,
         fullName: fullNameController.text.trim(),
-        email: emailController.text.trim(),
+        // email: emailController.text.trim(),
         phoneNumber: completePhoneNumber,
         dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
         gender: selectedGenderValue.value.toLowerCase(),
         bio: bioController.text,
       );
 
-      final url = updateClientUrl + userId;
+      final url = updateUserUrl + userId;
 
       final response = await apiService.putWithBody(url, body.toJson(), false,
           showResult: true, successCode: 200);
@@ -76,18 +84,18 @@ class ProfileController extends GetxController {
       if (response != null) {
         final message = response['message'];
         final user = response['user'];
-        log('Message:-> $message');
+
         if (message != null && message.isNotEmpty) {
-          final model = UserModel.fromJson(user);
-          UserService.instance.userModel.value = model;
-          log("Updated username: ${model.fullName}");
-          log("Updated Model: ${model.toJson()}");
+          if (UserTypeService.instance.userType == UserType.therapist.name) {
+            final model = TherapistDetailModel.fromJson(user);
+            UserService.instance.therapistDetailModel.value = model;
+          } else {
+            final model = UserModel.fromJson(user);
+            UserService.instance.userModel.value = model;
+          }
           Get.back();
         }
         displayToast(msg: 'User Profile Updated');
-        log('User Profile Updated');
-      } else {
-        log('User Not Updated');
       }
       hideLoadingDialog();
     } catch (e) {
@@ -145,7 +153,7 @@ class ProfileController extends GetxController {
         ]
       };
 
-      final url = updateClientUrl + UserService.instance.userModel.value.id!;
+      final url = updateUserUrl + UserService.instance.userModel.value.id!;
 
       final response = await apiService.putWithBody(url, body, false,
           showResult: false, successCode: 200);
@@ -184,11 +192,14 @@ class ProfileController extends GetxController {
     required String newPassword,
     required String confrimPassword,
   }) async {
-    log("Change Password Called");
+    log("Change Password Called ");
+    log("User Type: ${UserTypeService.instance.userType}");
     try {
       showLoadingDialog();
       Map<String, dynamic> body = {
-        'email': UserService.instance.userModel.value.email,
+        'email': (UserTypeService.instance.userType == UserType.client)
+            ? UserService.instance.userModel.value.email
+            : UserService.instance.therapistDetailModel.value.email,
         'currentPassword': oldPassword,
         'newPassword': newPassword,
       };
@@ -201,11 +212,105 @@ class ProfileController extends GetxController {
 
         if (message == 'Password changed successfully') {
           displayToast(msg: "Password changed successfully");
+          Get.close(1);
+          oldPasswordController.clear();
+          newPasswordController.clear();
+          confirmPasswordController.clear();
+          visiblityOld.value = false;
+          visiblityNew.value = false;
+          visiblityConfrim.value = false;
         }
       }
     } catch (e) {
       hideLoadingDialog();
       log('Error:-> $e');
+    }
+  }
+
+  passwordVisibityMethod(RxBool isVisible) {
+    isVisible.value == true ? isVisible.value = false : isVisible.value = true;
+  }
+
+  // ---------- Request Therapist ---------------
+  // ---------- Creating a notification request ---------------
+
+  void requestTherapist({
+    String? therapistID,
+  }) async {
+    if (therapistID != null) {
+      log('Request Therapist Called');
+      log("Therapist ID: $therapistID");
+      log("Client ID: ${UserService.instance.userModel.value.id}");
+
+      showLoadingDialog();
+
+      final body = {
+        'therapistId': therapistID,
+        'clientId': UserService.instance.userModel.value.id,
+        'action': ActionType.create.name,
+      };
+
+      final response = await apiService.post(requestNotificationUrl, body, true,
+          showResult: true, successCode: 201);
+
+      if (response != null) {
+        final message = response['message'];
+        final request = response['request'];
+        final requestID = request['_id'];
+
+        if (message != null && message.isNotEmpty) {
+          await createNotification(
+            requestId: requestID,
+            therapistId: therapistID,
+            title: 'Request from Client',
+            fullName: UserService.instance.userModel.value.fullName,
+            message: message,
+          );
+
+          hideLoadingDialog();
+
+          log('Request Send: $message');
+        }
+      }
+
+      hideLoadingDialog();
+    } else {
+      displayToast(msg: "Please select a therapist");
+    }
+  }
+
+  Future<void> createNotification({
+    String? therapistId,
+    String? requestId,
+    String? title,
+    String? fullName,
+    String? message,
+  }) async {
+    log('Create Notification Called');
+
+    final body = {
+      'requestId': requestId,
+      'userId': UserService.instance.userModel.value.id,
+      'therapistId': therapistId,
+      'title': title,
+      'fullName': fullName,
+      'body': '$fullName has requested to select you as their therapist.',
+    };
+
+    String createNotificationUrl = notificationUrl;
+
+    final response = await apiService.post(createNotificationUrl, body, true,
+        showResult: true, successCode: 201);
+
+    if (response != null) {
+      final notification = response['notification'];
+      if (notification != null && notification.isNotEmpty) {
+        Get.dialog(RequestCard(
+          message: '$message',
+        ));
+        log('Notification Created -------->');
+        log('Notification: $notification');
+      }
     }
   }
 }

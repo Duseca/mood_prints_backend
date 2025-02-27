@@ -83,7 +83,7 @@ class _ModeManagerState extends State<ModeManager> {
         appBar: simpleAppBar(
             title:
                 '${DateTimeService.instance.getSimpleUSDateFormat(modeCtrl.datePicker.value)}',
-            onTitleTap: showDatePickerOnTitleTap,
+            // onTitleTap: showDatePickerOnTitleTap,
             actions: [
               InkWell(
                 onTap: () {
@@ -116,7 +116,7 @@ class _ModeManagerState extends State<ModeManager> {
                       children: [
                         MyText(
                           paddingBottom: 16,
-                          text: "How is your mood today?*",
+                          text: "How are you feeling right now?",
                           size: 16,
                           weight: FontWeight.w600,
                         ),
@@ -137,10 +137,6 @@ class _ModeManagerState extends State<ModeManager> {
                                     onTap: () {
                                       modeCtrl.selectedMood.value =
                                           modeIndicatorItems[index];
-
-                                      log('selected Model:=> ${modeCtrl.selectedMood.value.toMap().toString()} ');
-                                      // currentModeIndex = index;
-                                      // log(currentModeIndex.toString());
                                     },
                                     child: Icon(
                                       ((modeCtrl.selectedMood.value ==
@@ -171,17 +167,21 @@ class _ModeManagerState extends State<ModeManager> {
                             decoration: BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(8)),
-                              // color: modeIndicatorItems[currentModeIndex].color,
                               color: modeCtrl.selectedMood.value.color,
                             ),
                             child: Center(
                               child: MyText(
-                                text:
-                                    // "${modeIndicatorItems[currentModeIndex].mode} Mode",
-                                    "${modeCtrl.selectedMood.value.mode} Mode",
+                                text: "${modeCtrl.selectedMood.value.mode}",
                                 size: 14,
                                 weight: FontWeight.w600,
-                                color: kWhiteColor,
+                                color:
+                                    (modeCtrl.selectedMood.value.stressLevel >=
+                                                0 &&
+                                            modeCtrl.selectedMood.value
+                                                    .stressLevel <=
+                                                3)
+                                        ? kTertiaryColor
+                                        : kWhiteColor,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -194,13 +194,15 @@ class _ModeManagerState extends State<ModeManager> {
                   SizedBox(
                     height: 10,
                   ),
+                  // ------------ How stressed are you feeling? -------------
+
                   Container(
                     padding: EdgeInsets.all(20),
                     decoration: AppStyling.CUSTOM_CARD,
                     child: Column(
                       children: [
                         MyText(
-                          text: 'How stressed are you feeling?*',
+                          text: 'How stressed are you feeling?',
                           size: 16,
                           paddingBottom: 20,
                           weight: FontWeight.w600,
@@ -210,26 +212,79 @@ class _ModeManagerState extends State<ModeManager> {
                           height: 10,
                         ),
 
-                        // ------- Emotions ----------
+                        // ------------ Stressed Icons -------------
 
                         Wrap(
                           alignment: WrapAlignment.center,
                           spacing: 10,
                           runSpacing: 10,
                           children: List.generate(
-                            feelingItems.length,
+                            stressItems.length,
                             (index) {
                               return Obx(
                                 () => InkWell(
                                   onTap: () {
-                                    modeCtrl.emotionSelector(index);
+                                    modeCtrl.stressedSelector(index);
                                   },
                                   child: Image.asset(
                                     (modeCtrl.stressIconHandler.value == index)
-                                        ? feelingItems[index]
-                                            .iconA // Highlighted icon
-                                        : feelingItems[index]
-                                            .iconB, // Normal icon
+                                        ? stressItems[index]
+                                            .selectedIcon // Highlighted icon
+                                        : stressItems[index]
+                                            .unselectedIcon, // Normal icon
+                                    height: 44,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+
+                  // ------------ How irritable do you feel? -------------
+
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: AppStyling.CUSTOM_CARD,
+                    child: Column(
+                      children: [
+                        MyText(
+                          text: 'How irritable do you feel?',
+                          size: 16,
+                          paddingBottom: 20,
+                          weight: FontWeight.w600,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+
+                        // ------- Irritable Icons ----------
+
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: List.generate(
+                            irritateItems.length,
+                            (index) {
+                              return Obx(
+                                () => InkWell(
+                                  onTap: () {
+                                    modeCtrl.irritableSelector(index);
+                                  },
+                                  child: Image.asset(
+                                    (modeCtrl.irritateIconHandler.value ==
+                                            index)
+                                        ? irritateItems[index]
+                                            .selectedIcon // Highlighted icon
+                                        : irritateItems[index]
+                                            .unselectedIcon, // Normal icon
                                     height: 44,
                                   ),
                                 ),
@@ -751,16 +806,92 @@ class _ModeManagerState extends State<ModeManager> {
 
             // ------------ Save Changes Button ----------------
 
-            Padding(
-              padding: AppSizes.DEFAULT,
-              child: MyButton(
-                buttonText: 'Save Changes',
-                onTap: () {
-                  modeCtrl.createBoard();
-                  // modeCtrl.uploadPhotosTOSorage();
-                },
-              ),
-            ),
+            Obx(() {
+              modeCtrl.isButtonEnabled.value =
+                  modeCtrl.remainingTime.value <= 0;
+
+              return Padding(
+                padding: AppSizes.DEFAULT,
+                child: MyButton(
+                  bgColor: (modeCtrl.isButtonEnabled.value)
+                      ? kSecondaryColor
+                      : kGreyColor.withOpacity(0.6),
+                  buttonText: (modeCtrl.isButtonEnabled.value)
+                      ? 'Save Changes'
+                      : "Time left: ${modeCtrl.formatDuration(Duration(milliseconds: modeCtrl.remainingTime.value))}",
+                  onTap: () async {
+                    if (modeCtrl.isButtonEnabled.value) {
+                      modeCtrl.createBoard();
+
+                      log('4');
+                    } else {
+                      log('sss ${modeCtrl.isButtonEnabled.value}');
+                    }
+
+                    // modeCtrl.uploadPhotosTOSorage();
+                  },
+                ),
+              );
+            }),
+
+            // GetBuilder<ModeManagerController>(
+            //   builder: (controller) {
+            //     RxBool isButtonEnabled = false.obs;
+            //     isButtonEnabled.value = controller.remainingTime.value <= 0;
+
+            //     return ElevatedButton(
+            //       onPressed:
+            //           isButtonEnabled.value ? controller.createBoard : null,
+            //       style: ElevatedButton.styleFrom(
+            //         backgroundColor:
+            //             isButtonEnabled.value ? Colors.blue : Colors.grey,
+            //       ),
+            //       child: Text(
+            //         isButtonEnabled.value
+            //             ? "Enter Data"
+            //             : "Wait: ${controller.formatDuration(Duration(milliseconds: controller.remainingTime.value))}",
+            //       ),
+            //     );
+            //   },
+            // )
+
+            // GetBuilder<ModeManagerController>(builder: (ctrl) {
+            //   bool isButtonEnabled = ctrl.remainingTime.value <= 0;
+
+            //   return (isButtonEnabled)
+            //       ? Padding(
+            //           padding: AppSizes.DEFAULT,
+            //           child: MyButton(
+            //             buttonText: 'Save Changes',
+            //             onTap: () async {
+            //               modeCtrl.createBoard();
+            //               await modeCtrl.displayCountdownForNextDataEntry();
+
+            //               // modeCtrl.uploadPhotosTOSorage();
+            //             },
+            //           ),
+            //         )
+            //       : Padding(
+            //           padding: AppSizes.DEFAULT,
+            //           child: MyButton(
+            //             bgColor: kGreyColor.withOpacity(0.6),
+            //             buttonText:
+            //                 "Wait: ${ctrl.formatDuration(Duration(milliseconds: ctrl.remainingTime.value))} ",
+            //             onTap: () {},
+            //           ),
+            //         );
+            // })
+
+            // Padding(
+            //   padding: AppSizes.DEFAULT,
+            //   child: MyButton(
+            //     buttonText: 'Save Changes',
+            //     onTap: () {
+            //       modeCtrl.createBoard();
+            //       // modeCtrl.uploadPhotosTOSorage();
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),

@@ -4,38 +4,39 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/firebase_const.dart';
 import 'package:mood_prints/model/chat/chat_thread_model.dart';
 import 'package:mood_prints/model/chat/message_model.dart';
+import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
+import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatController extends GetxController {
   TextEditingController textMessageController = TextEditingController();
-  // List participantsIDs = [];
   RxBool isLoading = false.obs;
   var uuid = Uuid();
-  DateTime currentDateTime = DateTime.now();
+  // Image Selection
+  Rxn<String> selectedImage = Rxn<String>(null);
+
+  // ---------------- Creating Chat Thread Model ---------------------
 
   Future<void> creatingChatThread({
-    required List<String> participants,
-    // required String participantsID,
-    // required String myID,
-    required String chatThreadId,
-    // required chatName,
-    // required chatImage
+    required String participantsID,
+    required String myID,
   }) async {
     try {
+      DateTime currentDateTime = DateTime.now();
+      String chatThreadId = "$myID-$participantsID";
       ChatThreadModel chatThreadModel = ChatThreadModel(
           createdAt: currentDateTime,
-          chatType: participants.length > 2 ? 'group' : 'one-to-one',
+          chatType: 'one-to-one',
           lastMessage: '',
           lastMessageType: '',
           unSeenMessage: false,
           lastMessageSeenBy: [],
           likedBy: [],
           deletedBy: [],
-          participants: participants,
-          // [
-          //   '$participantsID',
-          //   '$myID',
-          // ],
+          participants: [
+            myID,
+            participantsID,
+          ],
           receiverImage: '',
           receiverName: '',
           chatThreadId: chatThreadId,
@@ -58,7 +59,7 @@ class ChatController extends GetxController {
     required DateTime lastMessageTime,
     required String lastMessageType,
     required bool unSeenMessage,
-    required String lastTextMessage,
+    String? lastTextMessage,
   }) async {
     try {
       await chatCollection.doc(chatThreadId).update({
@@ -80,7 +81,7 @@ class ChatController extends GetxController {
 
   Future<void> messagesHandler({
     required dynamic type,
-    required String userID,
+    required String senderID,
     required String senderName,
     required String senderProfileImage,
     required String threadID,
@@ -90,15 +91,14 @@ class ChatController extends GetxController {
       isLoading.value = true;
 
       String newDocId = uuid.v4();
-      // DateTime currentDateTime = DateTime.now();
 
       MessageModel msgModel = MessageModel(
-        sentBy: userID,
-        sentAt: currentDateTime,
+        sentBy: senderID,
+        sentAt: DateTime.now(),
         senderName: senderName,
         senderProfileImage: senderProfileImage,
         messageId: newDocId,
-        messageType: type,
+        // messageType: type,
         textMessage: textMessageController.text.trim(),
         isSeen: false,
         seenBy: [],
@@ -114,40 +114,95 @@ class ChatController extends GetxController {
       await updateChatThread(
         chatThreadId: threadID,
         lastTextMessage: textMessageController.text.trim(),
-        lastMessageTime: currentDateTime,
+        lastMessageTime: DateTime.now(),
         chatImage: senderProfileImage,
         chatName: senderName,
         lastMessageType: type,
         unSeenMessage: false,
       );
 
-      // Update Chat thread
-
-      // await chatCollection.doc(threadID).update({
-      //   'lastMessage': newMessage,
-      //   'lastMessageDateTime': currentDateTime.toLocal(),
-      //   'lastMessageType': type,
-      // });
-
       log("Message send");
 
       textMessageController.clear();
       isLoading.value = false;
-
-      // chatCollection
     } catch (e) {
       isLoading.value = false;
       log("Message sending erorr: $e");
     }
   }
 
-  // String sortIds({String ids = '5678-1234'}) {
-  //   List<String> parts = ids.split('-').map((part) => part.trim()).toList();
-  //   log("Pats:--> ${parts}");
+  // --------- Image Type Chat -------------
 
-  //   parts.sort();
-  //   var result = parts.join('-');
-  //   log("Result:--> ${result}");
-  //   return result;
-  // }
+  Future<void> imageFromGallery() async {
+    await ImagePickerService().pickMedia(isImage: true, fromGallery: true);
+    selectedImage.value = ImagePickerService().activeMedia.value;
+    Get.close(1);
+  }
+
+  Future<void> imageFromCamera() async {
+    await ImagePickerService().pickMedia(isImage: true, fromGallery: false);
+    selectedImage.value = ImagePickerService().activeMedia.value;
+    Get.close(1);
+  }
+
+  // Image from gallery
+
+  Future<void> messagesPictureHandler({
+    required dynamic type,
+    required String senderID,
+    required String senderName,
+    required String senderProfileImage,
+    required String threadID,
+  }) async {
+    try {
+      isLoading.value = true;
+
+      String newDocId = uuid.v4();
+
+      String? downloadImageUrl;
+      if (selectedImage.value != null) {
+        downloadImageUrl = await FirebaseStorageService.instance.uploadImage(
+            imagePath: selectedImage.value!, storageFolderPath: 'chat_images');
+      }
+      log('download url is: $downloadImageUrl');
+
+      MessageModel msgModel = MessageModel(
+        sentBy: senderID,
+        sentAt: DateTime.now(),
+        senderName: senderName,
+        senderProfileImage: senderProfileImage,
+        messageId: newDocId,
+        messageType: type,
+        pictureMedia: downloadImageUrl,
+        isSeen: false,
+        textMessage: '',
+        seenBy: [],
+        deletedBy: [],
+      );
+
+      await chatCollection
+          .doc(threadID)
+          .collection('messages')
+          .doc(newDocId)
+          .set(msgModel.toMap());
+
+      await updateChatThread(
+        chatThreadId: threadID,
+        lastTextMessage: 'Picture',
+        lastMessageTime: DateTime.now(),
+        chatImage: senderProfileImage,
+        chatName: senderName,
+        lastMessageType: type,
+        unSeenMessage: false,
+      );
+
+      log("Picture Message send");
+      selectedImage.value = null;
+      downloadImageUrl = null;
+      isLoading.value = false;
+    } catch (e) {
+      isLoading.value = false;
+      log("Message sending erorr: $e");
+    }
+  }
 }

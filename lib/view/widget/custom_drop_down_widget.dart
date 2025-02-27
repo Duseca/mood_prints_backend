@@ -1,10 +1,9 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/material.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
-import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class CustomDropDown extends StatelessWidget {
   CustomDropDown({
     required this.hint,
@@ -17,7 +16,7 @@ class CustomDropDown extends StatelessWidget {
     this.labelText,
   });
 
-  final List<dynamic>? items;
+  final List<dynamic> items;
   String selectedValue;
   final ValueChanged<dynamic>? onChanged;
   String hint;
@@ -43,7 +42,7 @@ class CustomDropDown extends StatelessWidget {
             ),
           DropdownButtonHideUnderline(
             child: DropdownButton2(
-              items: items!
+              items: items
                   .map(
                     (item) => DropdownMenuItem<dynamic>(
                       value: item,
@@ -118,7 +117,7 @@ class CustomDropDown2 extends StatelessWidget {
     this.width,
   });
 
-  final List<dynamic>? items;
+  final List<dynamic> items;
   String selectedValue;
   final ValueChanged<dynamic>? onChanged;
   String hint;
@@ -128,7 +127,7 @@ class CustomDropDown2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
-        items: items!
+        items: items
             .map(
               (item) => DropdownMenuItem<dynamic>(
                 value: item,

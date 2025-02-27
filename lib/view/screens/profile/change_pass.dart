@@ -15,7 +15,7 @@ import 'package:mood_prints/view/widget/my_text_widget.dart';
 class ChangePass extends StatelessWidget {
   ChangePass({super.key});
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final loginCtrl = Get.find<AuthController>();
+  final loginCtrl = Get.find<AuthClientController>();
   final ctrl = Get.find<ProfileController>();
 
   @override
@@ -45,7 +45,7 @@ class ChangePass extends StatelessWidget {
                           InkWell(
                             onTap: () {
                               log('work');
-                              loginCtrl.passwordVisibityMethod();
+                              ctrl.passwordVisibityMethod(ctrl.visiblityOld);
                             },
                             child: Image.asset(
                               Assets.imagesVisibility,
@@ -54,7 +54,7 @@ class ChangePass extends StatelessWidget {
                           ),
                         ],
                       ),
-                      isObSecure: loginCtrl.passwordVisibility.value,
+                      isObSecure: ctrl.visiblityOld.value,
                       validator: validatePassword,
                     ),
                     MyTextField(
@@ -67,7 +67,7 @@ class ChangePass extends StatelessWidget {
                           InkWell(
                             onTap: () {
                               log('work');
-                              loginCtrl.passwordVisibityMethod();
+                              ctrl.passwordVisibityMethod(ctrl.visiblityNew);
                             },
                             child: Image.asset(
                               Assets.imagesVisibility,
@@ -76,7 +76,7 @@ class ChangePass extends StatelessWidget {
                           ),
                         ],
                       ),
-                      isObSecure: loginCtrl.passwordVisibility.value,
+                      isObSecure: ctrl.visiblityNew.value,
                       validator: validatePassword,
                     ),
                     MyTextField(
@@ -89,7 +89,8 @@ class ChangePass extends StatelessWidget {
                           InkWell(
                             onTap: () {
                               log('work');
-                              loginCtrl.passwordVisibityMethod();
+                              ctrl.passwordVisibityMethod(
+                                  ctrl.visiblityConfrim);
                             },
                             child: Image.asset(
                               Assets.imagesVisibility,
@@ -98,7 +99,7 @@ class ChangePass extends StatelessWidget {
                           ),
                         ],
                       ),
-                      isObSecure: loginCtrl.passwordVisibility.value,
+                      isObSecure: ctrl.visiblityConfrim.value,
                       validator: validatePassword,
                     ),
                   ],

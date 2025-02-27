@@ -15,11 +15,12 @@ import 'package:mood_prints/view/widget/social_login_%20widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+// ignore: must_be_immutable
 class ClientSignUp extends StatelessWidget {
   final String type;
   ClientSignUp({Key? key, required this.type}) : super(key: key);
 
-  final ctrl = Get.find<AuthController>();
+  final ctrl = Get.find<AuthClientController>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
 
   @override
@@ -154,7 +155,10 @@ class ClientSignUp extends StatelessWidget {
               children: [
                 Expanded(
                   child: SocialLogin(
-                    onTap: () {},
+                    onTap: () {
+                      ctrl.googleAuth(userType: type);
+                      // ctrl.isUserExistWithEmail(email: 'mood1@gmail.com');
+                    },
                     icon: Assets.imagesGoogle,
                     title: 'Google',
                   ),

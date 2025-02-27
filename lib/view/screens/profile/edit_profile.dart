@@ -11,7 +11,6 @@ import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
-import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
 import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
@@ -34,13 +33,17 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     var userModel = UserService.instance.userModel.value;
 
-    // ctrl.selectedProfileImage.value = userModel.image!;
-    ctrl.fullNameController.text = userModel.fullName!;
-    ctrl.emailController.text = userModel.email!;
-    ctrl.phoneNumberController.text = userModel.phoneNumber!;
-    // ctrl.selectedGenderValue.value = userModel.gender!;
-    ctrl.dob.value = DateTime.parse(userModel.dob!);
-    ctrl.bioController.text = userModel.bio!;
+    if (userModel.authProvider == 'google') {
+      ctrl.fullNameController.text = userModel.fullName!;
+      ctrl.phoneNumberController.text = '';
+
+      ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+    } else {
+      ctrl.fullNameController.text = userModel.fullName!;
+      ctrl.phoneNumberController.text = userModel.phoneNumber!;
+      ctrl.dob.value = DateTime.parse(userModel.dob!);
+      ctrl.bioController.text = userModel.bio!;
+    }
 
     return Scaffold(
       appBar: simpleAppBar(
@@ -127,11 +130,11 @@ class _EditProfileState extends State<EditProfile> {
                   labelText: 'Full Name',
                   hintText: 'Your full name here...',
                 ),
-                MyTextField(
-                  controller: ctrl.emailController,
-                  labelText: 'Email Address',
-                  hintText: 'Your email address...',
-                ),
+                // MyTextField(
+                //   controller: ctrl.emailController,
+                //   labelText: 'Email Address',
+                //   hintText: 'Your email address...',
+                // ),
                 // PhoneField(
                 //   controller: ctrl.phoneNumberController,
                 // ),
@@ -142,17 +145,38 @@ class _EditProfileState extends State<EditProfile> {
                     log("Complete Phone Number: ${ctrl.completePhoneNumber}");
                   },
                 ),
-                Obx(
-                  () => CustomDropDown(
-                    labelText: 'Gender',
-                    hint: ctrl.selectedGenderValue.value,
-                    items: ctrl.genderList,
-                    selectedValue: ctrl.selectedGenderValue.value,
-                    onChanged: (v) {
-                      ctrl.selectedGenderValue.value = v;
-                    },
-                  ),
-                ),
+                // Obx(
+                //   () => CustomDropDown(
+                //     labelText: 'Gender',
+                //     hint: ctrl.selectedGenderValue.value,
+                //     items: ctrl.genderList,
+                //     selectedValue: ctrl.selectedGenderValue.value,
+                //     onChanged: (v) {
+                //       ctrl.selectedGenderValue.value = v;
+                //     },
+                //   ),
+                // ),
+
+                // - Centerd -
+
+                // Obx(
+                //   () => CustomDropDown(
+                //     labelText: 'Gender',
+                //     hint: ctrl.selectedGenderValue.value.isEmpty
+                //         ? 'Select Gender'
+                //         : ctrl.selectedGenderValue.value,
+                //     items: ctrl.genderList,
+                //     selectedValue: ctrl.selectedGenderValue.value,
+
+                //     // ctrl.genderList.contains(ctrl.selectedGenderValue.value.toString())
+                //     //     ? ctrl.selectedGenderValue.value
+                //     //     : null, // Ensure selected value exists in list
+                //     onChanged: (v) {
+                //       ctrl.selectedGenderValue.value = v;
+                //     },
+                //   ),
+                // ),
+
                 // MyTextField(
                 //   labelText: 'Date of Birth',
                 //   hintText: (ctrl.dob.value != null)

@@ -13,9 +13,9 @@ import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/model/stats/mode_flow_stats_model.dart';
 import 'package:mood_prints/model/stats/emotion_stats_model.dart';
 import 'package:mood_prints/model/stats/mood_by_sleep.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
-import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -40,7 +40,7 @@ class _ClientStatsState extends State<ClientStats> {
     ];
     final List<Widget> _tabBarView = [
       _Weekly(),
-      Container(),
+      _Monthly(),
     ];
     return DefaultTabController(
       length: _items.length,
@@ -96,6 +96,15 @@ class _ClientStatsState extends State<ClientStats> {
                   );
                 },
               ).toList(),
+              onTap: (index) {
+                log("$index");
+                if (index == 1) {
+                  ctrl.allmonthlyStats(
+                      userID: UserService.instance.userModel.value.id);
+
+                  setState(() {});
+                }
+              },
             ),
             Expanded(
               child: TabBarView(
@@ -227,25 +236,9 @@ class _Weekly extends StatefulWidget {
 }
 
 class _WeeklyState extends State<_Weekly> {
-  // EmotionStatsModel? model;
   EmotionStatsModel? stats;
 
   List<String> weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-
-  // List<Month> months = [
-  //   Month(name: "January", number: 1),
-  //   Month(name: "February", number: 2),
-  //   Month(name: "March", number: 3),
-  //   Month(name: "April", number: 4),
-  //   Month(name: "May", number: 5),
-  //   Month(name: "June", number: 6),
-  //   Month(name: "July", number: 7),
-  //   Month(name: "August", number: 8),
-  //   Month(name: "September", number: 9),
-  //   Month(name: "October", number: 10),
-  //   Month(name: "November", number: 11),
-  //   Month(name: "December", number: 12),
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -266,10 +259,10 @@ class _WeeklyState extends State<_Weekly> {
                 ctrl.weekFrontUpdate.value = index;
                 ctrl.weekIndex.value = index + 1;
                 log("${ctrl.weekIndex.value}");
-                // ctrl.getModeFlowWeeklyStats();
 
                 showLoadingDialog();
-                await ctrl.calledStats();
+                await ctrl.allStats(
+                    userID: UserService.instance.userModel.value.id);
                 hideLoadingDialog();
                 setState(() {});
               },
@@ -295,10 +288,10 @@ class _WeeklyState extends State<_Weekly> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            MyText(
-              text: 'Select Month',
-              paddingBottom: 15,
-            ),
+            // MyText(
+            //   text: 'Select Month',
+            //   paddingBottom: 15,
+            // ),
             // SizedBox(
             //   width: 100,
             //   child: CustomDropDown(
@@ -345,35 +338,48 @@ class _WeeklyState extends State<_Weekly> {
                   // ------- Model Flow Chat ------
 
                   Expanded(
-                    child: _MoodFlowChart(
-                      // stats: ctrl.moodFlowStats,
-                      stats: ctrl.moodFlowStats,
-                    ),
-                  ),
+                      child: _MoodFlowChart(
+                    stats: ctrl.moodFlowStats,
+                  )
+
+                      // Obx(
+                      //   () => (ctrl.moodFlowStats != null &&
+                      //           ctrl.moodFlowStats!.isNotEmpty)
+                      //       ? _MoodFlowChart(
+                      //           stats: ctrl.moodFlowStats,
+                      //         )
+                      //       : _MoodFlowChart(
+                      //           // stats: ctrl.moodFlowStats,
+                      //           stats: ctrl.moodFlowStats,
+                      //         ),
+                      // ),
+                      ),
                 ],
               ),
               SizedBox(
                 height: 20,
               ),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: kTertiaryColor,
-                    fontFamily: AppFonts.URBANIST,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Mood Patterns: ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
+              (ctrl.moodFlowStats != null)
+                  ? SizedBox.shrink()
+                  : RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          color: kTertiaryColor,
+                          fontFamily: AppFonts.URBANIST,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Mood Patterns: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'No data available. ',
+                          ),
+                        ],
                       ),
                     ),
-                    TextSpan(
-                      text: 'No data available. ',
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -381,7 +387,7 @@ class _WeeklyState extends State<_Weekly> {
           height: 12,
         ),
 
-        // ---------- Mood Bar // Emotion ----------
+        // ---------- Mood Bar Percentage ----------
 
         Container(
           padding: EdgeInsets.all(20),
@@ -398,166 +404,15 @@ class _WeeklyState extends State<_Weekly> {
               SizedBox(
                 height: 10,
               ),
-              // Wrap(
-              //   alignment: WrapAlignment.center,
-              //   spacing: 10,
-              //   runSpacing: 10,
-              //   children: List.generate(
-              //     feelingItems.length,
-              //     (index) {
-
-              //       String stressLevel =
-              //           feelingItems[index].stressLevel.toString();
-
-              //       String? percentage =
-              //           ctrl.emotionPercentageStats?.firstWhere(
-              //         (item) =>
-              //             item.stressLevel ==
-              //             stressLevel, // Compare stressLevel directly
-              //         orElse: () => StressLevelPercentage(
-              //             stressLevel: null,
-              //             percentage: null), // Return a fallback object
-              //       ).toString();
-
-              //       log('percentage : $percentage');
-
-              //       return Column(
-              //         children: [
-              //           Image.asset(
-              //             feelingItems[index].iconA,
-              //             height: 44,
-              //           ),
-              //           SizedBox(
-              //             height: 8,
-              //           ),
-              //           // padding: EdgeInsets.symmetric(
-              //           //       horizontal: 12,
-              //           //       vertical: 3,
-              //           //     ),
-
-              //           SizedBox(
-              //             width: 60,
-              //             child: LinearPercentIndicator(
-              //               width: 60,
-              //               lineHeight: 14.0,
-              //               percent: 50 / 100,
-              //               backgroundColor: kGreyColor3,
-              //               progressColor: kSecondaryColor,
-              //               barRadius: Radius.circular(100),
-              //             ),
-
-              //             // LinearProgressIndicator(
-              //             //   minHeight: 20,
-              //             //   borderRadius: BorderRadius.circular(100),
-              //             //   backgroundColor: kGreyColor3,
-              //             //   value: 0.9,
-              //             // )
-              //           )
-              //           // Container(
-              //           //   padding: EdgeInsets.symmetric(
-              //           //     horizontal: 12,
-              //           //     vertical: 3,
-              //           //   ),
-              //           //   decoration: BoxDecoration(
-              //           //     color:
-              //           //         index == 0 ? kSecondaryColor : kOffWhiteColor,
-              //           //     borderRadius: BorderRadius.circular(50),
-              //           //   ),
-              //           //   child: MyText(
-              //           //     text: '4%',
-              //           //     size: 12,
-              //           //     color: index == 0 ? kWhiteColor : kGreyColor,
-              //           //   ),
-              //           // ),
-              //         ],
-              //       );
-              //     },
-              //   ),
-              // ),
-
-              // With Progress bar -----------
-
-              // Wrap(
-              //   alignment: WrapAlignment.center,
-              //   spacing: 10,
-              //   runSpacing: 10,
-              //   children: List.generate(
-              //     feelingItems.length,
-              //     (index) {
-              //       // Extract stress level for the current item
-              //       String stressLevel =
-              //           feelingItems[index].stressLevel.toString();
-
-              //       // Safely get the percentage for the current stress level
-              //       String? percentage = ctrl.emotionPercentageStats
-              //           ?.firstWhere(
-              //             (item) => item.stressLevel == stressLevel,
-              //             orElse: () => StressLevelPercentage(
-              //                 stressLevel: null, percentage: null),
-              //           )
-              //           .percentage;
-
-              //       log('Stress Level: $stressLevel, Percentage: $percentage');
-
-              //       // Convert percentage to a double for the progress bar
-              //       double progressValue = (percentage != null)
-              //           ? double.tryParse(percentage.replaceAll('%', '')) ?? 0.0
-              //           : 0.0;
-
-              //       return Column(
-              //         children: [
-              //           // Display iconA if percentage exists, otherwise iconB
-              //           Image.asset(
-              //             percentage != null
-              //                 ? feelingItems[index].iconA
-              //                 : feelingItems[index].iconB,
-              //             height: 44,
-              //           ),
-              //           const SizedBox(height: 8),
-
-              //           // LinearPercentIndicator with percentage text in the center
-              //           SizedBox(
-              //             width: 60,
-              //             child: Stack(
-              //               alignment: Alignment
-              //                   .center, // Center the text inside the progress bar
-              //               children: [
-              //                 LinearPercentIndicator(
-              //                   width: 60,
-              //                   lineHeight: 14.0,
-              //                   percent: (progressValue / 100).clamp(0.0, 1.0),
-              //                   backgroundColor: kGreyColor3,
-              //                   progressColor: kSecondaryColor,
-              //                   barRadius: const Radius.circular(100),
-              //                 ),
-              //                 Text(
-              //                   percentage != null ? percentage : "0%",
-
-              //                   style: const TextStyle(
-              //                     fontSize: 10,
-              //                     color: Colors.black,
-              //                     fontWeight: FontWeight.bold,
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ],
-              //       );
-              //     },
-              //   ),
-              // ),
-
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 10,
                 runSpacing: 10,
                 children: List.generate(
-                  feelingItems.length,
+                  stressItems.length,
                   (index) {
                     // Extract stress level for the current item
-                    String stressLevel =
-                        feelingItems[index].stressLevel.toString();
+                    String stressLevel = stressItems[index].level.toString();
 
                     // Safely get the percentage for the current stress level
                     String? percentage = ctrl.emotionPercentageStats
@@ -575,8 +430,8 @@ class _WeeklyState extends State<_Weekly> {
                         // Display iconA if percentage exists, otherwise iconB
                         Image.asset(
                           percentage != null
-                              ? feelingItems[index].iconA
-                              : feelingItems[index].iconB,
+                              ? stressItems[index].selectedIcon
+                              : stressItems[index].unselectedIcon,
                           height: 44,
                         ),
                         const SizedBox(height: 8),
@@ -596,22 +451,7 @@ class _WeeklyState extends State<_Weekly> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                             ),
-                            // Foreground bar for progress
-                            // if (percentage != null)
-                            //   Container(
-                            //     width: (60 *
-                            //             (double.tryParse(percentage.replaceAll(
-                            //                     '%', '')) ??
-                            //                 0.0) /
-                            //             100)
-                            //         .clamp(0.0, 60.0),
-                            //     height: 14,
-                            //     decoration: BoxDecoration(
-                            //       color: kSecondaryColor,
-                            //       borderRadius: BorderRadius.circular(100),
-                            //     ),
-                            //   ),
-                            // Centered text showing percentage
+
                             MyText(
                               text: percentage ?? '0%',
                               size: 12,
@@ -628,6 +468,7 @@ class _WeeklyState extends State<_Weekly> {
             ],
           ),
         ),
+
         SizedBox(
           height: 12,
         ),
@@ -1206,6 +1047,7 @@ class _WeeklyState extends State<_Weekly> {
 //     ];
 //   }
 // }
+
 class _MoodFlowChart extends StatelessWidget {
   final List<MoodFlowModel>? stats;
 
@@ -1626,10 +1468,10 @@ class SleepAnalysis extends StatelessWidget {
         dataSource: _dataSource,
         xValueMapper: (_ChartSampleData data, _) => data.x,
         yValueMapper: (_ChartSampleData data, _) => data.y,
-        dataLabelSettings: const DataLabelSettings(isVisible: true),
+        dataLabelSettings: const DataLabelSettings(isVisible: false),
         xAxisName: 'xAxis',
         yAxisName: 'yAxis',
-        color: Colors.blueAccent,
+        color: kSecondaryColor,
         borderRadius: BorderRadius.circular(10),
       ),
     ];
@@ -1650,15 +1492,15 @@ class _ChartSampleData {
   _ChartSampleData({required this.x, required this.y});
 }
 
-class Month {
+class MonthModel {
   final String name;
   final int number;
 
-  Month({required this.name, required this.number});
+  MonthModel({required this.name, required this.number});
 
   // Factory constructor to create a Month object from a map
-  factory Month.fromMap(Map<String, dynamic> map) {
-    return Month(
+  factory MonthModel.fromMap(Map<String, dynamic> map) {
+    return MonthModel(
       name: map['name'],
       number: map['number'],
     );
@@ -1670,5 +1512,583 @@ class Month {
       'name': name,
       'number': number,
     };
+  }
+}
+
+/*
+----------------------------
+ Monthly Stats
+----------------------------
+ */
+
+class _Monthly extends StatefulWidget {
+  _Monthly({super.key});
+
+  @override
+  State<_Monthly> createState() => __MonthlyState();
+}
+
+class __MonthlyState extends State<_Monthly> {
+  var ctrl = Get.find<ClientHomeController>();
+
+  @override
+  Widget build(BuildContext context) {
+    // ctrl.getSleepStats(
+    //     haveMonthly: true, userID: UserService.instance.userModel.value.id);
+
+    return ListView(
+      shrinkWrap: true,
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 120),
+      physics: BouncingScrollPhysics(),
+      children: [
+        // ----- Week Selector Button ----------
+
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: List.generate(
+        //     4,
+        //     (index) => GestureDetector(
+        //       onTap: () async {
+        //         ctrl.weekFrontUpdate.value = index;
+        //         ctrl.weekIndex.value = index + 1;
+        //         log("${ctrl.weekIndex.value}");
+
+        //         showLoadingDialog();
+        //         await ctrl.allStats(
+        //             userID: UserService.instance.userModel.value.id);
+        //         hideLoadingDialog();
+        //         setState(() {});
+        //       },
+        //       child: Obx(
+        //         () => Container(
+        //           height: 40,
+        //           width: 70,
+        //           decoration: BoxDecoration(
+        //               color: kWhiteColor,
+        //               border: Border.all(
+        //                   color: (ctrl.weekFrontUpdate == index)
+        //                       ? kSecondaryColor
+        //                       : kWhiteColor),
+        //               borderRadius: BorderRadius.circular(10)),
+        //           child: Center(child: MyText(text: '${weeks[index]}')),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+
+        SizedBox(height: 15),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            MyText(
+              text: 'Month',
+            ),
+            Container(
+              height: 40,
+              width: 120,
+              decoration: BoxDecoration(
+                color: kWhiteColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Center(
+                child: Obx(() => DropdownButton<MonthModel>(
+                      value: ctrl.selectedMonthModel.value,
+                      onChanged: (MonthModel? newValue) {
+                        if (newValue != null) {
+                          ctrl.selectedMonthModel.value = newValue;
+
+                          // widget.onMonthSelected(newValue);
+                        }
+                      },
+                      items: ctrl.months.map<DropdownMenuItem<MonthModel>>(
+                          (MonthModel month) {
+                        return DropdownMenuItem<MonthModel>(
+                          value: month,
+                          child: MyText(
+                            text: month.name,
+                            size: 13,
+                          ),
+                        );
+                      }).toList(),
+                      underline: SizedBox.shrink(),
+                    )),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 15),
+// ----------- Mode Flow Card ------------
+
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: AppStyling.CUSTOM_CARD,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MyText(
+                text: 'Mood Flow',
+                size: 16,
+                weight: FontWeight.w600,
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 17),
+                      child: Transform(
+                        alignment: Alignment.center, // Flip around the center
+                        transform: Matrix4.rotationX(
+                            3.14159), // Flip vertically (bottom to top)
+                        child: Image.asset(
+                          Assets.imagesColorDots,
+                          height: 210,
+                        ),
+                      )),
+                  SizedBox(
+                    width: 5,
+                  ),
+
+                  // ------- Model Flow Chat ------
+
+                  Expanded(
+                    child: Obx(
+                      () => (ctrl.moodFlowStatsMonthly != null &&
+                              ctrl.moodFlowStatsMonthly!.isNotEmpty)
+                          ? _MoodFlowChartMonthly(
+                              // stats: ctrl.moodFlowStats,
+                              stats: ctrl.moodFlowStatsMonthly,
+                            )
+                          : _MoodFlowChartMonthly(
+                              // stats: ctrl.moodFlowStats,
+                              stats: ctrl.moodFlowStatsMonthly,
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              (ctrl.moodFlowStatsMonthly != null)
+                  ? SizedBox.shrink()
+                  : RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          color: kTertiaryColor,
+                          fontFamily: AppFonts.URBANIST,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Mood Patterns: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'No data available. ',
+                          ),
+                        ],
+                      ),
+                    ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 12,
+        ),
+
+        // ---------- Mood Bar Percentage Monthly----------
+
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: AppStyling.CUSTOM_CARD,
+          child: Column(
+            children: [
+              MyText(
+                text: 'Mood Bar',
+                size: 16,
+                paddingBottom: 20,
+                weight: FontWeight.w600,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 10,
+                children: List.generate(
+                  stressItems.length,
+                  (index) {
+                    // Extract stress level for the current item
+                    String stressLevel = stressItems[index].level.toString();
+
+                    // Safely get the percentage for the current stress level
+                    String? percentage = ctrl.emotionPercentageStatsMonthly
+                        ?.firstWhere(
+                          (item) => item.stressLevel == stressLevel,
+                          orElse: () => StressLevelPercentage(
+                              stressLevel: null, percentage: null),
+                        )
+                        .percentage;
+
+                    // log('Stress Level: $stressLevel, Percentage: $percentage');
+
+                    return Column(
+                      children: [
+                        // Display iconA if percentage exists, otherwise iconB
+                        Image.asset(
+                          percentage != null
+                              ? stressItems[index].selectedIcon
+                              : stressItems[index].unselectedIcon,
+                          height: 44,
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Progress bar using Container with text
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Background bar
+                            Container(
+                              width: 60,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: (percentage != null)
+                                    ? kSecondaryColor
+                                    : kGreyColor3,
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+
+                            MyText(
+                              text: percentage ?? '0%',
+                              size: 12,
+                              color:
+                                  percentage != null ? kWhiteColor : kGreyColor,
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(
+          height: 12,
+        ),
+
+        SizedBox(
+          height: 12,
+        ),
+
+        //  ---- Sleep Analysis Montly ---
+
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: AppStyling.CUSTOM_CARD,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MyText(
+                text: 'Sleep Analysis',
+                size: 16,
+                weight: FontWeight.w600,
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          width: 1.0,
+                          color: kBorderColor,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          MyText(
+                            text: 'Bedtime',
+                            size: 12,
+                            color: kGreyColor,
+                          ),
+
+                          // ------ Average Bed Time -------
+                          MyText(
+                            paddingTop: 4,
+                            text:
+                                '${ctrl.sleepAnalysisMonthModel.value?.averageBedtime}',
+                            size: 16,
+                            weight: FontWeight.w600,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          width: 1.0,
+                          color: kBorderColor,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          MyText(
+                            text: 'Wake Up',
+                            size: 12,
+                            color: kGreyColor,
+                          ),
+                          MyText(
+                            paddingTop: 4,
+                            text:
+                                '${ctrl.sleepAnalysisMonthModel.value?.averageWakeupTime}',
+                            size: 16,
+                            weight: FontWeight.w600,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              // --------- Sleep Duration Graph Montly ------------
+
+              SleepAnalysisMonthlyWidget(),
+              SizedBox(
+                height: 20,
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 12,
+        ),
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: AppStyling.CUSTOM_CARD,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MyText(
+                text: 'Moods by Sleep',
+                size: 16,
+                weight: FontWeight.w600,
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              _MoodBySleep()
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/*
+Montly Graph Widgets 
+ */
+
+class _MoodFlowChartMonthly extends StatelessWidget {
+  final List<MoodFlowModel>? stats;
+
+  _MoodFlowChartMonthly({this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 239,
+      child: SfCartesianChart(
+        tooltipBehavior: TooltipBehavior(
+          enable: true,
+        ),
+        margin: EdgeInsets.zero,
+        borderWidth: 0,
+        borderColor: Colors.transparent,
+        plotAreaBorderWidth: 0,
+        enableAxisAnimation: true,
+        primaryYAxis: NumericAxis(
+          name: 'yAxis',
+          maximum: 4, // Stress level max at +4
+          minimum: -4, // Stress level min at -4
+          interval: 1,
+          isVisible: true,
+          plotOffset: 10.0,
+          majorGridLines: MajorGridLines(
+            width: 1,
+            color: kBorderColor,
+          ),
+          majorTickLines: MajorTickLines(
+            width: 0,
+          ),
+          axisLine: AxisLine(
+            width: 0,
+          ),
+          opposedPosition: false,
+          labelStyle: TextStyle(
+            color: kGreyColor,
+            fontSize: 12.0,
+            fontFamily: AppFonts.URBANIST,
+          ),
+        ),
+        primaryXAxis: CategoryAxis(
+          name: 'xAxis',
+          maximum: 30,
+          minimum: 1,
+          interval: 1,
+          plotOffset: 5,
+          majorGridLines: MajorGridLines(
+            width: 0,
+          ),
+          axisLine: AxisLine(
+            width: 0,
+          ),
+          majorTickLines: MajorTickLines(
+            width: 0,
+          ),
+          labelStyle: TextStyle(
+            color: kGreyColor,
+            fontSize: 12.0,
+            fontFamily: AppFonts.URBANIST,
+          ),
+          labelRotation: 0, // Keep labels straight
+        ),
+        series: graphData(stats),
+      ),
+    );
+  }
+
+  List<LineSeries<MoodFlowModel, String>> graphData(
+      List<MoodFlowModel>? stats) {
+    return [
+      LineSeries<MoodFlowModel, String>(
+        dataSource: stats,
+        xValueMapper: (MoodFlowModel data, _) {
+          // Format the date as "day" only for 30 days view
+          if (data.date != null) {
+            return DateFormat('d').format(DateTime.parse(data.date!));
+          }
+          return '';
+        },
+        yValueMapper: (MoodFlowModel data, _) => data.mood ?? 0,
+        xAxisName: 'xAxis',
+        yAxisName: 'yAxis',
+        color: kSecondaryColor,
+        width: 2,
+        markerSettings: MarkerSettings(
+          isVisible: true,
+        ),
+      ),
+    ];
+  }
+}
+
+class SleepAnalysisMonthlyWidget extends StatelessWidget {
+  final ctrl = Get.find<ClientHomeController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return SizedBox(
+        height: 200,
+        child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
+          margin: EdgeInsets.zero,
+          borderWidth: 0,
+          borderColor: Colors.transparent,
+          plotAreaBorderWidth: 0,
+          enableAxisAnimation: true,
+          primaryYAxis: NumericAxis(
+            name: 'yAxis',
+            maximum: 24, // 24-hour format
+            minimum: 0,
+            interval: 4,
+            isVisible: true,
+            axisLabelFormatter: (AxisLabelRenderDetails details) {
+              return ChartAxisLabel('${details.value.toInt()}h',
+                  TextStyle(color: Colors.grey, fontSize: 12.0));
+            },
+            majorGridLines:
+                MajorGridLines(width: 1, color: Colors.grey.shade300),
+            majorTickLines: MajorTickLines(width: 0),
+            axisLine: AxisLine(width: 0),
+          ),
+          primaryXAxis: CategoryAxis(
+            name: 'xAxis',
+            maximum: 30,
+            minimum: 1,
+            interval: 1,
+            labelStyle: TextStyle(color: Colors.grey, fontSize: 12.0),
+            majorGridLines: MajorGridLines(width: 0),
+            axisLine: AxisLine(width: 0),
+            majorTickLines: MajorTickLines(width: 0),
+          ),
+          series: graphData(ctrl.sleepStatsMontly),
+        ),
+      );
+    });
+  }
+
+  List<ColumnSeries<_ChartSampleData, String>> graphData(
+      List<SleepData> sleepStats) {
+    if (sleepStats.isEmpty) return [];
+
+    final List<_ChartSampleData> _dataSource = sleepStats.map((data) {
+      return _ChartSampleData(
+        x: _formatDateByMonth(data.date ?? ""), // Group dates by month
+        y: data.sleepTime?.toDouble() ?? 0,
+      );
+    }).toList();
+
+    return [
+      ColumnSeries<_ChartSampleData, String>(
+        dataSource: _dataSource,
+        xValueMapper: (_ChartSampleData data, _) => data.x,
+        yValueMapper: (_ChartSampleData data, _) => data.y,
+        xAxisName: 'xAxis',
+        yAxisName: 'yAxis',
+        pointColorMapper: (_, __) => LinearGradient(
+          begin: Alignment.topLeft,
+          // end: Alignment.bottomRight,
+          colors: [kSecondaryColor, Colors.orange],
+        ).colors.first,
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ];
+  }
+
+  /// Formats date to group by month and show dates accordingly.
+  String _formatDateByMonth(String date) {
+    if (date.isEmpty) return "";
+    final parsedDate = DateTime.parse(date);
+    return '${parsedDate.day}';
   }
 }

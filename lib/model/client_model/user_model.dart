@@ -114,29 +114,40 @@ class UserModel {
   // Factory constructor to create an instance from JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      stripeCustomerId: json['stripeCustomerId'],
-      id: json['_id'],
-      deviceToken: json['deviceToken'],
-      email: json['email'],
-      authProvider: json['authProvider'],
-      userType: json['userType'],
-      fullName: json['fullName'],
-      username: json['username'],
-      bio: json['bio'],
-      image: json['image'],
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'])
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt'])
-          : null,
-      dob: json['dob'], // Keeping as String
-      phoneNumber: json['phoneNumber'],
-      gender: json['gender'],
-      therapistId: json['therapistId'] != null
-          ? List<String>.from(
-              json['therapistId']) // Convert List<dynamic> to List<String>
-          : null,
+      stripeCustomerId: json.containsKey('stripeCustomerId')
+          ? json['stripeCustomerId'] as String? ?? ''
+          : '',
+      id: json.containsKey('_id') ? json['_id'] as String? ?? '' : '',
+      deviceToken: json.containsKey('deviceToken')
+          ? json['deviceToken'] as String? ?? ''
+          : '',
+      email: json.containsKey('email') ? json['email'] as String? ?? '' : '',
+      authProvider: json.containsKey('authProvider')
+          ? json['authProvider'] as String? ?? 'email'
+          : 'email',
+      userType:
+          json.containsKey('userType') ? json['userType'] as String? ?? '' : '',
+      fullName:
+          json.containsKey('fullName') ? json['fullName'] as String? ?? '' : '',
+      username:
+          json.containsKey('username') ? json['username'] as String? ?? '' : '',
+      bio: json.containsKey('bio') ? json['bio'] as String? ?? '' : '',
+      image: json.containsKey('image') ? json['image'] as String? ?? '' : '',
+      createdAt: json.containsKey('createdAt') && json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime(1970, 1, 1)
+          : DateTime(1970, 1, 1),
+      updatedAt: json.containsKey('updatedAt') && json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt']) ?? DateTime(1970, 1, 1)
+          : DateTime(1970, 1, 1),
+      dob: json.containsKey('dob') ? json['dob'] as String? ?? '' : '',
+      phoneNumber: json.containsKey('phoneNumber')
+          ? json['phoneNumber'] as String? ?? ''
+          : '',
+      gender: json.containsKey('gender') ? json['gender'] as String? ?? '' : '',
+      therapistId:
+          json.containsKey('therapistId') && json['therapistId'] is List
+              ? List<String>.from(json['therapistId'] as List)
+              : [],
     );
   }
 

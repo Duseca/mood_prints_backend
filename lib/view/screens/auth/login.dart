@@ -4,7 +4,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/auth/forgot_pass/forgot_password.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/sign_up.dart';
+import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -21,7 +21,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final ctrl = Get.find<AuthController>();
+  final ctrl = Get.find<AuthClientController>();
 
   GlobalKey<FormState> formKey1 = GlobalKey<FormState>();
   @override
@@ -101,16 +101,14 @@ class _LoginState extends State<Login> {
             ),
             MyButton(
               onTap: () {
+                // ---------------------------------------------
+                // TODO: Saved UserType & fetch data accordingly
+                // ---------------------------------------------
+
                 if (formKey1.currentState!.validate()) {
-                  if (ctrl.acceptTermsAndCondition == true) {
-                    ctrl.loginMethod(
-                        email: ctrl.emailController.text.trim(),
-                        password: ctrl.passwordController.text.trim());
-                  } else {
-                    displayToast(
-                        msg:
-                            "Please accept the terms and conditions to proceed.");
-                  }
+                  ctrl.loginMethod(
+                      email: ctrl.emailController.text.trim(),
+                      password: ctrl.passwordController.text.trim());
                 }
 
                 // ctrl.loginMethod(
@@ -179,7 +177,12 @@ class _LoginState extends State<Login> {
                   weight: FontWeight.w500,
                 ),
                 MyText(
-                  onTap: () => Get.to(() => SignUp()),
+                  onTap: () {
+                    Get.to(() => GetStarted());
+                    // Get.to(() => ClientSignUp(
+                    //       type: 'therapist',
+                    //     ));
+                  },
                   text: 'Register',
                   color: kQuaternaryColor,
                   decoration: TextDecoration.underline,

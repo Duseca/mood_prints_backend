@@ -14,6 +14,7 @@ class SendField extends StatelessWidget {
     this.onAttachmentTap,
     this.onEmojiTap,
     this.haveSendButton = false,
+    this.isLoading = false,
     this.onSendTap,
   }) : super(key: key);
   final String? hintText;
@@ -23,6 +24,7 @@ class SendField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final VoidCallback? onEmojiTap, onAttachmentTap, onSendTap;
   final bool haveSendButton;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -123,10 +125,17 @@ class SendField extends StatelessWidget {
                       color: kWhiteColor,
                     ),
                     child: Center(
-                        child: Icon(
-                      Icons.send,
-                      color: kSecondaryColor,
-                    )
+                        child: (isLoading)
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                    color: kSecondaryColor, strokeWidth: 2.0),
+                              )
+                            : Icon(
+                                Icons.send,
+                                color: kSecondaryColor,
+                              )
                         //  Image.asset(
                         //   Assets.imagesMic,
                         //   height: 23.99,

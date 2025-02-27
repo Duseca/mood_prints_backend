@@ -7,7 +7,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
-import 'package:mood_prints/view/screens/client/client_profile/edit_therapist.dart';
+import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
@@ -23,8 +23,6 @@ class ClientProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userModel = UserService.instance.userModel.value;
-
     return Scaffold(
       appBar: simpleAppBar(
         title: 'User Profile',
@@ -129,9 +127,9 @@ class ClientProfile extends StatelessWidget {
           ),
           _ProfileTile(
             icon: Assets.imagesProfile,
-            title: 'Edit Therapist',
+            title: 'My Therapist',
             onTap: () {
-              Get.to(() => EditTherapist());
+              Get.to(() => MyTherapist());
             },
           ),
           _ProfileTile(
@@ -183,7 +181,7 @@ class ClientProfile extends StatelessWidget {
                 },
                 onLogoutTap: () {
                   log('work logout');
-                  Get.find<AuthController>().logOutMethod();
+                  Get.find<AuthClientController>().logOutMethod();
                 },
               ));
             },

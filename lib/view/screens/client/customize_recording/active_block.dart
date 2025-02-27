@@ -7,7 +7,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
-import 'package:mood_prints/model/mood_models/block_model.dart';
+import 'package:mood_prints/model/client_model/mood_models/block_model.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/alert_dialogs/delete_dialog.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -133,11 +133,11 @@ class _ActiveBlockState extends State<ActiveBlock> {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        feelingItems.length,
+                        stressItems.length,
                         (index) {
                           return InkWell(
                             child: Image.asset(
-                              feelingItems[index].iconB,
+                              stressItems[index].unselectedIcon,
                               height: 44,
                             ),
                           );

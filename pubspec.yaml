@@ -8,11 +8,10 @@ version: 1.0.0+1
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
-dependencies:
+dependencies: 
   cached_network_image: ^3.4.1
   country_picker: ^2.0.26
-  cupertino_icons: ^1.0.6
-  dropdown_button2: ^2.3.9
+  cupertino_icons: ^1.0.6 
   expandable: ^5.0.1
   flutter:
     sdk: flutter
@@ -23,7 +22,8 @@ dependencies:
   pinput: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
   syncfusion_flutter_charts: ^27.1.52
-  table_calendar: ^3.1.2
+  # table_calendar: ^3.1.2
+  # table_calendar: 3.1.2
   #
   fluttertoast: ^8.2.10
   http: ^1.2.2
@@ -42,6 +42,16 @@ dependencies:
   firebase_auth: ^5.4.1
   # firebase_messaging: ^15.2.1
   firebase_messaging: 
+  flutter_local_notifications: ^17.2.3
+  app_settings: 
+  permission_handler: 
+  flutter_slidable: 
+  timezone: ^0.9.4
+  flutter_timezone: ^4.1.0
+  table_calendar: 3.1.2
+  dropdown_button2: ^2.3.9
+  google_sign_in: 
+  
 
 
 dev_dependencies:

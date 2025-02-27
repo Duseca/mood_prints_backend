@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mood_prints/constants/app_colors.dart';
-import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
@@ -35,8 +34,9 @@ class ChatHeadTiles extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(7.8),
           ),
-          selectedTileColor:
-              isNewMessage ? kSecondaryColor.withOpacity(0.10) : kWhiteColor,
+          selectedTileColor: Colors.transparent,
+          // selectedTileColor:
+          //     isNewMessage ? kSecondaryColor.withOpacity(0.10) : kWhiteColor,
           onTap: onTap,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 7.8,
@@ -60,7 +60,7 @@ class ChatHeadTiles extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1.97,
-                      color: kPrimaryColor,
+                      color: Colors.transparent,
                     ),
                     shape: BoxShape.circle,
                     color: isOnline ? kSecondaryColor : Colors.transparent,
@@ -78,13 +78,12 @@ class ChatHeadTiles extends StatelessWidget {
           ),
           subtitle: Row(
             children: [
-              Image.asset(
-                Assets.imagesDoubleTick,
-                height: 15.6,
-              ),
+              // Image.asset(
+              //   Assets.imagesDoubleTick,
+              //   height: 15.6,
+              // ),
               Expanded(
                 child: MyText(
-                  paddingLeft: 4,
                   text: lastMsg,
                   size: 11.7,
                   color: kGreyColor,

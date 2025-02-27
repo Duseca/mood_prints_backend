@@ -3,6 +3,7 @@ class BoardModel {
   final DateTime? date;
   final int? mood;
   final int? stressLevel;
+  final int? irritateLevel;
   // final List<String>? emotions;
   final String? note;
   final List<String>? photos;
@@ -18,6 +19,7 @@ class BoardModel {
     this.date,
     this.mood,
     this.stressLevel,
+    this.irritateLevel,
     // this.emotions,
     this.note,
     this.photos,
@@ -35,8 +37,7 @@ class BoardModel {
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
       mood: json['mood'],
       stressLevel: json['stressLevel'],
-      // emotions:
-      //     json['emotions'] != null ? List<String>.from(json['emotions']) : null,
+      irritateLevel: json['irritateLevel'],
       note: json['note'],
       photos: json['photos'] != null ? List<String>.from(json['photos']) : null,
       sleep: json['sleep'] != null ? Sleep.fromJson(json['sleep']) : null,
@@ -60,7 +61,7 @@ class BoardModel {
       'date': date?.toIso8601String(),
       'mood': mood,
       'stressLevel': stressLevel,
-      // 'emotions': emotions,
+      'irritateLevel': irritateLevel,
       'note': note,
       'photos': photos,
       'sleep': sleep?.toJson(),

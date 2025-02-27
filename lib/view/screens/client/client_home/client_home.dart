@@ -8,11 +8,14 @@ import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/notification/notification_services.dart';
 import 'package:mood_prints/view/screens/client/edit_mode_manager/edit_mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
+import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -24,11 +27,11 @@ class ClientHome extends StatefulWidget {
 }
 
 class _ClientHomeState extends State<ClientHome> {
-  final eventDates = [
-    DateTime.now(),
-    DateTime.now().subtract(Duration(days: 1)),
-    DateTime.now().add(Duration(days: 2)),
-  ];
+  // final eventDates = [
+  //   DateTime.now(),
+  //   DateTime.now().subtract(Duration(days: 1)),
+  //   DateTime.now().add(Duration(days: 2)),
+  // ];
 
   final homeCtrl = Get.find<ClientHomeController>();
 
@@ -44,85 +47,184 @@ class _ClientHomeState extends State<ClientHome> {
         physics: BouncingScrollPhysics(),
         child: Padding(
           padding: AppSizes.DEFAULT,
-          child: Column(
-            // shrinkWrap: true,
-            // padding: AppSizes.DEFAULT,
-            // physics: BouncingScrollPhysics(),
-            children: [
-              //----- Calender -----
+          child: Obx(
+            () => Column(
+              // shrinkWrap: true,
+              // padding: AppSizes.DEFAULT,
+              // physics: BouncingScrollPhysics(),
+              children: [
+                //----- Calender -----
 
-              Obx(
-                () => _Calendar(
-                  eventDates: (homeCtrl.allboardDates.isNotEmpty)
-                      ? homeCtrl.allboardDates
-                      : [],
+                Obx(
+                  () => _Calendar(
+                    // onDateSelection: ,
+                    eventDates: (homeCtrl.allboardDates.isNotEmpty)
+                        ? homeCtrl.allboardDates
+                        : [],
+                  ),
                 ),
-              ),
 
-              Obx(
-                () => Column(
-                  children:
-                      List.generate(homeCtrl.allBoardsData.length, (headIndex) {
-                    final model = homeCtrl.allBoardsData[headIndex];
+                // If Filter Applied Show clear Filter Button
 
-                    // Loop for getting emotion icon
+                (homeCtrl.filterBoardData.isNotEmpty)
+                    ? Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: AppStyling.CUSTOM_CARD,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            MyText(
+                              text: "Filter Applied",
+                              size: 14,
+                            ),
+                            SizedBox(
+                              width: 70,
+                              child: MyButton(
+                                height: 24,
+                                buttonText: 'Clear',
+                                textSize: 12,
+                                radius: 100,
+                                textColor: kSecondaryColor,
+                                bgColor: kSecondaryColor.withOpacity(0.1),
+                                onTap: () {
+                                  homeCtrl.filterBoardData.clear();
+                                  homeCtrl.selectedDay.value = DateTime.now();
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    : SizedBox.shrink(),
 
-                    int? _iconIndex;
-                    for (int i = 0; i < feelingItems.length; i++) {
-                      if (model.stressLevel == feelingItems[i].stressLevel) {
-                        _iconIndex = i;
-                        break;
-                      }
-                    }
-                    return DetailCard(
-                      emotionWidget: Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: (_iconIndex != null)
-                              ? CommonImageView(
-                                  height: 44,
-                                  width: 44,
-                                  imagePath: feelingItems[_iconIndex].iconA)
-                              : CommonImageView(
-                                  height: 44,
-                                  width: 44,
-                                  imagePath: feelingItems[0].iconA)),
-                      imageList: (model.photos != null) ? model.photos! : [],
-                      headIndex: headIndex,
-                      note: model.note,
-                      bedTime: model.sleep.dozeOffTime,
-                      riseTime: model.sleep.wakeupTime,
-                      dateTime: model.date,
-                      onDeleteTap: () {
-                        log('work');
-                        log('Board ID: ${model.id}');
-                        homeCtrl.deleteBoard(model.id);
-                      },
-                      onEditTap: () {
-                        Get.to(() => EditModeManager(model: model));
-                      },
-                    );
-                  }),
+                Obx(() {
+                  return
+
+                      // If filter applied show filter data
+
+                      (homeCtrl.filterBoardData.isNotEmpty)
+                          ? Column(
+                              children: List.generate(
+                                  homeCtrl.filterBoardData.length, (headIndex) {
+                                final model =
+                                    homeCtrl.filterBoardData[headIndex];
+
+                                // Loop for getting emotion icon
+
+                                int? _iconIndex;
+                                for (int i = 0; i < stressItems.length; i++) {
+                                  if (model.stressLevel ==
+                                      stressItems[i].level) {
+                                    _iconIndex = i;
+                                    break;
+                                  }
+                                }
+                                return DetailCard(
+                                  emotionWidget: Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: (_iconIndex != null)
+                                          ? CommonImageView(
+                                              height: 44,
+                                              width: 44,
+                                              imagePath: stressItems[_iconIndex]
+                                                  .selectedIcon)
+                                          : CommonImageView(
+                                              height: 44,
+                                              width: 44,
+                                              imagePath:
+                                                  stressItems[0].selectedIcon)),
+                                  imageList: (model.photos != null)
+                                      ? model.photos!
+                                      : [],
+                                  headIndex: headIndex,
+                                  note: model.note,
+                                  bedTime: model.sleep.dozeOffTime,
+                                  riseTime: model.sleep.wakeupTime,
+                                  dateTime: model.date,
+                                  onDeleteTap: () {
+                                    log('work');
+                                    log('Board ID: ${model.id}');
+                                    homeCtrl.deleteBoard(model.id);
+                                  },
+                                  onEditTap: () {
+                                    Get.to(() => EditModeManager(model: model));
+                                  },
+                                );
+                              }),
+                            )
+                          :
+                          // No filter applied display all board data
+
+                          Column(
+                              children: List.generate(
+                                  homeCtrl.allBoardsData.length, (headIndex) {
+                                final model = homeCtrl.allBoardsData[headIndex];
+
+                                // Loop for getting emotion icon
+
+                                int? _iconIndex;
+                                for (int i = 0; i < stressItems.length; i++) {
+                                  if (model.stressLevel ==
+                                      stressItems[i].level) {
+                                    _iconIndex = i;
+                                    break;
+                                  }
+                                }
+                                return DetailCard(
+                                  emotionWidget: Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: (_iconIndex != null)
+                                          ? CommonImageView(
+                                              height: 44,
+                                              width: 44,
+                                              imagePath: stressItems[_iconIndex]
+                                                  .selectedIcon)
+                                          : CommonImageView(
+                                              height: 44,
+                                              width: 44,
+                                              imagePath:
+                                                  stressItems[0].selectedIcon)),
+                                  imageList: (model.photos != null)
+                                      ? model.photos!
+                                      : [],
+                                  headIndex: headIndex,
+                                  note: model.note,
+                                  bedTime: model.sleep.dozeOffTime,
+                                  riseTime: model.sleep.wakeupTime,
+                                  dateTime: model.date,
+                                  onDeleteTap: () {
+                                    log('work');
+                                    log('Board ID: ${model.id}');
+                                    homeCtrl.deleteBoard(model.id);
+                                  },
+                                  onEditTap: () {
+                                    Get.to(() => EditModeManager(model: model));
+                                  },
+                                );
+                              }),
+                            );
+                }),
+
+                SizedBox(
+                  height: 100,
                 ),
-              ),
 
-              SizedBox(
-                height: 100,
-              ),
-
-              // MyButton(
-              //   buttonText: 'Hit',
-              //   onTap: () {
-              //     homeCtrl.calledStats();
-              //     // homeCtrl.getEmotionStats();
-              //     // homeCtrl.getModeWeeklyStats();
-              //     // homeCtrl.getSleepWeeklyStats();
-              //     //homeCtrl.getSleepWeeklyStats();
-              //     // homeCtrl.getModeWeeklyStats();
-              //     // Get.find<ClientHomeController>().getAllBoard();
-              //   },
-              // ),
-              SizedBox(height: 200),
-            ],
+                // MyButton(
+                //   buttonText: 'Hit',
+                //   onTap: () {
+                //     homeCtrl.calledStats();
+                //     // homeCtrl.getEmotionStats();
+                //     // homeCtrl.getModeWeeklyStats();
+                //     // homeCtrl.getSleepWeeklyStats();
+                //     //homeCtrl.getSleepWeeklyStats();
+                //     // homeCtrl.getModeWeeklyStats();
+                //     // Get.find<ClientHomeController>().getAllBoard();
+                //   },
+                // ),
+                SizedBox(height: 200),
+              ],
+            ),
           ),
         ),
       ),
@@ -449,10 +551,12 @@ class DetailCard extends StatelessWidget {
 
 class _Calendar extends StatefulWidget {
   final List<DateTime> eventDates;
+  final VoidCallback? onDateSelection;
 
   const _Calendar({
     Key? key,
-    required this.eventDates, // Accept data as a parameter
+    required this.eventDates,
+    this.onDateSelection,
   }) : super(key: key);
 
   @override
@@ -460,8 +564,10 @@ class _Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<_Calendar> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  // DateTime _focusedDay = DateTime.now();
+  // DateTime? _selectedDay;
+
+  var homeCtrl = Get.find<ClientHomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -472,66 +578,68 @@ class _CalendarState extends State<_Calendar> {
       fontFamily: AppFonts.URBANIST,
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TableCalendar(
-          headerStyle: _header(),
-          firstDay: DateTime.utc(2010, 10, 16),
-          lastDay: DateTime.utc(2030, 3, 14),
-          focusedDay: _focusedDay,
-          selectedDayPredicate: (day) {
-            // Highlight the selected day
-            return isSameDay(_selectedDay, day);
-          },
-          eventLoader: (day) {
-            // Highlight event dates
-            return widget.eventDates.contains(day) ? ['Event'] : [];
-          },
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay; // Update focused day
-            });
-          },
-          calendarStyle: CalendarStyle(
-            tablePadding: EdgeInsets.zero,
-            defaultTextStyle: _DEFAULT_TEXT_STYLE,
-            selectedTextStyle: _DEFAULT_TEXT_STYLE.copyWith(
-              color: kPrimaryColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-            todayTextStyle: _DEFAULT_TEXT_STYLE.copyWith(
-              color: kPrimaryColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-            disabledTextStyle: _DEFAULT_TEXT_STYLE,
-            holidayTextStyle: _DEFAULT_TEXT_STYLE,
-            outsideTextStyle: _DEFAULT_TEXT_STYLE,
-            weekendTextStyle: _DEFAULT_TEXT_STYLE,
-            rangeEndTextStyle: _DEFAULT_TEXT_STYLE,
-            weekNumberTextStyle: _DEFAULT_TEXT_STYLE,
-            rangeStartTextStyle: _DEFAULT_TEXT_STYLE,
-            withinRangeTextStyle: _DEFAULT_TEXT_STYLE,
-            selectedDecoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kSecondaryColor,
-            ),
-            cellMargin: EdgeInsets.zero,
-            todayDecoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kSecondaryColor,
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TableCalendar(
+            headerStyle: _header(),
+            firstDay: DateTime.utc(2010, 10, 16),
+            lastDay: DateTime.utc(2030, 3, 14),
+            focusedDay: homeCtrl.focusedDay.value,
+            selectedDayPredicate: (day) {
+              // Highlight the selected day
+              return isSameDay(homeCtrl.selectedDay.value, day);
+            },
+            eventLoader: (day) {
+              // Highlight event dates
+              return widget.eventDates.contains(day) ? ['Event'] : [];
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              homeCtrl.selectedDay.value = selectedDay;
+              homeCtrl.focusedDay.value = focusedDay;
+              homeCtrl.filterDataByDateTime();
+            },
+            calendarStyle: CalendarStyle(
+              tablePadding: EdgeInsets.zero,
+              defaultTextStyle: _DEFAULT_TEXT_STYLE,
+              selectedTextStyle: _DEFAULT_TEXT_STYLE.copyWith(
+                color: kPrimaryColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              todayTextStyle: _DEFAULT_TEXT_STYLE.copyWith(
+                color: kPrimaryColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              disabledTextStyle: _DEFAULT_TEXT_STYLE,
+              holidayTextStyle: _DEFAULT_TEXT_STYLE,
+              outsideTextStyle: _DEFAULT_TEXT_STYLE,
+              weekendTextStyle: _DEFAULT_TEXT_STYLE,
+              rangeEndTextStyle: _DEFAULT_TEXT_STYLE,
+              weekNumberTextStyle: _DEFAULT_TEXT_STYLE,
+              rangeStartTextStyle: _DEFAULT_TEXT_STYLE,
+              withinRangeTextStyle: _DEFAULT_TEXT_STYLE,
+              selectedDecoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kSecondaryColor,
+              ),
+              cellMargin: EdgeInsets.zero,
+              todayDecoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kSecondaryColor,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   HeaderStyle _header() {
     return HeaderStyle(
+      headerMargin: EdgeInsets.only(bottom: 15),
       headerPadding: EdgeInsets.all(8),
       formatButtonVisible: false,
       titleCentered: true,

@@ -8,7 +8,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
-import 'package:mood_prints/model/board_model/all_%20board.dart';
+import 'package:mood_prints/model/client_model/board_model/all_%20board.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -81,11 +81,13 @@ class _EditModeManagerState extends State<EditModeManager> {
     boardID = widget.model.id;
     // ctrl.selectedMood.value = widget.model.mode;
     ctrl.datePicker.value = widget.model.date;
-    ctrl.stressIconHandler.value = 0;
+    ctrl.stressIconHandler.value = widget.model.stressLevel;
     ctrl.stressLevel = widget.model.stressLevel;
+    ctrl.irritateIconHandler.value = widget.model.irritateLevel;
+    ctrl.irritateLevel = widget.model.irritateLevel;
     ctrl.todayNoteController.text = widget.model.note;
     ctrl.todayPhotos.value = widget.model.photos!;
-    log("photo Length: ${ctrl.todayPhotos.length}");
+    log("Seletcted Stress Icon: ${ctrl.stressIconHandler.value}");
 
     return Obx(
       () => Scaffold(
@@ -112,7 +114,7 @@ class _EditModeManagerState extends State<EditModeManager> {
                       children: [
                         MyText(
                           paddingBottom: 16,
-                          text: "How is your mood today?*",
+                          text: "How are you feeling right now?",
                           size: 16,
                           weight: FontWeight.w600,
                         ),
@@ -133,10 +135,6 @@ class _EditModeManagerState extends State<EditModeManager> {
                                     onTap: () {
                                       ctrl.selectedMood.value =
                                           modeIndicatorItems[index];
-
-                                      log('selected Model:=> ${ctrl.selectedMood.value.toMap().toString()} ');
-                                      // currentModeIndex = index;
-                                      // log(currentModeIndex.toString());
                                     },
                                     child: Icon(
                                       ((ctrl.selectedMood.value ==
@@ -167,17 +165,19 @@ class _EditModeManagerState extends State<EditModeManager> {
                             decoration: BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(8)),
-                              // color: modeIndicatorItems[currentModeIndex].color,
                               color: ctrl.selectedMood.value.color,
                             ),
                             child: Center(
                               child: MyText(
-                                text:
-                                    // "${modeIndicatorItems[currentModeIndex].mode} Mode",
-                                    "${ctrl.selectedMood.value.mode} Mode",
+                                text: "${ctrl.selectedMood.value.mode}",
                                 size: 14,
                                 weight: FontWeight.w600,
-                                color: kWhiteColor,
+                                color: (ctrl.selectedMood.value.stressLevel >=
+                                            0 &&
+                                        ctrl.selectedMood.value.stressLevel <=
+                                            3)
+                                    ? kTertiaryColor
+                                    : kWhiteColor,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -190,13 +190,16 @@ class _EditModeManagerState extends State<EditModeManager> {
                   SizedBox(
                     height: 10,
                   ),
+
+                  // ------------ How stressed are you feeling? -------------
+
                   Container(
                     padding: EdgeInsets.all(20),
                     decoration: AppStyling.CUSTOM_CARD,
                     child: Column(
                       children: [
                         MyText(
-                          text: 'How stressed are you feeling?*',
+                          text: 'How stressed are you feeling?',
                           size: 16,
                           paddingBottom: 20,
                           weight: FontWeight.w600,
@@ -206,33 +209,30 @@ class _EditModeManagerState extends State<EditModeManager> {
                           height: 10,
                         ),
 
-                        // ------- Emotions ----------
+                        // ------------ Stressed Icons -------------
 
                         Wrap(
                           alignment: WrapAlignment.center,
                           spacing: 10,
                           runSpacing: 10,
                           children: List.generate(
-                            feelingItems.length,
+                            stressItems.length,
                             (index) {
                               ctrl.stressIconHandler.value =
-                                  feelingItems.indexWhere((item) =>
-                                      item.stressLevel == ctrl.stressLevel);
-
-                              // log("finding Index: ${stressLevelIndex}");
+                                  stressItems.indexWhere(
+                                      (item) => item.level == ctrl.stressLevel);
 
                               return Obx(
                                 () => InkWell(
                                   onTap: () {
-                                    ctrl.emotionSelector(index);
-                                    // stressLevelIndex = index;
+                                    ctrl.stressedSelector(index);
                                   },
                                   child: Image.asset(
                                     (ctrl.stressIconHandler.value == index)
-                                        ? feelingItems[index]
-                                            .iconA // Highlighted icon
-                                        : feelingItems[index]
-                                            .iconB, // Normal icon
+                                        ? stressItems[index]
+                                            .selectedIcon // Highlighted icon
+                                        : stressItems[index]
+                                            .unselectedIcon, // Normal icon
                                     height: 44,
                                   ),
                                 ),
@@ -245,6 +245,54 @@ class _EditModeManagerState extends State<EditModeManager> {
                   ),
                   SizedBox(
                     height: 10,
+                  ),
+
+                  // ------------ How irritable do you feel? -------------
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: AppStyling.CUSTOM_CARD,
+                    child: Column(
+                      children: [
+                        MyText(
+                          text: 'How irritable do you feel?',
+                          size: 16,
+                          paddingBottom: 20,
+                          weight: FontWeight.w600,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+
+                        // ------- Irritable Icons ----------
+
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: List.generate(
+                            irritateItems.length,
+                            (index) {
+                              return Obx(
+                                () => InkWell(
+                                  onTap: () {
+                                    ctrl.irritableSelector(index);
+                                  },
+                                  child: Image.asset(
+                                    (ctrl.irritateIconHandler.value == index)
+                                        ? irritateItems[index]
+                                            .selectedIcon // Highlighted icon
+                                        : irritateItems[index]
+                                            .unselectedIcon, // Normal icon
+                                    height: 44,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
                   // ------- Emotions --------

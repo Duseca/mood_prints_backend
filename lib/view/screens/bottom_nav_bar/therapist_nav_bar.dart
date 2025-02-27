@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:mood_prints/view/screens/chat/chat_head.dart';
 import 'package:mood_prints/view/screens/profile/profile.dart';
 import 'package:mood_prints/view/screens/therapist/therapist_billing/therapist_biling.dart';
-import 'package:mood_prints/view/screens/therapist/therapist_home/therapist_home.dart';
+import 'package:mood_prints/view/screens/therapist/therapist_home/therapist_client.dart';
 
 // ignore: must_be_immutable
 class TherapistNavBar extends StatefulWidget {
@@ -23,10 +23,15 @@ class _TherapistNavBarState extends State<TherapistNavBar> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> _items = [
+      // {
+      //   'icon': Assets.imagesHome,
+      //   'iconA': Assets.imagesHomeA,
+      //   'label': 'Home',
+      // },
       {
-        'icon': Assets.imagesHome,
-        'iconA': Assets.imagesHomeA,
-        'label': 'Home',
+        'icon': Assets.imagesClientA,
+        'iconA': Assets.imagesClientB,
+        'label': 'Client',
       },
       {
         'icon': Assets.imagesChat,
@@ -38,6 +43,7 @@ class _TherapistNavBarState extends State<TherapistNavBar> {
         'iconA': Assets.imagesBillA,
         'label': 'Billing',
       },
+
       {
         'icon': Assets.imagesProfile,
         'iconA': Assets.imagesProfileA,
@@ -46,7 +52,8 @@ class _TherapistNavBarState extends State<TherapistNavBar> {
     ];
 
     final List<Widget> _screens = [
-      TherapistHome(),
+      // TherapistHome(),
+      TherapistClient(),
       ChatHead(),
       TherapistBilling(),
       Profile(),

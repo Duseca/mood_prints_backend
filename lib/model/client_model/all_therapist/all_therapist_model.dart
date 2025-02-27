@@ -12,6 +12,7 @@ class AllTherapist {
   final String? gender;
   final String? phoneNumber;
   final String? city;
+
   final String? bio;
   final String? image;
   final DateTime createdAt;

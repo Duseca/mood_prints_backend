@@ -8,6 +8,7 @@ class MessageModel {
   String? messageType;
   String? senderProfileImage;
   String? textMessage;
+  String? pictureMedia;
   bool? isSeen;
   List<String>? deletedBy;
   List<String>? seenBy;
@@ -21,6 +22,7 @@ class MessageModel {
     this.messageType,
     this.senderProfileImage,
     this.textMessage,
+    this.pictureMedia,
     this.isSeen,
     this.deletedBy,
     this.seenBy,
@@ -36,6 +38,7 @@ class MessageModel {
       'messageType': messageType,
       'senderProfileImage': senderProfileImage,
       'textMessage': textMessage,
+      'pictureMedia': pictureMedia ?? '',
       'isSeen': isSeen,
       'deletedBy': deletedBy,
       'seenBy': seenBy,
@@ -56,6 +59,7 @@ class MessageModel {
       messageType: map['messageType'],
       senderProfileImage: map['senderProfileImage'],
       textMessage: map['textMessage'],
+      pictureMedia: map['pictureMedia'],
       isSeen: map['isSeen'],
       deletedBy:
           map['deletedBy'] != null ? List<String>.from(map['deletedBy']) : null,

@@ -3,26 +3,63 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
-import 'package:mood_prints/model/board_model/all_%20board.dart';
+import 'package:mood_prints/model/client_model/board_model/all_%20board.dart';
 import 'package:mood_prints/model/stats/mode_flow_stats_model.dart';
 import 'package:mood_prints/model/stats/emotion_stats_model.dart';
 import 'package:mood_prints/model/stats/mood_by_sleep.dart';
 import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
+import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
 
 class ClientHomeController extends GetxController {
+  // For Calender
+  Rx<DateTime> focusedDay = DateTime.now().obs;
+  Rxn<DateTime> selectedDay = Rxn<DateTime>(null);
+
+  // For Stats get current month and current year
+  int currentMonth = DateTime.now().month;
+  int currentYear = DateTime.now().year;
+  Rxn<MonthModel> selectedMonthModel = Rxn<MonthModel>(null);
+  // Board data
   var allBoardsData = <BoardEntry>[].obs;
   var allboardDates = <DateTime>[].obs;
-  List<MoodFlowModel>? moodFlowStats = <MoodFlowModel>[];
+  var filterBoardData = <BoardEntry>[].obs;
+  // --- Stats varibles weekly & monthly ---
+  // Mood-flow
+  RxList<MoodFlowModel>? moodFlowStats = <MoodFlowModel>[].obs;
+  RxList<MoodFlowModel>? moodFlowStatsMonthly = <MoodFlowModel>[].obs;
+  // Sleep Analysis
   Rx<SleepAnalysisModel?> sleepAnalysisModel = Rx<SleepAnalysisModel?>(null);
-
-  // List<SleepAnalysisModel>? sleepStats = <SleepAnalysisModel>[];
+  Rx<SleepAnalysisModel?> sleepAnalysisMonthModel =
+      Rx<SleepAnalysisModel?>(null);
   RxList<SleepData> sleepStats = <SleepData>[].obs;
-  RxList<MoodSleepStats> moodBySleepStats = <MoodSleepStats>[].obs;
+  RxList<SleepData> sleepStatsMontly = <SleepData>[].obs; // New
 
+  // Mood bar OR emotion percentage
   List<StressLevelPercentage>? emotionPercentageStats =
       <StressLevelPercentage>[];
+  List<StressLevelPercentage>? emotionPercentageStatsMonthly =
+      <StressLevelPercentage>[];
+
+  // Mood by sleep
+  RxList<MoodSleepStats> moodBySleepStats = <MoodSleepStats>[].obs;
+  RxList<MoodSleepStats> moodBySleepStatsMonthly = <MoodSleepStats>[].obs;
+
   RxInt weekIndex = 1.obs;
   RxInt weekFrontUpdate = 0.obs;
+  List<MonthModel> months = [
+    MonthModel(name: "January", number: 1),
+    MonthModel(name: "February", number: 2),
+    MonthModel(name: "March", number: 3),
+    MonthModel(name: "April", number: 4),
+    MonthModel(name: "May", number: 5),
+    MonthModel(name: "June", number: 6),
+    MonthModel(name: "July", number: 7),
+    MonthModel(name: "August", number: 8),
+    MonthModel(name: "September", number: 9),
+    MonthModel(name: "October", number: 10),
+    MonthModel(name: "November", number: 11),
+    MonthModel(name: "December", number: 12),
+  ];
 
   // ------- Get All Boards ------------
 
@@ -109,17 +146,64 @@ class ClientHomeController extends GetxController {
     hideLoadingDialog();
   }
 
+  // ------- Current Date -----------
+
+  void filterDataByDateTime() {
+    filterBoardData.clear();
+    for (var filter in allBoardsData) {
+      if (selectedDay.value == filter.createdAt) {
+        filterBoardData.add(filter);
+      }
+    }
+    log("Filter Board Length : ${filterBoardData.length}");
+  }
+
+  // --------------------------------
   // ------- Stats Functions --------
+  // --------------------------------
 
-  Future<void> getModeFlowWeeklyStats() async {
+  // --- Mood-flow weekly & montly ---
+
+  Future<void> getModeFlow({String? userID}) async {
     moodFlowStats?.clear();
-    // showLoadingDialog();
-
-    log("Mode Flow Stats Hit ------------------------");
 
     final response = await apiService.get(
-        buildMoodFlowStatsUrl(week: weekIndex.value, year: 2025), false,
-        showResult: false, successCode: 200);
+        buildMoodFlowStatsWeeklyUrl(
+            week: weekIndex.value,
+            year: currentYear,
+            month: currentMonth,
+            userId: userID),
+        true,
+        showResult: false,
+        successCode: 200);
+    log(" --- Mode Flow Stats Weekly ---");
+
+    if (response != null) {
+      final List<dynamic>? data = response['data'];
+
+      if (data != null && data.isNotEmpty) {
+        // Weekly data
+
+        List<MoodFlowModel> moodList =
+            data.map((item) => MoodFlowModel.fromJson(item)).toList();
+        moodFlowStats?.addAll(moodList);
+      }
+    }
+  }
+
+  Future<void> getModeFlowMonthly({String? userID}) async {
+    moodFlowStatsMonthly?.clear();
+
+    final response = await apiService.get(
+        buildMoodFlowStatsMontlyUrl(
+            year: currentYear,
+            month: selectedMonthModel.value!.number,
+            userId: userID),
+        true,
+        showResult: false,
+        successCode: 200);
+
+    log(" --- Mode Flow Stats Montly ---");
 
     if (response != null) {
       final List<dynamic>? data = response['data'];
@@ -127,55 +211,89 @@ class ClientHomeController extends GetxController {
       if (data != null && data.isNotEmpty) {
         List<MoodFlowModel> moodList =
             data.map((item) => MoodFlowModel.fromJson(item)).toList();
-        moodFlowStats?.addAll(moodList);
+        moodFlowStatsMonthly?.addAll(moodList);
 
-        log("Report length:-> ${moodFlowStats?.length}");
-        log("Mode - Stats - Model :-> ${moodList.map((e) => e.toJson()).toList()}");
+        log("Montly Flow Stats Length: ${moodFlowStatsMonthly?.length}");
       }
     }
-    // hideLoadingDialog();
   }
 
-////////////////////////////////
-////////////////////////////////
-////////////////////////////////
-////////////////////////////////
-////////////////////////////////
-////////////////////////////////
-////////////////////////////////
-  ///
-  Future<void> getSleepWeeklyStats() async {
+  // ---- Sleep-stats weekly & montly ----
+
+  Future<void> getSleepStats({String? userID}) async {
     sleepStats.clear();
 
     final response = await apiService.get(
-      buildSleepAnalysisStatsUrl(week: weekIndex.value, year: 2025),
+      buildSleepAnalysisStatsUrl(
+          week: weekIndex.value,
+          year: currentYear,
+          month: currentMonth,
+          userId: userID),
       false,
       showResult: false,
       successCode: 200,
     );
+    log(" --- Sleep weekly stats montly ---");
 
     if (response != null) {
       final report = response['report'];
       if (report != null) {
         SleepAnalysisModel model = SleepAnalysisModel.fromJson(report);
-        sleepAnalysisModel.value = model;
+
         if (model.dateWiseSleepStats != null &&
             model.dateWiseSleepStats!.isNotEmpty) {
+          sleepAnalysisModel.value = model;
           sleepStats.addAll(model.dateWiseSleepStats!);
-          log("Sleep Report length:-> ${sleepStats.length}");
+          log("Sleep report weekly length:-> ${sleepStats.length}");
         }
       }
     }
   }
 
-  //---------- Emotion Stats -----------
-
-  Future<void> getEmotionStats() async {
-    emotionPercentageStats?.clear();
+  Future<void> getSleepStatsMontly({String? userID}) async {
+    sleepStatsMontly.clear();
 
     final response = await apiService.get(
-        buildMoodBarStatsUrl(week: weekIndex.value, year: 2025), false,
-        showResult: false, successCode: 200);
+      buildSleepAnalysisStatsMonthlyUrl(
+          year: currentYear,
+          month: selectedMonthModel.value!.number,
+          userId: userID),
+      false,
+      showResult: false,
+      successCode: 200,
+    );
+    log(" --- Sleep analysis stats montly ---");
+
+    if (response != null) {
+      final report = response['report'];
+      if (report != null) {
+        SleepAnalysisModel model = SleepAnalysisModel.fromJson(report);
+
+        if (model.dateWiseSleepStats != null &&
+            model.dateWiseSleepStats!.isNotEmpty) {
+          sleepAnalysisMonthModel.value = model;
+          sleepStatsMontly.addAll(model.dateWiseSleepStats!);
+          log("Sleep report monthly length:-> ${sleepStatsMontly.length}");
+        }
+      }
+    }
+  }
+
+  //---------- Emotion stats weekly & monthly-----------
+
+  Future<void> getEmotionStats({String? userID}) async {
+    emotionPercentageStats?.clear();
+
+    Map<String, dynamic>? response = await apiService.get(
+        buildMoodBarStatsUrl(
+            week: weekIndex.value,
+            year: currentYear,
+            month: currentMonth,
+            userId: userID),
+        false,
+        showResult: false,
+        successCode: 200);
+    log("Mood-Bar weekly called");
 
     if (response != null) {
       final report = response['report'];
@@ -185,23 +303,57 @@ class ClientHomeController extends GetxController {
         if (model.stressLevelPercentages != null) {
           emotionPercentageStats
               ?.addAll(model.stressLevelPercentages!.toList());
+          log("Mood-Bar weekly list length:-> ${emotionPercentageStats?.length}");
         }
-        log("emotion Percentage Stats length :-> ${emotionPercentageStats?.length}");
       }
     }
   }
 
-  // ---------- Get Mode By Sleep --------------
+  Future<void> getEmotionStatsMontly({String? userID}) async {
+    emotionPercentageStatsMonthly?.clear();
 
-  Future<void> getMoodBySleepStats() async {
+    Map<String, dynamic>? response = await apiService.get(
+        buildMoodBarStatsMontlyUrl(
+            year: currentYear,
+            month: selectedMonthModel.value!.number,
+            userId: userID),
+        false,
+        showResult: false,
+        successCode: 200);
+
+    log("Mood-Bar montly called");
+
+    if (response != null) {
+      final report = response['report'];
+
+      if (report != null && report.isNotEmpty) {
+        EmotionStatsModel model = EmotionStatsModel.fromJson(report);
+        if (model.stressLevelPercentages != null) {
+          emotionPercentageStatsMonthly
+              ?.addAll(model.stressLevelPercentages!.toList());
+
+          log("Mood-Bar montly list length:-> ${emotionPercentageStatsMonthly?.length}");
+        }
+      }
+    }
+  }
+
+  //---------- Get Mood by sleep stats weekly & monthly-----------
+
+  Future<void> getMoodBySleepStats({String? userID}) async {
     moodBySleepStats.clear();
 
     final response = await apiService.get(
-      buildMoodBySleepStatsUrl(week: weekIndex.value, year: 2025),
+      buildMoodBySleepStatsUrl(
+          week: weekIndex.value,
+          year: currentYear,
+          month: currentMonth,
+          userId: userID),
       false,
       showResult: false,
       successCode: 200,
     );
+    log("Mood-by-sleep weekly called");
 
     if (response != null) {
       final report = response['report'];
@@ -210,26 +362,71 @@ class ClientHomeController extends GetxController {
 
         if (model.dateWiseMoodStats.isNotEmpty) {
           moodBySleepStats.addAll(model.dateWiseMoodStats);
-          log("Mood By Sleep stats:-> ${moodBySleepStats.length}");
+          log("Mood By Sleep weekly stats:-> ${moodBySleepStats.length}");
         }
       }
     }
   }
 
-  Future<void> calledStats() async {
+  Future<void> getMoodBySleepStatsMonthly({String? userID}) async {
+    moodBySleepStatsMonthly.clear();
+
+    final response = await apiService.get(
+      buildMoodBySleepStatsMonthlyUrl(
+          year: currentYear,
+          month: selectedMonthModel.value!.number,
+          userId: userID),
+      false,
+      showResult: false,
+      successCode: 200,
+    );
+    log("Mood-by-sleep montly called");
+
+    if (response != null) {
+      final report = response['report'];
+      if (report != null) {
+        MoodBySleepModel model = MoodBySleepModel.fromJson(report);
+
+        if (model.dateWiseMoodStats.isNotEmpty) {
+          moodBySleepStatsMonthly.addAll(model.dateWiseMoodStats);
+          log("Mood By Sleep monthly stats:-> ${moodBySleepStatsMonthly.length}");
+        }
+      }
+    }
+  }
+
+  Future<void> allStats({
+    String? userID,
+  }) async {
     log('Common Stats Called');
-    await getModeFlowWeeklyStats();
-    await getSleepWeeklyStats();
-    await getEmotionStats();
-    await getMoodBySleepStats();
+
+    await getModeFlow(userID: userID);
+    await getSleepStats(userID: userID);
+    await getEmotionStats(userID: userID);
+    await getMoodBySleepStats(userID: userID);
     hideLoadingDialog();
   }
 
-  @override
-  void onInit() {
-    // TODO: Put Function When User Login Called
-    super.onInit();
-    getAllBoard();
-    calledStats();
+  Future<void> allmonthlyStats({
+    String? userID,
+  }) async {
+    showLoadingDialog();
+    log('Montly Stats Called');
+
+    selectedMonthModel.value =
+        months.firstWhere((month) => month.number == DateTime.now().month);
+
+    await getModeFlowMonthly(userID: userID);
+    await getEmotionStatsMontly(userID: userID);
+    await getSleepStatsMontly(userID: userID);
+    await getMoodBySleepStatsMonthly(userID: userID);
+    hideLoadingDialog();
   }
+
+  // @override
+  // void onInit() {
+  //   // TODO: implement onInit
+  //   super.onInit();
+  //   allmonthlyStats(userID: UserService.instance.userModel.value.id);
+  // }
 }

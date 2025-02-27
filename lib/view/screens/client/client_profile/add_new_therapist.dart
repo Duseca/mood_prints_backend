@@ -1,279 +1,220 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
-import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/controller/client/profile/profile_controller.dart';
+import 'package:mood_prints/services/user/user_services.dart';
+import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class AddNewTherapist extends StatelessWidget {
+// ignore: must_be_immutable
+class AddNewTherapist extends StatefulWidget {
   bool editTherapist;
   AddNewTherapist({super.key, this.editTherapist = false});
 
+  @override
+  State<AddNewTherapist> createState() => _AddNewTherapistState();
+}
+
+class _AddNewTherapistState extends State<AddNewTherapist> {
   final ctrl = Get.find<ProfileController>();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    ctrl.selectedTherapistModel.value = null;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: simpleAppBar(
-        title: (editTherapist) ? 'Edit Therapist' : 'Add New',
+        title: (widget.editTherapist) ? 'Edit Therapist' : 'Add Therapist',
       ),
-      body: Column(
-        children: [
-          SizedBox(height: 20),
-          (editTherapist)
-              ? Column(
-                  children: [
-                    CommonImageView(
-                      height: 100,
-                      width: 100,
-                      radius: 100,
-                      imagePath: Assets.imagesProfileImageUser,
+      body: Obx(
+        () => Column(
+          children: [
+            SizedBox(height: 20),
+            (widget.editTherapist)
+                ?
+                //(UserService.instance.relationWithTherapist.isNotEmpty)
+                // ?
+
+                (ctrl.selectedTherapistModel.value != null)
+                    ? MyTherapistCard(
+                        imageUrl: ctrl.selectedTherapistModel.value?.image,
+                        fullname: ctrl.selectedTherapistModel.value?.fullName,
+                        email: ctrl.selectedTherapistModel.value?.email,
+                        phoneNumber:
+                            ctrl.selectedTherapistModel.value?.phoneNumber,
+                        location: "${ctrl.selectedTherapistModel.value?.city}}",
+                      )
+                    : Column(
+                        children: List.generate(
+                            UserService.instance.relationWithTherapist.length,
+                            (index) {
+                          var data = UserService
+                              .instance.relationWithTherapist[index].therapist;
+                          return MyTherapistCard(
+                            imageUrl: data?.image,
+                            fullname: data?.fullName,
+                            email: data?.email,
+                            phoneNumber: data?.phoneNumber,
+                            location: data?.city,
+                          );
+                        }),
+                      )
+                : Obx(
+                    () => Column(
+                      children: [
+                        (ctrl.selectedTherapistModel.value != null)
+                            ? MyTherapistCard(
+                                imageUrl:
+                                    ctrl.selectedTherapistModel.value?.image,
+                                fullname:
+                                    ctrl.selectedTherapistModel.value?.fullName,
+                                email: ctrl.selectedTherapistModel.value?.email,
+                                phoneNumber: ctrl
+                                    .selectedTherapistModel.value?.phoneNumber,
+                                location:
+                                    "${ctrl.selectedTherapistModel.value?.city}}",
+                              )
+                            : NoTherapistCard()
+                      ],
                     ),
-                    SizedBox(height: 15),
-                    MyText(
-                      text: 'Asclad son of ola',
-                      size: 15,
-                      weight: FontWeight.w600,
-                    ),
-                    MyText(
-                      paddingTop: 5,
-                      text: 'example@gmail.com',
-                      size: 15,
-                      // weight: FontWeight.w600,
-                    ),
-                    MyText(
-                      paddingBottom: 20,
-                      paddingTop: 5,
-                      text: '03150965522',
-                      size: 15,
-                      // weight: FontWeight.w600,
-                    ),
-                  ],
-                )
-              : Obx(
-                  () => Column(
-                    children: [
-                      (ctrl.selectedTherapistModel.value != null)
-                          ? Column(
-                              children: [
-                                CommonImageView(
-                                  height: 100,
-                                  width: 100,
-                                  radius: 100,
-                                  url: ctrl.selectedTherapistModel.value?.image,
-                                ),
-                                SizedBox(height: 15),
-                                MyText(
-                                  text:
-                                      '${ctrl.selectedTherapistModel.value?.fullName}',
-                                  size: 15,
-                                  weight: FontWeight.w600,
-                                ),
-                                MyText(
-                                  paddingTop: 5,
-                                  text:
-                                      '${ctrl.selectedTherapistModel.value?.email}',
-                                  size: 15,
-                                  // weight: FontWeight.w600,
-                                ),
-                                MyText(
-                                  // paddingBottom: 20,
-                                  paddingTop: 5,
-                                  text:
-                                      '${ctrl.selectedTherapistModel.value?.phoneNumber}',
-                                  size: 15,
-                                  // weight: FontWeight.w600,
-                                ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                Icon(
-                                  Icons.new_releases_rounded,
-                                  color: kHintColor,
-                                  size: 70,
-                                ),
-                                MyText(
-                                  paddingTop: 15,
-                                  text: 'No Therapist found.',
-                                  size: 15,
-                                  weight: FontWeight.w600,
-                                  color: kHintColor,
-                                ),
-                              ],
-                            ),
-                    ],
                   ),
-                ),
-          SizedBox(height: 40),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: MyText(
-              paddingLeft: 20,
-              textAlign: TextAlign.start,
-              paddingBottom: 7,
-              paddingTop: 5,
-              text: 'Search Therapist',
-              size: 15,
-              // weight: FontWeight.w600,
+            SizedBox(
+                height: (ctrl.selectedTherapistModel.value != null) ? 20 : 40),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: MyText(
+                paddingLeft: 20,
+                textAlign: TextAlign.start,
+                paddingBottom: 7,
+                paddingTop: 5,
+                text: 'Search Therapist',
+                size: 15,
+                // weight: FontWeight.w600,
+              ),
             ),
-          ),
+            Obx(() => TappableCard(
+                  hint: (ctrl.selectedTherapistModel.value?.fullName != null)
+                      ? ctrl.selectedTherapistModel.value!.fullName
+                      : 'Search Therapist',
+                  onTap: () {
+                    ctrl.getAllTherapist();
+                  },
+                )),
+            Obx(
+              () => Column(
+                children: [
+                  (ctrl.isLoading.value == true && ctrl.allTherapists.isEmpty)
+                      ? CircularProgressIndicator()
+                      : (ctrl.isLoading.value == false &&
+                              ctrl.allTherapists.isNotEmpty)
+                          ? Container(
+                              margin: AppSizes.HORIZONTAL,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 16),
+                              height: 250,
+                              width: Get.width,
+                              decoration: AppStyling.CUSTOM_CARD,
+                              child: SingleChildScrollView(
+                                physics: BouncingScrollPhysics(),
+                                child: Column(
+                                  children: List.generate(
+                                    ctrl.allTherapists.length,
+                                    (index) => InkWell(
+                                      onTap: () {
+                                        ctrl.selectedTherapistModel.value =
+                                            ctrl.allTherapists[index];
 
-          // Padding(
-          //   padding: AppSizes.HORIZONTAL,
-          //   child: CustomDropDown(
-          //       hint: 'item',
-          //       items: ['1', '2', '3', '4', '5'],
-          //       selectedValue: '1',
-          //       onChanged: (v) {
+                                        ctrl.allTherapists.clear();
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CommonImageView(
+                                              height: 40,
+                                              width: 40,
+                                              radius: 100,
+                                              url:
+                                                  "${ctrl.allTherapists[index].image}",
+                                            ),
+                                            SizedBox(width: 15),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                MyText(
+                                                  text:
+                                                      "${ctrl.allTherapists[index].fullName}",
+                                                  size: 14,
+                                                  weight: FontWeight.w600,
+                                                ),
+                                                MyText(
+                                                  paddingTop: 5,
+                                                  text:
+                                                      "${ctrl.allTherapists[index].email}",
+                                                  size: 12,
 
-          //       }),
-          // ),
-
-          TappableCard(
-            onTap: () {
-              ctrl.getAllTherapist();
-            },
-          ),
-
-          Obx(
-            () => Column(
-              children: [
-                (ctrl.isLoading.value == true && ctrl.allTherapists.isEmpty)
-                    ? CircularProgressIndicator()
-                    : (ctrl.isLoading.value == false &&
-                            ctrl.allTherapists.isNotEmpty)
-                        ? Container(
-                            margin: AppSizes.HORIZONTAL,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 16),
-                            height: 250,
-                            width: Get.width,
-                            decoration: AppStyling.CUSTOM_CARD,
-                            child: SingleChildScrollView(
-                              physics: BouncingScrollPhysics(),
-                              child: Column(
-                                children: List.generate(
-                                  ctrl.allTherapists.length,
-                                  (index) => InkWell(
-                                    onTap: () {
-                                      ctrl.selectedTherapistModel.value =
-                                          ctrl.allTherapists[index];
-
-                                      ctrl.allTherapists.clear();
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.only(bottom: 8),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          CommonImageView(
-                                            height: 40,
-                                            width: 40,
-                                            radius: 100,
-                                            url:
-                                                "${ctrl.allTherapists[index].image}",
-                                          ),
-                                          SizedBox(width: 15),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              MyText(
-                                                text:
-                                                    "${ctrl.allTherapists[index].fullName}",
-                                                size: 14,
-                                                weight: FontWeight.w600,
-                                              ),
-                                              MyText(
-                                                paddingTop: 5,
-                                                text:
-                                                    "${ctrl.allTherapists[index].email}",
-                                                size: 12,
-
-                                                // weight: FontWeight.w600,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                  // weight: FontWeight.w600,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ))
-                        : SizedBox.shrink(),
-              ],
+                              ))
+                          : SizedBox.shrink(),
+                ],
+              ),
             ),
-          ),
-
-          // ctrl.getAllTherapist();
-
-          // Expanded(
-          //   child: ListView(
-          //     shrinkWrap: true,
-          //     padding: AppSizes.DEFAULT,
-          //     physics: BouncingScrollPhysics(),
-          //     children: [
-          //       MyTextField(
-          //         labelText: 'Therapist First Name',
-          //       ),
-          //       MyTextField(
-          //         labelText: 'Therapist Last Name',
-          //       ),
-          //       MyTextField(
-          //         labelText: 'Country',
-          //       ),
-          //       MyTextField(
-          //         labelText: 'State',
-          //       ),
-          //       MyTextField(
-          //         labelText: 'City',
-          //       ),
-          //     ],
-          //   ),
-          // ),
-
-          // Padding(
-          //   padding: AppSizes.DEFAULT,
-          //   child: MyButton(
-          //     buttonText: 'Add New Therapist',
-          //     onTap: () {},
-          //   ),
-          // ),
-        ],
+          ],
+        ),
       ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-              padding: AppSizes.DEFAULT,
-              child: MyButton(
-                buttonText: 'Save',
-                onTap: () {
-                  ctrl.changeTherapist();
-                },
-              ))
-        ],
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(left: 20, right: 20, bottom: 40, top: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MyButton(
+              buttonText: 'Request Therapist',
+              onTap: () {
+                // ctrl.changeTherapist();
+                ctrl.requestTherapist(
+                    therapistID:
+                        ctrl.selectedTherapistModel.value!.id.toString());
+              },
+            )
+          ],
+        ),
       ),
     );
   }
 }
 
+// ignore: must_be_immutable
 class TappableCard extends StatelessWidget {
   VoidCallback? onTap;
   final bool haveData;
+  final String? hint;
 
   TappableCard({
     super.key,
     this.haveData = false,
     this.onTap,
+    this.hint,
   });
 
   @override
@@ -292,7 +233,7 @@ class TappableCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 MyText(
-                  text: "Search Therapist",
+                  text: hint ?? "Search Therapist",
                   size: 12,
                 ),
                 Icon(
@@ -344,3 +285,66 @@ class TappableCard extends StatelessWidget {
 //     };
 //   }
 // }
+
+class RequestCard extends StatelessWidget {
+  final String message;
+  const RequestCard({
+    super.key,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: Container(
+            margin: AppSizes.DEFAULT,
+            padding: AppSizes.DEFAULT,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: kPrimaryColor,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                MyText(
+                  text: 'Request Therapist',
+                  size: 16,
+                  textAlign: TextAlign.center,
+                  weight: FontWeight.w600,
+                ),
+                MyText(
+                  textAlign: TextAlign.center,
+                  paddingTop: 6,
+                  // text: 'Are you sure you want to remove?',
+                  text: '$message',
+                  size: 13,
+                  color: kGreyColor,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        buttonText: 'Close',
+                        onTap: () {
+                          Get.close(2);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -72,8 +72,7 @@ class BoardEntry {
   final String userId;
   final DateTime date;
   final int stressLevel;
-  // final int mode;
-  // final List<String> emotions;
+  final int irritateLevel;
   final String note;
   final List<String>? photos;
   final List<DynamicField>? dynamicFields;
@@ -87,8 +86,7 @@ class BoardEntry {
     required this.userId,
     required this.date,
     required this.stressLevel,
-    // required this.mode,
-    // required this.emotions,
+    required this.irritateLevel,
     required this.note,
     this.photos,
     this.dynamicFields,
@@ -104,8 +102,7 @@ class BoardEntry {
       userId: json['userId'],
       date: DateTime.parse(json['date']),
       stressLevel: json['stressLevel'],
-      // mode: json['mode'],
-      // emotions: List<String>.from(json['emotions']),
+      irritateLevel: json['irritateLevel'] ?? 0,
       note: json['note'],
       photos: json.containsKey('photos') && json['photos'] != null
           ? List<String>.from(json['photos'])
@@ -128,8 +125,7 @@ class BoardEntry {
       'userId': userId,
       'date': date.toIso8601String(),
       'stressLevel': stressLevel,
-      // 'mode': mode,
-      // 'emotions': emotions,
+      'irritateLevel': irritateLevel,
       'note': note,
       'photos': photos,
       'dynamicFields': dynamicFields?.map((field) => field.toJson()).toList(),

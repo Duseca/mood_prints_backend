@@ -1,15 +1,16 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/user/user_services.dart';
-
+import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
+import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -26,19 +27,33 @@ class _SplashScreenState extends State<SplashScreen> {
   void splashScreenHandler() {
     Timer(Duration(seconds: 2), () async {
       checkUserStatus();
+      // Get.offAll(() => TherapistNavBar());
     });
   }
 
   Future<void> checkUserStatus() async {
-    String? checkingID =
-        await Get.find<AuthController>().getStringSharedPrefMethod(key: 'id');
+    String? checkingID = await Get.find<AuthClientController>()
+        .getStringSharedPrefMethod(key: 'id');
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await UserTypeService.instance.initUserType();
+    final userType = await prefs.getString('userType');
 
     if (checkingID.isNotEmpty) {
       // await Get.put(AuthController()).getCurrentUserDataMethod();
       await UserService.instance.getUserInformation();
-      await Get.find<ClientHomeController>().getAllBoard();
 
-      Get.offAll(() => ClientNavBar());
+      if (userType == 'client') {
+        await Get.find<ClientHomeController>().getAllBoard();
+        await Get.find<ClientHomeController>()
+            .allStats(userID: UserService.instance.userModel.value.id!);
+        ();
+        Get.offAll(() => ClientNavBar());
+      } else if (userType == 'therapist') {
+        Get.offAll(() => TherapistNavBar());
+      }
+
+      // Get.offAll(() => ClientNavBar());
     } else {
       Get.offAll(() => GetStarted());
     }

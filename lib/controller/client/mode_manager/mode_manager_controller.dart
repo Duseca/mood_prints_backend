@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,12 +8,14 @@ import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
-import 'package:mood_prints/model/board_model/board_model.dart';
-import 'package:mood_prints/model/mood_models/block_model.dart';
-import 'package:mood_prints/model/mood_models/mood_indicator_model.dart';
+import 'package:mood_prints/model/client_model/board_model/board_model.dart';
+import 'package:mood_prints/model/client_model/mood_models/block_model.dart';
+import 'package:mood_prints/model/client_model/mood_models/mood_indicator_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
+import 'package:mood_prints/services/notification/notification_services.dart';
 import 'package:mood_prints/services/user/user_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ModeManagerController extends GetxController {
   GetStorage storage = GetStorage();
@@ -21,9 +24,12 @@ class ModeManagerController extends GetxController {
   RxList<BlockModel> hiddenWidgets = <BlockModel>[].obs;
   RxString selectedEmoji = ''.obs;
   Map<int, bool> visibilityDisplayCustomCards = {};
+  // Variables for selecting values related to feeling, stress, and irritability.
   Rx<MoodModel> selectedMood = modeIndicatorItems.first.obs;
   Rx<int?> stressIconHandler = Rx<int?>(null);
   int? stressLevel;
+  Rx<int?> irritateIconHandler = Rx<int?>(null);
+  int? irritateLevel;
 
   final selectedEmojiTextModel = Rxn<EmojiWithText>();
   TextEditingController todayNoteController = TextEditingController();
@@ -35,6 +41,11 @@ class ModeManagerController extends GetxController {
   DateTime? dateTime;
   RxBool isStartingSleepRecordSelected = true.obs;
 
+  // Visually timer show how much time is left, for next board creation.
+  RxInt remainingTime = 0.obs;
+  RxBool isButtonEnabled = false.obs;
+  Timer? timer;
+
   // -------------------------------------------------------------------------
   /* 
   Posting Data throught Api "Creating Board"
@@ -44,8 +55,8 @@ class ModeManagerController extends GetxController {
     log("Try Called Create Board");
     try {
       if (todayNoteController.text.isNotEmpty &&
-          // selectedFeelingList.isNotEmpty &&
           stressLevel != null &&
+          irritateLevel != null &&
           endSleepDuration.value != null &&
           startSleepDuration.value != null) {
         showLoadingDialog();
@@ -64,8 +75,7 @@ class ModeManagerController extends GetxController {
             note: todayNoteController.text.trim(),
             mood: selectedMood.value.stressLevel,
             stressLevel: stressLevel,
-            // selectedMood.value.stressLevel,
-            // emotions: feelingListofText,
+            irritateLevel: irritateLevel,
             date: datePicker.value,
             createdAt: datePicker.value,
             sleep: sleep,
@@ -88,6 +98,9 @@ class ModeManagerController extends GetxController {
             Get.find<ClientHomeController>().getAllBoard();
           }
         }
+        await setScheduleNotification();
+        await checkTimeLeft();
+        await displayCountdownForNextDataEntry();
         Get.close(1);
         clearBoardEntries();
       } else {
@@ -122,17 +135,12 @@ class ModeManagerController extends GetxController {
 
   void updateBoard({
     required String boardID,
-  }
-      //  required DateTime date,
-      //  required int stressLevel,
-      //  required String todayText,
-      //  required String todayText,
-
-      ) async {
+  }) async {
     log("Try Called Update Board");
     try {
       if (todayNoteController.text.isNotEmpty &&
           stressLevel != null &&
+          irritateLevel != null &&
           endSleepDuration.value != null &&
           startSleepDuration.value != null) {
         showLoadingDialog();
@@ -151,6 +159,7 @@ class ModeManagerController extends GetxController {
             note: todayNoteController.text.trim(),
             mood: selectedMood.value.stressLevel,
             stressLevel: stressLevel,
+            irritateLevel: irritateLevel,
             date: datePicker.value,
             createdAt: datePicker.value,
             sleep: sleep,
@@ -172,7 +181,7 @@ class ModeManagerController extends GetxController {
           if (status != null && status.isNotEmpty) {
             if (status == 'success') {
               log("Data Updated Status Code is  -------> : $status");
-              Get.find<ClientHomeController>().getAllBoard();
+              await Get.find<ClientHomeController>().getAllBoard();
             }
             // BoardModel boardModel = BoardModel.fromJson(data);
             // log("Data After Board Created: ${boardModel.toString()}");
@@ -180,8 +189,8 @@ class ModeManagerController extends GetxController {
             log("Status -------> : $status");
           }
         }
-        // Get.close(1);
-        // clearBoardEntries();
+        Get.close(1);
+        clearBoardEntries();
       } else {
         displayToast(msg: 'Please fill data');
       }
@@ -209,12 +218,20 @@ class ModeManagerController extends GetxController {
 
   // ------ Emotion Selector -------
 
-  void emotionSelector(
+  void stressedSelector(
     index,
   ) {
     stressIconHandler.value = index;
-    stressLevel = feelingItems[index].stressLevel;
+    stressLevel = stressItems[index].level;
     log("Stress Level: ${stressLevel}");
+  }
+
+  void irritableSelector(
+    index,
+  ) {
+    irritateIconHandler.value = index;
+    irritateLevel = irritateItems[index].level;
+    log("Irritate Level: ${irritateLevel}");
   }
 
   // -------------------------------------------------------------------------
@@ -330,9 +347,102 @@ class ModeManagerController extends GetxController {
     update();
   }
 
+  /*
+  
+   ***************** Algo for enter data after next 8 hours ********************
+
+  */
+
+  Future<void> setScheduleNotification() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // Save timestamp
+    await prefs.setInt('last_entry_time', now);
+    await prefs.setBool('canEnterData', false);
+
+    // Schedule Notification for 8 hours later
+    await NotificationServices().scheduleNotification();
+  }
+
+  Future<void> checkTimeLeft() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastEntryTime = prefs.getInt('last_entry_time') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    final timePassed = now - lastEntryTime;
+    final totalDuration = Duration(hours: 8, minutes: 0).inMilliseconds;
+
+    if (timePassed >= totalDuration) {
+      // Time is up, enable button
+      await prefs.setBool('canEnterData', true);
+    } else {
+      // Still waiting, calculate remaining time
+      final remainingTime = totalDuration - timePassed;
+      log('⏰ Time left: ${Duration(milliseconds: remainingTime)}');
+    }
+  }
+
+  // void displayCountdownForNextDataEntry() async {
+  //   if (timer != null) {
+  //     timer!.cancel(); // 🔹 Prevent multiple timers
+  //   }
+
+  //   timer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //     if (remainingTime.value > 0) {
+  //       remainingTime.value -= 1000; // 🔹 Updates UI automatically
+  //     } else {
+  //       timer.cancel();
+  //       remainingTime.value = 0;
+  //     }
+  //   });
+  // }
+
+  Future<void> displayCountdownForNextDataEntry() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastEntryTime = prefs.getInt('last_entry_time') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final totalDuration = Duration(hours: 8, minutes: 0).inMilliseconds;
+
+    final timePassed = now - lastEntryTime;
+    remainingTime.value = totalDuration - timePassed;
+
+    if (remainingTime.value < 0) {
+      remainingTime.value = 0;
+      await prefs.setBool('canEnterData', true);
+    }
+
+    // Start the countdown
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (remainingTime.value > 0) {
+        remainingTime.value -= 1000;
+      } else {
+        timer.cancel();
+      }
+    });
+
+    update();
+  }
+
+  String formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String hours = twoDigits(duration.inHours);
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$hours:$minutes:$seconds";
+  }
+
   @override
   void onInit() {
     super.onInit();
     loadBlocks();
+    checkTimeLeft();
+    displayCountdownForNextDataEntry();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 }
