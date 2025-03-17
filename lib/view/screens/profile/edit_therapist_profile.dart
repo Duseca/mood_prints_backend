@@ -15,6 +15,8 @@ import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
+import '../../../model/therapist_model/therapist_detail_model.dart';
+import '../../widget/intel_phone_field_widget.dart';
 
 class EditTherapistProfile extends StatefulWidget {
   // UserModel? model;
@@ -28,10 +30,14 @@ class EditTherapistProfile extends StatefulWidget {
 
 class _EditTherapistProfileState extends State<EditTherapistProfile> {
   var ctrl = Get.find<ProfileController>();
+  var userModel = TherapistDetailModel();
 
   @override
-  Widget build(BuildContext context) {
-    var userModel = UserService.instance.therapistDetailModel.value;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+     userModel = UserService.instance.therapistDetailModel.value;
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
       ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
@@ -43,9 +49,25 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
       ctrl.bioController.text = userModel.bio!;
     }
     ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-    setState(() {
+  }
 
-    });
+  @override
+  Widget build(BuildContext context) {
+    // var userModel = UserService.instance.therapistDetailModel.value;
+    // if (userModel.authProvider == 'google') {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //   ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+    // } else {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //   ctrl.dob.value = DateTime.parse(userModel.dob!);
+    //   ctrl.bioController.text = userModel.bio!;
+    // }
+    // ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+    // setState(() {
+    //
+    // });
 
     return Scaffold(
       appBar: simpleAppBar(
@@ -117,7 +139,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                               height: 70,
                               width: 70,
                               radius: 100.0,
-                              url: userModel.image,
+                        url: UserService.instance.therapistDetailModel.value.image,
                             ),
                     ),
                   ],
@@ -147,18 +169,29 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                 //     log("Complete Phone Number: ${ctrl.completePhoneNumber}");
                 //   },
                 // ),
-                Obx(
-                      ()=> UpdatedPhoneField(
-                    // initialFlag: ,
-                    initialCountryCode: ctrl.countryCode.value,
-                    controller: ctrl.phoneNumberController,
+                IntlPhoneFieldWidget(
+                  initialCountryCode: ctrl.initialCountryCodeValue.value,
+                  controller: ctrl.phoneNumberController,
+                  onChanged: (v) {
+                    ctrl.completePhoneNumber = v.completeNumber;
 
-                    onPhoneNumberChanged: (value) {
-                      ctrl.completePhoneNumber = value;
-                      log("Complete Phone Number: ${value}");
-                    },
-                  ),
+                    log("onChanged -------> ${ctrl.completePhoneNumber}");
+                  },
+
                 ),
+                SizedBox(height: 16.0),
+                // Obx(
+                //       ()=> UpdatedPhoneField(
+                //     // initialFlag: ,
+                //     initialCountryCode: ctrl.countryCode.value,
+                //     controller: ctrl.phoneNumberController,
+                //
+                //     onPhoneNumberChanged: (value) {
+                //       ctrl.completePhoneNumber = value;
+                //       log("Complete Phone Number: ${value}");
+                //     },
+                //   ),
+                // ),
                 // Obx(
                 //   () => CustomDropDown(
                 //     labelText: 'Gender',

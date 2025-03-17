@@ -94,8 +94,11 @@ class HiddenBlocks extends StatelessWidget {
                                                   ),
                                                 ),
                                                 MyText(
+                                                  maxLines: 1,
+                                                    textOverflow: TextOverflow.ellipsis,
+
                                                   text:
-                                                      '${'${modeCtrl.hiddenWidgets[headIndex].data[index].text}'}',
+                                                      '${'${modeCtrl.hiddenWidgets[headIndex].data[index].text.trim()}'}',
                                                   size: 12,
                                                 ),
                                               ],

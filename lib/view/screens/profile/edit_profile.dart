@@ -6,6 +6,7 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/profile/profile_controller.dart';
+import 'package:mood_prints/model/client_model/user_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -31,11 +32,16 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   var ctrl = Get.find<ProfileController>();
+  var userModel = UserModel();
+
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
     var userModel = UserService.instance.userModel.value;
- 
+
 
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
@@ -51,9 +57,30 @@ class _EditProfileState extends State<EditProfile> {
 
 
     ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-setState(() {
+  }
 
-});
+  @override
+  Widget build(BuildContext context) {
+    // var userModel = UserService.instance.userModel.value;
+    //
+    //
+    // if (userModel.authProvider == 'google') {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //
+    //   ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+    // } else {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //   ctrl.dob.value = DateTime.parse(userModel.dob!);
+    //   ctrl.bioController.text = userModel.bio!;
+    // }
+    //
+    //
+    // ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+// setState(() {
+//
+// });
 
     return Scaffold(
       appBar: simpleAppBar(
@@ -125,7 +152,7 @@ setState(() {
                               height: 70,
                               width: 70,
                               radius: 100.0,
-                              url: userModel.image,
+                              url: UserService.instance.userModel.value.image,
                             ),
                     ),
                   ],
@@ -140,6 +167,7 @@ setState(() {
                   labelText: 'Full Name',
                   hintText: 'Your full name here...',
                 ),
+
                 // MyTextField(
                 //   controller: ctrl.emailController,
                 //   labelText: 'Email Address',
@@ -163,17 +191,16 @@ setState(() {
 
 
                 IntlPhoneFieldWidget(
+                  initialCountryCode: ctrl.initialCountryCodeValue.value,
                   controller: ctrl.phoneNumberController,
                   onChanged: (v) {
-                    ctrl.userPhoneNumber = v.completeNumber;
-                    log("onChanged -------> ${ctrl.userPhoneNumber}");
+                    ctrl.completePhoneNumber = v.completeNumber;
+
+                    log("onChanged -------> ${ctrl.completePhoneNumber}");
                   },
-                  validator: (val) {
-                    // if (val!.completeNumber != '') {
-                    //   return "Required phone number";
-                    // }
-                  },
+
                 ),
+                SizedBox(height: 16.0),
 
 
 

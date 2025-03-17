@@ -79,6 +79,8 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                 therapistID: ctrl.notificationList[index]
                                     .requestId!.therapistId
                                     .toString());
+
+
                           },
                           onDeclineTap: () {
                             log('Decline Tapped ${ctrl.notificationList[index].requestId!.id}');

@@ -40,7 +40,8 @@ class ProfileController extends GetxController {
   RxBool visiblityNew = false.obs;
   RxBool visiblityConfrim = false.obs;
   RxString countryCode = '1'.obs;
-  RxString userPhoneNumber = ''.obs;
+  RxString initialCountryCodeValue  = ''.obs;
+
 
 
   // Image Picker
@@ -238,8 +239,9 @@ class ProfileController extends GetxController {
   // ---------- Request Therapist ---------------
   // ---------- Creating a notification request ---------------
 
-  void requestTherapist({
+  Future<void> requestNotification({
     String? therapistID,
+    String? clientID
   }) async {
     if (therapistID != null) {
       log('Request Therapist Called');
@@ -250,7 +252,7 @@ class ProfileController extends GetxController {
 
       final body = {
         'therapistId': therapistID,
-        'clientId': UserService.instance.userModel.value.id,
+        'clientId': clientID ?? UserService.instance.userModel.value.id,
         'action': ActionType.create.name,
       };
 
@@ -272,12 +274,15 @@ class ProfileController extends GetxController {
           );
 
           hideLoadingDialog();
-
+          Get.back();
           log('Request Send: $message');
+          displayToast(msg: 'Request send to therapist!');
+
         }
       }
 
       hideLoadingDialog();
+
     } else {
       displayToast(msg: "Please select a therapist");
     }
@@ -322,7 +327,8 @@ class ProfileController extends GetxController {
   Future<void> extractCountryCode(String phoneNumber) async {
     PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
     countryCode.value = number.dialCode ?? '';
-    log('Country Code: ${countryCode.value}');
+    initialCountryCodeValue.value = number.isoCode ?? '';
+    log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
   }
 
 

@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/chat/chat_controller.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
+import 'package:mood_prints/core/enums/notification_type.dart';
 import 'package:mood_prints/model/notification/notification_model.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/therapist/therapist_home/therapist_notification.dart';
@@ -67,9 +69,35 @@ class NotificationController extends GetxController {
         if (request != null && request.isNotEmpty) {
           await buildTherapistClientRelation(
               therapistID: therapistID, clientID: clientID);
+
+
+
           isRequestAccepted.value = false;
           Get.dialog(RequestAcceptedCard());
         }
+      }
+
+
+      if(status == Status.accepted.name
+      )
+        {
+
+          log('------------ Accepted Status Called -------------');
+
+          await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
+
+
+
+        }
+      else
+      {
+
+        log('------------ Decline Status Called -------------');
+
+        await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
+
+
+
       }
       isRequestAccepted.value = false;
     } catch (e) {
@@ -127,6 +155,7 @@ class NotificationController extends GetxController {
   Future<void> buildTherapistClientRelation({
     required String therapistID,
     required String clientID,
+
   }) async {
     try {
       log(' Build Relation Called');
@@ -148,9 +177,22 @@ class NotificationController extends GetxController {
         if (relationships != null && relationships.isNotEmpty) {
           await Get.find<ChatController>()
               .creatingChatThread(participantsID: clientID, myID: therapistID);
+
+
+
+
           await UserService.instance.getUserInformation();
 
           log('Chat Thead Called : ---------- ');
+
+          // -------------------------------------------------------------------
+          // -------------------------------------------------------------------
+          // --- If request accepted by therepist send notification to client ---
+
+          // Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
+
+          // -------------------------------------------------------------------
+          // -------------------------------------------------------------------
 
           // log('Relationships: -> $relationships');
         }

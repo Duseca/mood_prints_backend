@@ -192,7 +192,7 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
               buttonText: 'Request Therapist',
               onTap: () {
                 // ctrl.changeTherapist();
-                ctrl.requestTherapist(
+                ctrl.requestNotification(
                     therapistID:
                         ctrl.selectedTherapistModel.value!.id.toString());
               },
