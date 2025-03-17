@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (userType == 'client') {
         await Get.find<ClientHomeController>().getAllBoard();
         await Get.find<ClientHomeController>()
-            .allStats(userID: UserService.instance.userModel.value.id!);
+            .allStats(userID: UserService.instance.userModel.value.id);
         ();
         Get.offAll(() => ClientNavBar());
       } else if (userType == 'therapist') {

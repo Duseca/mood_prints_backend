@@ -16,6 +16,9 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
+import '../../widget/intel_phone_field_widget.dart';
+
+
 class EditProfile extends StatefulWidget {
   // UserModel? model;
   EditProfile({
@@ -32,18 +35,25 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     var userModel = UserService.instance.userModel.value;
+ 
 
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = '';
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
 
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber!;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
     }
+
+
+    ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+setState(() {
+
+});
 
     return Scaffold(
       appBar: simpleAppBar(
@@ -138,13 +148,35 @@ class _EditProfileState extends State<EditProfile> {
                 // PhoneField(
                 //   controller: ctrl.phoneNumberController,
                 // ),
-                PhoneField(
+                // Obx(
+                //   ()=> UpdatedPhoneField(
+                //     // initialFlag: ,
+                //     initialCountryCode: ctrl.countryCode.value,
+                //     controller: ctrl.phoneNumberController,
+                //
+                //     onPhoneNumberChanged: (value) {
+                //       ctrl.completePhoneNumber = value;
+                //       log("Complete Phone Number: ${value}");
+                //     },
+                //   ),
+                // ),
+
+
+                IntlPhoneFieldWidget(
                   controller: ctrl.phoneNumberController,
-                  onPhoneNumberChanged: (value) {
-                    ctrl.completePhoneNumber = value;
-                    log("Complete Phone Number: ${ctrl.completePhoneNumber}");
+                  onChanged: (v) {
+                    ctrl.userPhoneNumber = v.completeNumber;
+                    log("onChanged -------> ${ctrl.userPhoneNumber}");
+                  },
+                  validator: (val) {
+                    // if (val!.completeNumber != '') {
+                    //   return "Required phone number";
+                    // }
                   },
                 ),
+
+
+
                 // Obx(
                 //   () => CustomDropDown(
                 //     labelText: 'Gender',

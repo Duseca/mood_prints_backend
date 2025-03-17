@@ -34,14 +34,18 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
     var userModel = UserService.instance.therapistDetailModel.value;
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = '';
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber!;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
     }
+    ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+    setState(() {
+
+    });
 
     return Scaffold(
       appBar: simpleAppBar(
@@ -136,12 +140,24 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                 // PhoneField(
                 //   controller: ctrl.phoneNumberController,
                 // ),
-                PhoneField(
-                  controller: ctrl.phoneNumberController,
-                  onPhoneNumberChanged: (value) {
-                    ctrl.completePhoneNumber = value;
-                    log("Complete Phone Number: ${ctrl.completePhoneNumber}");
-                  },
+                // PhoneField(
+                //   controller: ctrl.phoneNumberController,
+                //   onPhoneNumberChanged: (value) {
+                //     ctrl.completePhoneNumber = value;
+                //     log("Complete Phone Number: ${ctrl.completePhoneNumber}");
+                //   },
+                // ),
+                Obx(
+                      ()=> UpdatedPhoneField(
+                    // initialFlag: ,
+                    initialCountryCode: ctrl.countryCode.value,
+                    controller: ctrl.phoneNumberController,
+
+                    onPhoneNumberChanged: (value) {
+                      ctrl.completePhoneNumber = value;
+                      log("Complete Phone Number: ${value}");
+                    },
+                  ),
                 ),
                 // Obx(
                 //   () => CustomDropDown(

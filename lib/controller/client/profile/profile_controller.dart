@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
@@ -38,6 +39,9 @@ class ProfileController extends GetxController {
   RxBool visiblityOld = false.obs;
   RxBool visiblityNew = false.obs;
   RxBool visiblityConfrim = false.obs;
+  RxString countryCode = '1'.obs;
+  RxString userPhoneNumber = ''.obs;
+
 
   // Image Picker
 
@@ -313,4 +317,15 @@ class ProfileController extends GetxController {
       }
     }
   }
+
+
+  Future<void> extractCountryCode(String phoneNumber) async {
+    PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
+    countryCode.value = number.dialCode ?? '';
+    log('Country Code: ${countryCode.value}');
+  }
+
+
+
+
 }

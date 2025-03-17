@@ -18,6 +18,7 @@ import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
+import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
@@ -106,7 +107,17 @@ class AuthClientController extends GetxController {
             userType: userType!,
             authId: auth.currentUser!.uid);
 
+        await UserTypeService.instance.initUserType();
+        if (UserTypeService.instance.userType == UserType.client.name) {
+          log('Go To Client Nav Bar');
+          Get.to(() => ClientNavBar());
+        } else {
+          log('Go To Therapist Nav Bar');
+          Get.to(() => TherapistNavBar());
+        }
+
         hideLoadingDialog();
+
 
         log("else: Is email exist: $isEmailExist");
       }
@@ -244,7 +255,7 @@ class AuthClientController extends GetxController {
       };
 
       final response = await apiService.post(signUpUrl, body, true,
-          showResult: true, successCode: 200);
+          showResult: false, successCode: 200);
 
       if (response != null) {
         final token = response['token'];
@@ -259,12 +270,14 @@ class AuthClientController extends GetxController {
           await prefs.setString('id', userModel.id.toString());
           await prefs.setString('userType', userModel.userType.toString());
           await UserService.instance.getUserInformation();
-
-          if (userModel.userType == UserType.client.name) {
-            Get.to(() => ClientNavBar());
-          } else {
-            Get.to(() => TherapistNavBar());
-          }
+          //
+          // if (userModel.userType == UserType.client.name) {
+          //   log('Go To Client Nav Bar');
+          //   Get.to(() => ClientNavBar());
+          // } else {
+          //   log('Go To Therapist Nav Bar');
+          //   Get.to(() => TherapistNavBar());
+          // }
         }
       }
     } catch (e) {

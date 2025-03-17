@@ -28,7 +28,7 @@ dependencies:
   fluttertoast: ^8.2.10
   http: ^1.2.2
   shared_preferences:
-  connectivity_plus: ^6.1.1
+  connectivity_plus:
   loading_animation_widget: ^1.3.0 
   image_picker: ^1.1.2
   emoji_picker_flutter: ^4.2.0
@@ -42,7 +42,7 @@ dependencies:
   firebase_auth: ^5.4.1
   # firebase_messaging: ^15.2.1
   firebase_messaging: 
-  flutter_local_notifications: ^17.2.3
+  flutter_local_notifications:
   app_settings: 
   permission_handler: 
   flutter_slidable: 
@@ -50,8 +50,10 @@ dependencies:
   flutter_timezone: ^4.1.0
   table_calendar: 3.1.2
   dropdown_button2: ^2.3.9
-  google_sign_in: 
-  
+  google_sign_in:
+  intl_phone_number_input:
+  intl_phone_field: ^3.2.0
+
 
 
 dev_dependencies:

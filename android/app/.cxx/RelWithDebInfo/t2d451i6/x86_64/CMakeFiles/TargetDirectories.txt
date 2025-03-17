@@ -1,0 +1,2 @@
+/Users/Flutter Projects/Duseca Backend Project/mood_prints_backend/android/app/.cxx/RelWithDebInfo/t2d451i6/x86_64/CMakeFiles/edit_cache.dir
+/Users/Flutter Projects/Duseca Backend Project/mood_prints_backend/android/app/.cxx/RelWithDebInfo/t2d451i6/x86_64/CMakeFiles/rebuild_cache.dir
