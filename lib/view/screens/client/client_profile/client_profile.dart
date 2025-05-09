@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -179,9 +178,10 @@ class ClientProfile extends StatelessWidget {
                 onCancelTap: () {
                   Get.back();
                 },
-                onLogoutTap: () {
-                  log('work logout');
-                  Get.find<AuthClientController>().logOutMethod();
+                onLogoutTap: () async {
+                  await Get.find<AuthClientController>().logOutMethod();
+                  UserService.instance.relationWithClients.clear();
+                  UserService.instance.relationWithTherapist.clear();
                 },
               ));
             },

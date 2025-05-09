@@ -118,7 +118,6 @@ class AuthClientController extends GetxController {
 
         hideLoadingDialog();
 
-
         log("else: Is email exist: $isEmailExist");
       }
 
@@ -472,6 +471,7 @@ class AuthClientController extends GetxController {
               UserService.instance.userModel.value = model;
 
               Get.offAll(() => ClientNavBar());
+              resetValues();
             }
 
             log('User Profile Updated');
@@ -513,6 +513,7 @@ class AuthClientController extends GetxController {
               UserService.instance.therapistDetailModel.value = model;
 
               Get.offAll(() => TherapistNavBar());
+              resetValues();
             }
 
             log('Therapist Profile Updated');
@@ -627,6 +628,10 @@ class AuthClientController extends GetxController {
     cityController.clear();
     BioController.clear();
     acceptTermsAndCondition.value = false;
+    selectedProfileImage.value = null;
+    dob.value = null;
+    phoneNumberController.clear();
+
     update();
   }
 

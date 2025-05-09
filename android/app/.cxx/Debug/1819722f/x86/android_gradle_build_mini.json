@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/sufyanshaukat/development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/sufyanshaukat/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/Flutter Projects/Duseca Backend Project/mood_prints_backend/android/app/.cxx/Debug/1819722f/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/sufyanshaukat/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/Flutter Projects/Duseca Backend Project/mood_prints_backend/android/app/.cxx/Debug/1819722f/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

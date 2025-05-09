@@ -40,9 +40,7 @@ class ProfileController extends GetxController {
   RxBool visiblityNew = false.obs;
   RxBool visiblityConfrim = false.obs;
   RxString countryCode = '1'.obs;
-  RxString initialCountryCodeValue  = ''.obs;
-
-
+  RxString initialCountryCodeValue = ''.obs;
 
   // Image Picker
 
@@ -239,10 +237,8 @@ class ProfileController extends GetxController {
   // ---------- Request Therapist ---------------
   // ---------- Creating a notification request ---------------
 
-  Future<void> requestNotification({
-    String? therapistID,
-    String? clientID
-  }) async {
+  Future<void> requestNotification(
+      {String? therapistID, String? clientID}) async {
     if (therapistID != null) {
       log('Request Therapist Called');
       log("Therapist ID: $therapistID");
@@ -265,45 +261,59 @@ class ProfileController extends GetxController {
         final requestID = request['_id'];
 
         if (message != null && message.isNotEmpty) {
+          // ----- New Response ---------
+          //TODO:  Create Notification API
           await createNotification(
             requestId: requestID,
-            therapistId: therapistID,
+            reciverID: therapistID,
             title: 'Request from Client',
             fullName: UserService.instance.userModel.value.fullName,
             message: message,
           );
 
+          // ------ Old Response ---------
+
+          // await createNotification(
+          //   requestId: requestID,
+          //   therapistId: therapistID,
+          //   title: 'Request from Client',
+          //   fullName: UserService.instance.userModel.value.fullName,
+          //   message: message,
+          // );
+
           hideLoadingDialog();
           Get.back();
           log('Request Send: $message');
           displayToast(msg: 'Request send to therapist!');
-
         }
       }
 
       hideLoadingDialog();
-
     } else {
       displayToast(msg: "Please select a therapist");
     }
   }
 
   Future<void> createNotification({
-    String? therapistId,
+    // String? therapistId,
+    String? reciverID,
     String? requestId,
     String? title,
     String? fullName,
+    String notificationMsg = "has requested to select you as their therapist.",
     String? message,
   }) async {
     log('Create Notification Called');
 
     final body = {
       'requestId': requestId,
-      'userId': UserService.instance.userModel.value.id,
-      'therapistId': therapistId,
+      // 'userId': reciverID ?? UserService.instance.userModel.value.id,
+      'userId': reciverID,
+      // 'therapistId': therapistId,
       'title': title,
       'fullName': fullName,
-      'body': '$fullName has requested to select you as their therapist.',
+      'body': "${fullName} ${notificationMsg}",
+      // 'body': '$fullName has requested to select you as their therapist.',
     };
 
     String createNotificationUrl = notificationUrl;
@@ -323,15 +333,45 @@ class ProfileController extends GetxController {
     }
   }
 
+  Future<void> createNotificationWithoutRequest({
+    String? reciverID,
+    String? title,
+    String? fullName,
+    String notificationMsg = "has requested to select you as their therapist.",
+    String? message,
+  }) async {
+    log('Create Notification Called');
+
+    final body = {
+      // 'requestId': requestId,
+      // 'userId': reciverID ?? UserService.instance.userModel.value.id,
+      'userId': reciverID,
+      // 'therapistId': therapistId,
+      'title': title,
+      'fullName': fullName,
+      'body': "${notificationMsg}",
+      // 'body': '$fullName has requested to select you as their therapist.',
+    };
+
+    String createNotificationUrl = notificationUrl;
+
+    final response = await apiService.post(createNotificationUrl, body, true,
+        showResult: true, successCode: 201);
+
+    if (response != null) {
+      final notification = response['notification'];
+      if (notification != null && notification.isNotEmpty) {
+        log('Notification Created -------->');
+        log('Notification: $notification');
+      }
+    }
+  }
 
   Future<void> extractCountryCode(String phoneNumber) async {
-    PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
+    PhoneNumber number =
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
     countryCode.value = number.dialCode ?? '';
     initialCountryCodeValue.value = number.isoCode ?? '';
     log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
   }
-
-
-
-
 }

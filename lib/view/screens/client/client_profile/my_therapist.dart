@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -12,7 +13,7 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 // ignore: must_be_immutable
-class MyTherapist extends StatelessWidget {
+class MyTherapist extends StatefulWidget {
   // bool haveTherapist;
 
   MyTherapist({
@@ -20,9 +21,16 @@ class MyTherapist extends StatelessWidget {
     // this.haveTherapist = false
   });
 
-  // final ctrl = Get.find<ProfileController>();
+  @override
+  State<MyTherapist> createState() => _MyTherapistState();
+}
 
-  // bool haveTherapist;
+class _MyTherapistState extends State<MyTherapist> {
+  Future<void> _refresh() async {
+    await Future.delayed(Duration(seconds: 2));
+    await UserService.instance.getUserInformation();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,27 +38,30 @@ class MyTherapist extends StatelessWidget {
       appBar: simpleAppBar(
         title: 'My Therapist',
       ),
-      body: Column(
-        children: [
-          SizedBox(height: 15),
-          (UserService.instance.relationWithTherapist.isNotEmpty)
-              ? Column(
-                  children: List.generate(
-                      UserService.instance.relationWithTherapist.length,
-                      (index) {
-                    var data = UserService
-                        .instance.relationWithTherapist[index].therapist;
-                    return MyTherapistCard(
-                      imageUrl: data?.image,
-                      fullname: data?.fullName,
-                      email: data?.email,
-                      phoneNumber: data?.phoneNumber,
-                      location: data?.city,
-                    );
-                  }),
-                )
-              : Center(child: NoTherapistCard()),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: ListView(
+          children: [
+            SizedBox(height: 15),
+            (UserService.instance.relationWithTherapist.isNotEmpty)
+                ? Column(
+                    children: List.generate(
+                        UserService.instance.relationWithTherapist.length,
+                        (index) {
+                      var data = UserService
+                          .instance.relationWithTherapist[index].therapist;
+                      return MyTherapistCard(
+                        imageUrl: data?.image,
+                        fullname: data?.fullName,
+                        email: data?.email,
+                        phoneNumber: data?.phoneNumber,
+                        location: data?.city,
+                      );
+                    }),
+                  )
+                : Center(child: NoTherapistCard()),
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(left: 20, right: 20, bottom: 40, top: 20),

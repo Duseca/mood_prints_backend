@@ -178,6 +178,10 @@ class _LoginState extends State<Login> {
                 ),
                 MyText(
                   onTap: () {
+                    ctrl.emailController.clear();
+                    ctrl.passwordController.clear();
+                    ctrl.acceptTermsAndCondition.value = false;
+                    ctrl.passwordVisibility.value = true;
                     Get.to(() => GetStarted());
                     // Get.to(() => ClientSignUp(
                     //       type: 'therapist',

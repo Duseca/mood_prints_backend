@@ -19,7 +19,6 @@ import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 import '../../widget/intel_phone_field_widget.dart';
 
-
 class EditProfile extends StatefulWidget {
   // UserModel? model;
   EditProfile({
@@ -34,27 +33,26 @@ class _EditProfileState extends State<EditProfile> {
   var ctrl = Get.find<ProfileController>();
   var userModel = UserModel();
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    var userModel = UserService.instance.userModel.value;
+    log('--------- VVRR --------');
 
+    var userModel = UserService.instance.userModel.value;
 
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
 
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
     }
-
 
     ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
   }
@@ -189,7 +187,6 @@ class _EditProfileState extends State<EditProfile> {
                 //   ),
                 // ),
 
-
                 IntlPhoneFieldWidget(
                   initialCountryCode: ctrl.initialCountryCodeValue.value,
                   controller: ctrl.phoneNumberController,
@@ -198,11 +195,8 @@ class _EditProfileState extends State<EditProfile> {
 
                     log("onChanged -------> ${ctrl.completePhoneNumber}");
                   },
-
                 ),
                 SizedBox(height: 16.0),
-
-
 
                 // Obx(
                 //   () => CustomDropDown(

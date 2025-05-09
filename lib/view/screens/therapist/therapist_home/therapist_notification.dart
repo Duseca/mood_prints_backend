@@ -5,12 +5,14 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/controller/notification/notification_controller.dart';
 import 'package:mood_prints/core/enums/notification_type.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
+import '../../../../services/user/user_services.dart';
 
 // ignore: must_be_immutable
 class TherapistNotificationPage extends StatefulWidget {
@@ -23,12 +25,13 @@ class TherapistNotificationPage extends StatefulWidget {
 
 class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
   var ctrl = Get.find<NotificationController>();
+  var pctrl = Get.find<ProfileController>();
 
   @override
   void initState() {
     super.initState();
 
-    ctrl.getAllNotification();
+    ctrl.getAllNotification(UserService.instance.therapistDetailModel.value.id);
   }
 
   @override
@@ -63,12 +66,29 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                       : Status.declined.name,
                           title: '${ctrl.notificationList[index].title}',
                           description: '${ctrl.notificationList[index].body}',
-                          onAcceptTap: () {
+                          onAcceptTap: () async {
                             log('Accept Tapped');
 
-                            // Update notification status & Buidl Connection with client
+                            // ---------- Accept Request notification send to the client --------------
+                            var name = UserService
+                                .instance.therapistDetailModel.value.fullName;
 
-                            ctrl.updateNotificationStatus(
+                            await pctrl.createNotificationWithoutRequest(
+                              title: 'Request Accepted',
+                              notificationMsg:
+                                  "${name} has selected you as their patient.",
+                              message:
+                                  "${UserService.instance.therapistDetailModel.value.fullName} has selected you as their patient.",
+                              reciverID: ctrl
+                                  .notificationList[index].requestId!.clientId
+                                  .toString(),
+                            );
+
+                            log("Name $name");
+
+                            //----------- Update notification status & Build Connection with client --------------
+
+                            await ctrl.updateNotificationStatus(
                                 requestId: ctrl
                                     .notificationList[index].requestId!.id
                                     .toString(),
@@ -79,19 +99,32 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                 therapistID: ctrl.notificationList[index]
                                     .requestId!.therapistId
                                     .toString());
-
-
                           },
-                          onDeclineTap: () {
+                          onDeclineTap: () async {
                             log('Decline Tapped ${ctrl.notificationList[index].requestId!.id}');
-                            ctrl.deleteNotificationRequest(
+
+                            // ---------- Declined Request notification send to the client --------------
+
+                            var name = UserService
+                                .instance.therapistDetailModel.value.fullName;
+
+                            await pctrl.createNotificationWithoutRequest(
+                              title: 'Request Declined',
+                              notificationMsg:
+                                  "${name} has declined your request.",
+                              message:
+                                  "${UserService.instance.therapistDetailModel.value.fullName} has declined your request.",
+                              reciverID: ctrl
+                                  .notificationList[index].requestId!.clientId
+                                  .toString(),
+                            );
+
+                            //----------- Update notification status --------------
+
+                            await ctrl.deleteNotificationRequest(
                                 requestId: ctrl
                                     .notificationList[index].requestId!.id
                                     .toString());
-                            // ctrl.updateNotificationStatus(
-                            //     requestId:
-                            //         ctrl.notificationList[index].id.toString(),
-                            //     status: Status.declined.name);
                           },
                           onDeleteTap: (v) {
                             ctrl.deleteNotification(

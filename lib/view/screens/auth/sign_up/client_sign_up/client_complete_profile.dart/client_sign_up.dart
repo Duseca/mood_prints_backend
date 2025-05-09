@@ -186,7 +186,14 @@ class ClientSignUp extends StatelessWidget {
                   weight: FontWeight.w500,
                 ),
                 MyText(
-                  onTap: () => Get.offAll(() => Login()),
+                  onTap: () {
+                    ctrl.emailController.clear();
+                    ctrl.passwordController.clear();
+                    ctrl.acceptTermsAndCondition.value = false;
+                    ctrl.passwordVisibility.value = true;
+
+                    Get.offAll(() => Login());
+                  },
                   text: 'Login',
                   color: kQuaternaryColor,
                   decoration: TextDecoration.underline,

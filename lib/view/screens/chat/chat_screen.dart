@@ -324,37 +324,52 @@ class _ChatScreenState extends State<ChatScreen> {
                       Get.bottomSheet(_MoreContent());
                     },
                     onSendTap: () async {
+                      log("My Terrible Code");
+
                       if (UserTypeService.instance.userType ==
                           UserType.therapist.name) {
+                        log("1");
                         final user =
                             UserService.instance.therapistDetailModel.value;
 
-                        if (ctrl.textMessageController.text.trim().isNotEmpty) {
-                          ctrl.messagesHandler(
-                              type: MsgType.text_msg.name,
-                              senderID: user.id!,
-                              senderName: user.fullName!,
-                              senderProfileImage: user.image!,
-                              threadID: widget.chatHeadID,
-                              newMessage:
-                                  ctrl.textMessageController.text.trim());
+                        if (ctrl.isLoading.value == false) {
+                          if (ctrl.textMessageController.text
+                              .trim()
+                              .isNotEmpty) {
+                            ctrl.messagesHandler(
+                                type: MsgType.text_msg.name,
+                                senderID: user.id!,
+                                senderName: user.fullName!,
+                                senderProfileImage: user.image!,
+                                threadID: widget.chatHeadID,
+                                newMessage:
+                                    ctrl.textMessageController.text.trim());
 
-                          _scrollToBottom();
+                            _scrollToBottom();
+                          }
+                        } else {
+                          log("------> My Terrible Therapist");
                         }
                       } else {
                         final user = UserService.instance.userModel.value;
 
-                        if (ctrl.textMessageController.text.trim().isNotEmpty) {
-                          ctrl.messagesHandler(
-                              type: MsgType.text_msg.name,
-                              senderID: user.id!,
-                              senderName: user.fullName!,
-                              senderProfileImage: user.image!,
-                              threadID: widget.chatHeadID,
-                              newMessage:
-                                  ctrl.textMessageController.text.trim());
+                        if (ctrl.isLoading.value == false) {
+                          if (ctrl.textMessageController.text
+                              .trim()
+                              .isNotEmpty) {
+                            ctrl.messagesHandler(
+                                type: MsgType.text_msg.name,
+                                senderID: user.id!,
+                                senderName: user.fullName!,
+                                senderProfileImage: user.image!,
+                                threadID: widget.chatHeadID,
+                                newMessage:
+                                    ctrl.textMessageController.text.trim());
 
-                          _scrollToBottom();
+                            _scrollToBottom();
+                          }
+                        } else {
+                          log("------> My Terrible User ");
                         }
                       }
                     },

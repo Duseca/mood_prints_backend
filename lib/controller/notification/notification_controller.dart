@@ -3,9 +3,7 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/chat/chat_controller.dart';
-import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
-import 'package:mood_prints/core/enums/notification_type.dart';
 import 'package:mood_prints/model/notification/notification_model.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/therapist/therapist_home/therapist_notification.dart';
@@ -17,13 +15,15 @@ class NotificationController extends GetxController {
 
   // --------------- Get All Notification ---------------
 
-  Future<void> getAllNotification() async {
+  Future<void> getAllNotification(id) async {
     log("Getting all user notification Called");
 
     try {
       notificationList.clear();
       isLoading.value = true;
-      String getAllNotificationUrl = notificationUrl;
+      String getAllNotificationUrl = '$notificationUrl/${id}';
+
+      log("URL: $getAllNotificationUrl");
 
       final response = await apiService.get(getAllNotificationUrl, true,
           showResult: false, successCode: 200);
@@ -31,8 +31,16 @@ class NotificationController extends GetxController {
       if (response != null) {
         final notifications = response['notifications'];
         if (notifications != null || notifications.isNotEmpty) {
-          for (var notification in notifications) {
-            notificationList.add(NotificationModel.fromJson(notification));
+          for (Map<String, dynamic> notification in notifications) {
+            if (notification.containsKey('requestId')) {
+              notificationList.add(NotificationModel.fromJson(notification));
+            }
+
+            // I wana print this notificatiion in my debug console
+            // log('Notification _Id: -> ${notification['_id']}');
+            // log('Notification userID: -> ${notification['userId']}');
+            // log('Notification type: -> ${notification['type']}');
+            // log('Notification read: -> ${notification['read']}');
           }
           log('Notifications is not null: -> ${notificationList.length}');
           isLoading.value = false;
@@ -70,40 +78,32 @@ class NotificationController extends GetxController {
           await buildTherapistClientRelation(
               therapistID: therapistID, clientID: clientID);
 
+          // *******************************************************************************
+          // Notification to Client ------------- 17 - Mar - 2025
+          // Notification to Client ------------- 17 - Mar - 2025
+          // Notification to Client ------------- 17 - Mar - 2025
 
+          //
+          // await Get.find<ProfileController>().createNotification(therapistId: therapistID ,requestId: requestId , title: "${UserService.instance.therapistDetailModel.value.fullName}" , notificationMsg: "has selected you as their patient." , message: "${UserService.instance.therapistDetailModel.value.fullName} has selected you as their patient.");
+          //
 
           isRequestAccepted.value = false;
           Get.dialog(RequestAcceptedCard());
         }
       }
 
+      // -----------------------------------------
+      // -----------------------------------------
+      // -----------------------------------------
 
-      if(status == Status.accepted.name
-      )
-        {
-
-          log('------------ Accepted Status Called -------------');
-
-          await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
-
-
-
-        }
-      else
-      {
-
-        log('------------ Decline Status Called -------------');
-
-        await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
-
-
-
-      }
+      // await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
       isRequestAccepted.value = false;
     } catch (e) {
       isRequestAccepted.value = false;
       log('Error occurs during Notification Status updating:-> $e');
     }
+
+    update();
   }
 
   // --------------- Delete Request ---------------
@@ -140,7 +140,8 @@ class NotificationController extends GetxController {
           showResult: true, successCode: 200);
 
       if (response != null) {
-        await getAllNotification();
+        await getAllNotification(
+            UserService.instance.therapistDetailModel.value.id);
         hideLoadingDialog();
       }
       hideLoadingDialog();
@@ -155,7 +156,6 @@ class NotificationController extends GetxController {
   Future<void> buildTherapistClientRelation({
     required String therapistID,
     required String clientID,
-
   }) async {
     try {
       log(' Build Relation Called');
@@ -177,9 +177,6 @@ class NotificationController extends GetxController {
         if (relationships != null && relationships.isNotEmpty) {
           await Get.find<ChatController>()
               .creatingChatThread(participantsID: clientID, myID: therapistID);
-
-
-
 
           await UserService.instance.getUserInformation();
 

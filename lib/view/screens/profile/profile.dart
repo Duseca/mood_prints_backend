@@ -177,8 +177,8 @@ class Profile extends StatelessWidget {
                   onCancelTap: () {
                     Get.back();
                   },
-                  onLogoutTap: () {
-                    Get.find<AuthClientController>().logOutMethod();
+                  onLogoutTap: () async {
+                    await Get.find<AuthClientController>().logOutMethod();
                   },
                 ));
               },
