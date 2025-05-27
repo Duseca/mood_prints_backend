@@ -1,4 +1,8 @@
 import 'dart:developer';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
@@ -9,8 +13,11 @@ import 'package:mood_prints/model/stats/emotion_stats_model.dart';
 import 'package:mood_prints/model/stats/mood_by_sleep.dart';
 import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class ClientHomeController extends GetxController {
+  GlobalKey globalKey = GlobalKey();
   // For Calender
   Rx<DateTime> focusedDay = DateTime.now().obs;
   Rxn<DateTime> selectedDay = Rxn<DateTime>(null);
@@ -422,6 +429,68 @@ class ClientHomeController extends GetxController {
     await getMoodBySleepStatsMonthly(userID: userID);
     hideLoadingDialog();
   }
+
+
+  /*
+  ----------------------------
+  Export Stats 
+  ----------------------------
+   */
+
+final GlobalKey graph1Key = GlobalKey();
+final GlobalKey graph2Key = GlobalKey();
+final GlobalKey graph3Key = GlobalKey();
+
+
+RxBool graph1Selected = true.obs;
+  RxBool graph2Selected = false.obs;
+  RxBool graph3Selected = false.obs;
+
+ Future<Uint8List?> captureGraph(GlobalKey key) async {
+    RenderRepaintBoundary boundary = key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData?.buffer.asUint8List();
+  }
+  
+  Future<void> exportSelectedGraphsToPDF() async {
+  final pdf = pw.Document();
+  final List<Uint8List> images = [];
+
+  // ✅ Wait until the widgets are fully built and rendered
+  await WidgetsBinding.instance.endOfFrame;
+
+  if (graph1Selected.value) {
+    final img = await captureGraph(graph1Key);
+    if (img != null) images.add(img);
+  }
+  if (graph2Selected.value) {
+    final img = await captureGraph(graph2Key);
+    if (img != null) images.add(img);
+  }
+  if (graph3Selected.value) {
+    final img = await captureGraph(graph3Key);
+    if (img != null) images.add(img);
+  }
+
+  for (var img in images) {
+    final pwImage = pw.MemoryImage(img);
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Center(child: pw.Image(pwImage)),
+      ),
+    );
+  }
+
+  await Printing.sharePdf(
+    bytes: await pdf.save(),
+    filename: 'selected_graphs_${DateTime.now().millisecondsSinceEpoch}.pdf',
+  );
+}
+
+
+
+
 
   // @override
   // void onInit() {

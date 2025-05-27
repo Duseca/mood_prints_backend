@@ -19,6 +19,7 @@ import 'package:mood_prints/services/firebase_storage/firebase_storage_service.d
 import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
+import 'package:mood_prints/view/screens/auth/forgot_pass/forgot_pass_verification.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
@@ -635,7 +636,112 @@ class AuthClientController extends GetxController {
     update();
   }
 
-  // --------------------------------------------------------------------
-  // --------------------- Therapist Authentication ---------------------
-  // --------------------------------------------------------------------
+  
+  // ------ Forget Password ---------
+
+  Future<void> forgetApi({
+    String? email,
+   
+  }) async {
+
+    try{
+
+log('Forget Passowrd Api Called');
+showLoadingDialog();
+    final body = {
+     'email': email
+    };
+  
+    final response = await apiService.post(forgetPasswordUrl, body, true,
+        showResult: true, successCode: 200);
+
+    if (response != null) {
+      final message = response['message'];
+      if (message != null && message.isNotEmpty) {
+        // Get.to(() => ForgotPassVerification());
+       
+        displayToast(msg: "$message");
+        log('Message ---> $message');
+        hideLoadingDialog();
+        Get.to(()=>ForgotPassVerification());
+      }
+    }
+hideLoadingDialog();
+
+    }catch(e){
+      hideLoadingDialog();
+       log('Error Occurs during forget password ---> $e');
+    }
+    
+  }
+
+
+
+  // ------ Reset Password ---------
+
+  Future<void> ResetPasswordApi({
+    String? email,
+    String? otpCode,
+    String? newPassword,
+    required Widget widget,
+  }) async {
+
+    try{
+
+log('Reset Passowrd Api Called');
+showLoadingDialog();
+    final body = {
+     'email': email,
+     'otp': otpCode,
+     'newPassword': newPassword,
+    };
+
+    log("1. Email ${email}");
+     log("2. otp ${otpCode}");
+      log("3. pass ${newPassword}");
+  
+
+    final response = await apiService.post(resetPasswordUrl, body, true,
+        showResult: true, successCode: 200);
+
+    if (response != null) {
+      final message = response['message'];
+      if (message != null && message.isNotEmpty) {
+        // Get.to(() => ForgotPassVerification());
+
+      
+    log("-----------------------------");
+           log("33. Email ${email}");
+     log("44. otpCode ${otpCode}");
+      log("55. password ${newPassword}");
+
+
+
+
+
+          
+           displayToast(msg: "$message");
+        log('Message ---> $message');
+        hideLoadingDialog();
+        emailController.clear();
+        otpCode = null;
+        passwordController.clear();
+        passwordVisibility.value = true;
+        // Get.dialog(widget);
+        Get.close(3);
+        // Get.offAll(()=>Login());
+
+       
+       
+       
+      }
+    }
+hideLoadingDialog();
+
+    }catch(e){
+      hideLoadingDialog();
+       log('Error Occurs during forget password ---> $e');
+    }
+    
+  }
 }

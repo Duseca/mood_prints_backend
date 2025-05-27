@@ -53,13 +53,13 @@ class CustomCard extends StatelessWidget {
               ),
               Visibility(
                 visible: haveEditButton,
-                child: GestureDetector(
-                  onTap: onMore,
-                  child: Image.asset(
-                    Assets.imagesMoreHorizontal,
-                    height: 20,
-                  ),
-                ),
+                child: GestureDetector(onTap: onMore, child: SizedBox()
+
+                    // Image.asset(
+                    //   Assets.imagesMoreHorizontal,
+                    //   height: 20,
+                    // ),
+                    ),
               ),
             ],
           ),

@@ -23,8 +23,8 @@ class SleepAnalysisModel {
       dateWiseSleepStats: (json['dateWiseSleepStats'] as List<dynamic>?)
           ?.map((item) => SleepData.fromJson(item as Map<String, dynamic>))
           .toList(),
-      averageBedtime: json['averageBedtime'] as String?,
-      averageWakeupTime: json['averageWakeupTime'] as String?,
+      averageBedtime: json['averageBedtime'] ?? '' as String?,
+      averageWakeupTime: json['averageWakeupTime'] ?? '' as String?,
     );
   }
 

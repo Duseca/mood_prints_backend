@@ -53,6 +53,11 @@ dependencies:
   google_sign_in:
   intl_phone_number_input:
   intl_phone_field: ^3.2.0
+  pdf: 
+  printing: 
+  # path_provider: 
+  # downloads_path_provider_28: 
+  
   
 
 

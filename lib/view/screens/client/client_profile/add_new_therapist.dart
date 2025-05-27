@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -106,7 +108,17 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                       ? ctrl.selectedTherapistModel.value!.fullName
                       : 'Search Therapist',
                   onTap: () {
-                    ctrl.getAllTherapist();
+                    if (ctrl.isCardOpen.value == false) {
+                      ctrl.isCardOpen.value = true;
+                      ctrl.getAllTherapist();
+                      log('open');
+                    } else {
+                      ctrl.isCardOpen.value = false;
+                      ctrl.isLoading.value = false;
+                      ctrl.allTherapists.clear();
+                      log('closed');
+                    }
+                    // ctrl.getAllTherapist();
                   },
                 )),
             Obx(
@@ -114,7 +126,8 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                 children: [
                   (ctrl.isLoading.value == true && ctrl.allTherapists.isEmpty)
                       ? CircularProgressIndicator()
-                      : (ctrl.isLoading.value == false &&
+                      : (ctrl.isCardOpen.value == true &&
+                              ctrl.isLoading.value == false &&
                               ctrl.allTherapists.isNotEmpty)
                           ? Container(
                               margin: AppSizes.HORIZONTAL,
@@ -236,9 +249,12 @@ class TappableCard extends StatelessWidget {
                   text: hint ?? "Search Therapist",
                   size: 12,
                 ),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: kHintColor,
+                Container(
+                  // color: Colors.amber,
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: kHintColor,
+                  ),
                 )
               ],
             ),

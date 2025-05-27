@@ -12,6 +12,7 @@ import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
+import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
 import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
@@ -38,8 +39,6 @@ class _EditProfileState extends State<EditProfile> {
     // TODO: implement initState
     super.initState();
 
-    log('--------- VVRR --------');
-
     var userModel = UserService.instance.userModel.value;
 
     if (userModel.authProvider == 'google') {
@@ -47,12 +46,15 @@ class _EditProfileState extends State<EditProfile> {
       ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
 
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+      ctrl.selectedGenderValue.value = userModel.gender ?? '';
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
       ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
+      ctrl.selectedGenderValue.value = userModel.gender ?? '';
     }
+    log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
 
     ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
   }
@@ -198,17 +200,27 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 SizedBox(height: 16.0),
 
-                // Obx(
-                //   () => CustomDropDown(
-                //     labelText: 'Gender',
-                //     hint: ctrl.selectedGenderValue.value,
-                //     items: ctrl.genderList,
-                //     selectedValue: ctrl.selectedGenderValue.value,
-                //     onChanged: (v) {
-                //       ctrl.selectedGenderValue.value = v;
-                //     },
-                //   ),
-                // ),
+                Obx(
+                  () => (ctrl.selectedGenderValue.value == 'male')
+                      ? CustomDropDown(
+                          labelText: 'Gender',
+                          hint: ctrl.selectedGenderValue.value,
+                          items: ['male', 'female'],
+                          selectedValue: ctrl.selectedGenderValue.value,
+                          onChanged: (v) {
+                            ctrl.selectedGenderValue.value = v;
+                          },
+                        )
+                      : CustomDropDown(
+                          labelText: 'Gender',
+                          hint: ctrl.selectedGenderValue.value,
+                          items: ['female', 'male'],
+                          selectedValue: ctrl.selectedGenderValue.value,
+                          onChanged: (v) {
+                            ctrl.selectedGenderValue.value = v;
+                          },
+                        ),
+                ),
 
                 // - Centerd -
 
@@ -298,9 +310,11 @@ class _EditProfileState extends State<EditProfile> {
             child: MyButton(
               buttonText: 'Save changes',
               onTap: () {
+                log("User-ID: ${UserService.instance.userModel.value.id.toString()}");
                 ctrl.updateUserProfile(
-                    userId: userModel.id!,
-                    oldProfileImageUrl: userModel.image!);
+                    userId: UserService.instance.userModel.value.id.toString(),
+                    oldProfileImageUrl:
+                        UserService.instance.userModel.value.image.toString());
               },
             ),
           ),

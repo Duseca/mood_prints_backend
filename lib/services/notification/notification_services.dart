@@ -4,8 +4,6 @@ import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mood_prints/services/user/user_services.dart';
-import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';

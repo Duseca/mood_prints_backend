@@ -11,6 +11,10 @@ String getAllTherapistUrl = "${baseUrl}/user/getAllUsers?userType=therapist";
 String getChangePasswordUrl = "${baseUrl}user/change-password";
 String checkEmailUrl = "${baseUrl}user/email";
 
+// ------------ Forget Password Urls ----------------
+String forgetPasswordUrl = "${baseUrl}user/forget-password";
+String resetPasswordUrl = "${baseUrl}user/reset-password";
+
 // ------------ Stats Urls ----------------
 
 String modeFlow = "${baseUrl}stats/mood-flow";

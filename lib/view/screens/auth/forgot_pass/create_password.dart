@@ -1,6 +1,7 @@
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/auth/login.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreatePassword extends StatelessWidget {
+  var ctrl = Get.find<AuthClientController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,32 +32,41 @@ class CreatePassword extends StatelessWidget {
                   title: 'Enter New Password',
                   subTitle: 'Please enter something you will remember',
                 ),
-                MyTextField(
-                  hintText: 'Password',
-                  suffix: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        Assets.imagesVisibility,
-                        height: 20,
+                Obx(
+                  ()=> MyTextField(
+                    controller: ctrl.passwordController,
+                    hintText: 'Password',
+                    suffix: InkWell(
+                      onTap: (){
+                        ctrl.passwordVisibityMethod();
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            Assets.imagesVisibility,
+                            height: 20,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                    isObSecure: ctrl.passwordVisibility.value,
+                  
                   ),
-                  isObSecure: true,
                 ),
-                MyTextField(
-                  hintText: 'Repeat Password',
-                  suffix: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        Assets.imagesVisibility,
-                        height: 20,
-                      ),
-                    ],
-                  ),
-                  isObSecure: true,
-                ),
+                // MyTextField(
+                //   hintText: 'Repeat Password',
+                //   suffix: Column(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Image.asset(
+                //         Assets.imagesVisibility,
+                //         height: 20,
+                //       ),
+                //     ],
+                //   ),
+                //   isObSecure: true,
+                // ),
               ],
             ),
           ),
@@ -66,7 +77,11 @@ class CreatePassword extends StatelessWidget {
               children: [
                 MyButton(
                   onTap: () {
-                    Get.dialog(_SuccessDialog());
+
+                    ctrl.ResetPasswordApi(otpCode: ctrl.otpCode , email: ctrl.emailController.text.trim(), newPassword: ctrl.passwordController.text.trim() , widget: _SuccessDialog());
+
+
+                    // Get.dialog(_SuccessDialog());
                   },
                   buttonText: 'Confirm',
                 ),

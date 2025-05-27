@@ -18,13 +18,17 @@ import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/client/client_profile/add_new_therapist.dart';
 
 class ProfileController extends GetxController {
+  RxBool isCardOpen = false.obs;
   TextEditingController fullNameController = TextEditingController();
   // TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   String? completePhoneNumber;
   TextEditingController bioController = TextEditingController();
+  TextEditingController countryController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
   RxString selectedGenderValue = 'Male'.obs;
-  RxList<String> genderList = <String>['Male', 'Female'].obs;
+  // RxList<String> genderList = <String>['Male', 'Female'].obs;
   var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
   Rx<DateTime?> dob = Rx<DateTime?>(null);
@@ -55,8 +59,10 @@ class ProfileController extends GetxController {
 
   //-------------- Update user profile information --------------
 
-  Future<void> updateUserProfile(
-      {required String userId, required String oldProfileImageUrl}) async {
+  Future<void> updateUserProfile({
+    required String userId,
+    required String oldProfileImageUrl,
+  }) async {
     try {
       showLoadingDialog();
 
@@ -96,6 +102,60 @@ class ProfileController extends GetxController {
             final model = UserModel.fromJson(user);
             UserService.instance.userModel.value = model;
           }
+          Get.back();
+        }
+        displayToast(msg: 'User Profile Updated');
+      }
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error occurs during updating user profile:-> $e');
+    }
+  }
+
+  //-------------- Update Therapist profile information --------------
+
+  Future<void> updateTherapistProfile({
+    required String userId,
+    required String oldProfileImageUrl,
+  }) async {
+    try {
+      showLoadingDialog();
+
+      if (selectedProfileImage.value != null) {
+        downloadImageUrl = await FirebaseStorageService.instance.uploadImage(
+            imagePath: selectedProfileImage.value!,
+            storageFolderPath: 'profile_images');
+      }
+
+      TherapistDetailModel body = TherapistDetailModel(
+        image:
+            (downloadImageUrl != null) ? downloadImageUrl : oldProfileImageUrl,
+        fullName: fullNameController.text.trim(),
+        // email: emailController.text.trim(),
+        phoneNumber: completePhoneNumber,
+        dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+        gender: selectedGenderValue.value.toLowerCase(),
+        bio: bioController.text,
+        country: countryController.text,
+        state: stateController.text,
+        city: cityController.text,
+      );
+
+      final url = updateUserUrl + userId;
+
+      final response = await apiService.putWithBody(url, body.toJson(), false,
+          showResult: true, successCode: 200);
+
+      hideLoadingDialog();
+
+      if (response != null) {
+        final message = response['message'];
+        final user = response['user'];
+
+        if (message != null && message.isNotEmpty) {
+          final model = TherapistDetailModel.fromJson(user);
+          UserService.instance.therapistDetailModel.value = model;
           Get.back();
         }
         displayToast(msg: 'User Profile Updated');
@@ -374,4 +434,11 @@ class ProfileController extends GetxController {
     initialCountryCodeValue.value = number.isoCode ?? '';
     log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
   }
+
+
+
+
+
+
+  
 }

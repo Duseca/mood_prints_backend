@@ -18,6 +18,8 @@ import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
 
@@ -30,6 +32,11 @@ class ClientStats extends StatefulWidget {
 
 class _ClientStatsState extends State<ClientStats> {
   var ctrl = Get.find<ClientHomeController>();
+  // GlobalKey _globalKey = GlobalKey();
+
+
+
+
 
   // final List<DateWiseStressStats> stats = modeStatsModel.dateWiseStressStats ?? [];
   @override
@@ -55,9 +62,11 @@ class _ClientStatsState extends State<ClientStats> {
             Center(
               child: GestureDetector(
                 onTap: () {
-                  Get.dialog(
-                    _ExportData(),
-                  );
+                  showExportPopup(ctrl);
+                  // _captureAndConvertToPdf();
+                  // Get.dialog(
+                  //   _ExportData(),
+                  // );
                 },
                 child: Image.asset(
                   Assets.imagesExportData,
@@ -101,7 +110,7 @@ class _ClientStatsState extends State<ClientStats> {
                 if (index == 1) {
                   ctrl.allmonthlyStats(
                       userID: UserService.instance.userModel.value.id);
-
+        
                   setState(() {});
                 }
               },
@@ -243,6 +252,8 @@ class _WeeklyState extends State<_Weekly> {
   @override
   Widget build(BuildContext context) {
     var ctrl = Get.find<ClientHomeController>();
+
+
     return ListView(
       shrinkWrap: true,
       padding: EdgeInsets.fromLTRB(20, 16, 20, 120),
@@ -304,83 +315,86 @@ class _WeeklyState extends State<_Weekly> {
         ),
 // ----------- Mode Flow Card ------------
 
-        Container(
-          padding: EdgeInsets.all(20),
-          decoration: AppStyling.CUSTOM_CARD,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              MyText(
-                text: 'Mood Flow',
-                size: 16,
-                weight: FontWeight.w600,
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Row(
-                children: [
-                  Padding(
-                      padding: EdgeInsets.only(bottom: 17),
-                      child: Transform(
-                        alignment: Alignment.center, // Flip around the center
-                        transform: Matrix4.rotationX(
-                            3.14159), // Flip vertically (bottom to top)
-                        child: Image.asset(
-                          Assets.imagesColorDots,
-                          height: 210,
-                        ),
-                      )),
-                  SizedBox(
-                    width: 5,
-                  ),
-
-                  // ------- Model Flow Chat ------
-
-                  Expanded(
-                      child: _MoodFlowChart(
-                    stats: ctrl.moodFlowStats,
-                  )
-
-                      // Obx(
-                      //   () => (ctrl.moodFlowStats != null &&
-                      //           ctrl.moodFlowStats!.isNotEmpty)
-                      //       ? _MoodFlowChart(
-                      //           stats: ctrl.moodFlowStats,
-                      //         )
-                      //       : _MoodFlowChart(
-                      //           // stats: ctrl.moodFlowStats,
-                      //           stats: ctrl.moodFlowStats,
-                      //         ),
-                      // ),
-                      ),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              (ctrl.moodFlowStats != null)
-                  ? SizedBox.shrink()
-                  : RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: kTertiaryColor,
-                          fontFamily: AppFonts.URBANIST,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Mood Patterns: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+        RepaintBoundary(
+         key: ctrl.graph1Key,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: AppStyling.CUSTOM_CARD,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                MyText(
+                  text: 'Mood Flow',
+                  size: 16,
+                  weight: FontWeight.w600,
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Row(
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 17),
+                        child: Transform(
+                          alignment: Alignment.center, // Flip around the center
+                          transform: Matrix4.rotationX(
+                              3.14159), // Flip vertically (bottom to top)
+                          child: Image.asset(
+                            Assets.imagesColorDots,
+                            height: 210,
                           ),
-                          TextSpan(
-                            text: 'No data available. ',
-                          ),
-                        ],
-                      ),
+                        )),
+                    SizedBox(
+                      width: 5,
                     ),
-            ],
+          
+                    // ------- Model Flow Chat ------
+          
+                    Expanded(
+                        child: _MoodFlowChart(
+                                            stats: ctrl.moodFlowStats,
+                                          )
+          
+                        // Obx(
+                        //   () => (ctrl.moodFlowStats != null &&
+                        //           ctrl.moodFlowStats!.isNotEmpty)
+                        //       ? _MoodFlowChart(
+                        //           stats: ctrl.moodFlowStats,
+                        //         )
+                        //       : _MoodFlowChart(
+                        //           // stats: ctrl.moodFlowStats,
+                        //           stats: ctrl.moodFlowStats,
+                        //         ),
+                        // ),
+                        ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                (ctrl.moodFlowStats != null)
+                    ? SizedBox.shrink()
+                    : RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: kTertiaryColor,
+                            fontFamily: AppFonts.URBANIST,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Mood Patterns: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'No data available. ',
+                            ),
+                          ],
+                        ),
+                      ),
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -389,83 +403,87 @@ class _WeeklyState extends State<_Weekly> {
 
         // ---------- Mood Bar Percentage ----------
 
-        Container(
-          padding: EdgeInsets.all(20),
-          decoration: AppStyling.CUSTOM_CARD,
-          child: Column(
-            children: [
-              MyText(
-                text: 'Mood Bar',
-                size: 16,
-                paddingBottom: 20,
-                weight: FontWeight.w600,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 10,
-                runSpacing: 10,
-                children: List.generate(
-                  stressItems.length,
-                  (index) {
-                    // Extract stress level for the current item
-                    String stressLevel = stressItems[index].level.toString();
+        RepaintBoundary(
+          key: ctrl.graph2Key,
 
-                    // Safely get the percentage for the current stress level
-                    String? percentage = ctrl.emotionPercentageStats
-                        ?.firstWhere(
-                          (item) => item.stressLevel == stressLevel,
-                          orElse: () => StressLevelPercentage(
-                              stressLevel: null, percentage: null),
-                        )
-                        .percentage;
-
-                    // log('Stress Level: $stressLevel, Percentage: $percentage');
-
-                    return Column(
-                      children: [
-                        // Display iconA if percentage exists, otherwise iconB
-                        Image.asset(
-                          percentage != null
-                              ? stressItems[index].selectedIcon
-                              : stressItems[index].unselectedIcon,
-                          height: 44,
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Progress bar using Container with text
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Background bar
-                            Container(
-                              width: 60,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: (percentage != null)
-                                    ? kSecondaryColor
-                                    : kGreyColor3,
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                            ),
-
-                            MyText(
-                              text: percentage ?? '0%',
-                              size: 12,
-                              color:
-                                  percentage != null ? kWhiteColor : kGreyColor,
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: AppStyling.CUSTOM_CARD,
+            child: Column(
+              children: [
+                MyText(
+                  text: 'Mood Bar',
+                  size: 16,
+                  paddingBottom: 20,
+                  weight: FontWeight.w600,
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+                SizedBox(
+                  height: 10,
+                ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: List.generate(
+                    stressItems.length,
+                    (index) {
+                      // Extract stress level for the current item
+                      String stressLevel = stressItems[index].level.toString();
+          
+                      // Safely get the percentage for the current stress level
+                      String? percentage = ctrl.emotionPercentageStats
+                          ?.firstWhere(
+                            (item) => item.stressLevel == stressLevel,
+                            orElse: () => StressLevelPercentage(
+                                stressLevel: null, percentage: null),
+                          )
+                          .percentage;
+          
+                      // log('Stress Level: $stressLevel, Percentage: $percentage');
+          
+                      return Column(
+                        children: [
+                          // Display iconA if percentage exists, otherwise iconB
+                          Image.asset(
+                            percentage != null
+                                ? stressItems[index].selectedIcon
+                                : stressItems[index].unselectedIcon,
+                            height: 44,
+                          ),
+                          const SizedBox(height: 8),
+          
+                          // Progress bar using Container with text
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Background bar
+                              Container(
+                                width: 60,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: (percentage != null)
+                                      ? kSecondaryColor
+                                      : kGreyColor3,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                              ),
+          
+                              MyText(
+                                text: percentage ?? '0%',
+                                size: 12,
+                                color:
+                                    percentage != null ? kWhiteColor : kGreyColor,
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -601,210 +619,220 @@ class _WeeklyState extends State<_Weekly> {
         SizedBox(
           height: 12,
         ),
-        Container(
-          padding: EdgeInsets.all(20),
-          decoration: AppStyling.CUSTOM_CARD,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              MyText(
-                text: 'Sleep Analysis',
-                size: 16,
-                weight: FontWeight.w600,
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          width: 1.0,
-                          color: kBorderColor,
+        RepaintBoundary(
+          key:ctrl.graph3Key,
+
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: AppStyling.CUSTOM_CARD,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                MyText(
+                  text: 'Sleep Analysis',
+                  size: 16,
+                  weight: FontWeight.w600,
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            width: 1.0,
+                            color: kBorderColor,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            MyText(
+                              text: 'Bedtime',
+                              size: 12,
+                              color: kGreyColor,
+                            ),
+          
+                            // ------ Average Bed Time -------
+                            MyText(
+                              paddingTop: 4,
+                              text: (ctrl.sleepAnalysisModel.value
+                                          ?.averageBedtime !=
+                                      null)
+                                  ? '${ctrl.sleepAnalysisModel.value?.averageBedtime}'
+                                  : '--',
+                              size: 16,
+                              weight: FontWeight.w600,
+                            ),
+                          ],
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          MyText(
-                            text: 'Bedtime',
-                            size: 12,
-                            color: kGreyColor,
-                          ),
-
-                          // ------ Average Bed Time -------
-                          MyText(
-                            paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisModel.value?.averageBedtime}',
-                            size: 16,
-                            weight: FontWeight.w600,
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          width: 1.0,
-                          color: kBorderColor,
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            width: 1.0,
+                            color: kBorderColor,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            MyText(
+                              text: 'Wake Up',
+                              size: 12,
+                              color: kGreyColor,
+                            ),
+                            MyText(
+                              paddingTop: 4,
+                              text: (ctrl.sleepAnalysisModel.value
+                                          ?.averageWakeupTime !=
+                                      null)
+                                  ? '${ctrl.sleepAnalysisModel.value?.averageWakeupTime}'
+                                  : '--',
+                              size: 16,
+                              weight: FontWeight.w600,
+                            ),
+                          ],
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          MyText(
-                            text: 'Wake Up',
-                            size: 12,
-                            color: kGreyColor,
-                          ),
-                          MyText(
-                            paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisModel.value?.averageWakeupTime}',
-                            size: 16,
-                            weight: FontWeight.w600,
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              // --------- Sleep Duration Graph ------------
-
-              SleepAnalysis(
-                  // sleepStats: ctrl.sleepStats,
-                  ),
-              SizedBox(
-                height: 20,
-              ),
-              // Container(
-              //   padding: EdgeInsets.all(10),
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(8),
-              //     border: Border.all(
-              //       width: 1.0,
-              //       color: kBorderColor,
-              //     ),
-              //   ),
-              //   child: Column(
-              //     children: [
-              //       Row(
-              //         children: [
-              //           Image.asset(
-              //             Assets.imagesOrange,
-              //             height: 16,
-              //           ),
-              //           Expanded(
-              //             child: MyText(
-              //               paddingLeft: 8,
-              //               text: 'Less than 6h',
-              //               size: 14,
-              //               color: kGreyColor,
-              //             ),
-              //           ),
-              //           MyText(
-              //             paddingLeft: 8,
-              //             text: '65 / 31 days',
-              //             size: 14,
-              //             color: kGreyColor,
-              //           ),
-              //         ],
-              //       ),
-              //       SizedBox(
-              //         height: 12,
-              //       ),
-              //       Row(
-              //         children: [
-              //           Image.asset(
-              //             Assets.imagesLightGreen,
-              //             height: 16,
-              //           ),
-              //           Expanded(
-              //             child: MyText(
-              //               paddingLeft: 8,
-              //               text: '6-8h',
-              //               size: 14,
-              //               color: kGreyColor,
-              //             ),
-              //           ),
-              //           MyText(
-              //             paddingLeft: 8,
-              //             text: '194 / 31 days',
-              //             size: 14,
-              //             color: kGreyColor,
-              //           ),
-              //         ],
-              //       ),
-              //       SizedBox(
-              //         height: 12,
-              //       ),
-              //       Row(
-              //         children: [
-              //           Image.asset(
-              //             Assets.imagesDarkGreen,
-              //             height: 16,
-              //           ),
-              //           Expanded(
-              //             child: MyText(
-              //               paddingLeft: 8,
-              //               text: 'Over 8h',
-              //               size: 14,
-              //               color: kGreyColor,
-              //             ),
-              //           ),
-              //           MyText(
-              //             paddingLeft: 8,
-              //             text: '83 / 31 days',
-              //             size: 14,
-              //             color: kGreyColor,
-              //           ),
-              //         ],
-              //       ),
-              //       SizedBox(
-              //         height: 12,
-              //       ),
-              //       Row(
-              //         children: [
-              //           Image.asset(
-              //             Assets.imagesNoRecord,
-              //             height: 16,
-              //           ),
-              //           Expanded(
-              //             child: MyText(
-              //               paddingLeft: 8,
-              //               text: 'No record',
-              //               size: 14,
-              //               color: kGreyColor,
-              //             ),
-              //           ),
-              //           MyText(
-              //             paddingLeft: 8,
-              //             text: '-311 / 31 days',
-              //             size: 14,
-              //             color: kGreyColor,
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-            ],
+                  ],
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                // --------- Sleep Duration Graph ------------
+          
+                SleepAnalysis(
+                    // sleepStats: ctrl.sleepStats,
+                    ),
+                SizedBox(
+                  height: 20,
+                ),
+                // Container(
+                //   padding: EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(8),
+                //     border: Border.all(
+                //       width: 1.0,
+                //       color: kBorderColor,
+                //     ),
+                //   ),
+                //   child: Column(
+                //     children: [
+                //       Row(
+                //         children: [
+                //           Image.asset(
+                //             Assets.imagesOrange,
+                //             height: 16,
+                //           ),
+                //           Expanded(
+                //             child: MyText(
+                //               paddingLeft: 8,
+                //               text: 'Less than 6h',
+                //               size: 14,
+                //               color: kGreyColor,
+                //             ),
+                //           ),
+                //           MyText(
+                //             paddingLeft: 8,
+                //             text: '65 / 31 days',
+                //             size: 14,
+                //             color: kGreyColor,
+                //           ),
+                //         ],
+                //       ),
+                //       SizedBox(
+                //         height: 12,
+                //       ),
+                //       Row(
+                //         children: [
+                //           Image.asset(
+                //             Assets.imagesLightGreen,
+                //             height: 16,
+                //           ),
+                //           Expanded(
+                //             child: MyText(
+                //               paddingLeft: 8,
+                //               text: '6-8h',
+                //               size: 14,
+                //               color: kGreyColor,
+                //             ),
+                //           ),
+                //           MyText(
+                //             paddingLeft: 8,
+                //             text: '194 / 31 days',
+                //             size: 14,
+                //             color: kGreyColor,
+                //           ),
+                //         ],
+                //       ),
+                //       SizedBox(
+                //         height: 12,
+                //       ),
+                //       Row(
+                //         children: [
+                //           Image.asset(
+                //             Assets.imagesDarkGreen,
+                //             height: 16,
+                //           ),
+                //           Expanded(
+                //             child: MyText(
+                //               paddingLeft: 8,
+                //               text: 'Over 8h',
+                //               size: 14,
+                //               color: kGreyColor,
+                //             ),
+                //           ),
+                //           MyText(
+                //             paddingLeft: 8,
+                //             text: '83 / 31 days',
+                //             size: 14,
+                //             color: kGreyColor,
+                //           ),
+                //         ],
+                //       ),
+                //       SizedBox(
+                //         height: 12,
+                //       ),
+                //       Row(
+                //         children: [
+                //           Image.asset(
+                //             Assets.imagesNoRecord,
+                //             height: 16,
+                //           ),
+                //           Expanded(
+                //             child: MyText(
+                //               paddingLeft: 8,
+                //               text: 'No record',
+                //               size: 14,
+                //               color: kGreyColor,
+                //             ),
+                //           ),
+                //           MyText(
+                //             paddingLeft: 8,
+                //             text: '-311 / 31 days',
+                //             size: 14,
+                //             color: kGreyColor,
+                //           ),
+                //         ],
+                //       ),
+                //     ],
+                //   ),
+                // ),
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -1832,8 +1860,11 @@ class __MonthlyState extends State<_Monthly> {
                           // ------ Average Bed Time -------
                           MyText(
                             paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisMonthModel.value?.averageBedtime}',
+                            text: (ctrl.sleepAnalysisMonthModel.value
+                                        ?.averageBedtime !=
+                                    null)
+                                ? '${ctrl.sleepAnalysisMonthModel.value?.averageBedtime}'
+                                : 'No data available',
                             size: 16,
                             weight: FontWeight.w600,
                           ),
@@ -2091,4 +2122,43 @@ class SleepAnalysisMonthlyWidget extends StatelessWidget {
     final parsedDate = DateTime.parse(date);
     return '${parsedDate.day}';
   }
+}
+
+
+
+
+
+// Export Poup
+
+void showExportPopup(controller) {
+  Get.defaultDialog(
+    title: 'Export Graphs',
+    content: Column(
+      children: [
+        Obx(() => CheckboxListTile(
+          title: Text('Graph 1'),
+          value: controller.graph1Selected.value,
+          onChanged: (val) => controller.graph1Selected.value = val!,
+        )),
+        Obx(() => CheckboxListTile(
+          title: Text('Graph 2'),
+          value: controller.graph2Selected.value,
+          onChanged: (val) => controller.graph2Selected.value = val!,
+        )),
+        Obx(() => CheckboxListTile(
+          title: Text('Graph 3'),
+          value: controller.graph3Selected.value,
+          onChanged: (val) => controller.graph3Selected.value = val!,
+        )),
+        SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () async {
+            Get.back();
+            await controller.exportSelectedGraphsToPDF();
+          },
+          child: Text('Export to PDF'),
+        )
+      ],
+    ),
+  );
 }

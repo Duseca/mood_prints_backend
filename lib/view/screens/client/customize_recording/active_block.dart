@@ -217,7 +217,9 @@ class _ActiveBlockState extends State<ActiveBlock> {
                                           },
                                         ));
                                       },
-                                      onMore: () {},
+                                      onMore: () {
+                                        log('work');
+                                      },
 
                                       // The Emotions Widgets
 
