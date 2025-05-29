@@ -97,6 +97,7 @@ class _ClientNavBarState extends State<ClientNavBar> {
           shape: CircularNotchedRectangle(),
           shadowColor: kTertiaryColor.withOpacity(0.10),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDc2_GUhopWi4Qr0kjQ0INnVawWRrDiLkc',
-    appId: '1:830689119309:android:18cad2e3a9196854f0e004',
+    appId: '1:830689119309:android:65e159b063c4f84af0e004',
     messagingSenderId: '830689119309',
     projectId: 'mode-print-cd976',
     storageBucket: 'mode-print-cd976.firebasestorage.app',
@@ -59,11 +59,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBsbiBc4jJ7z7wUa_fFPOzWg4rWFX9lmcY',
-    appId: '1:830689119309:ios:f47082be30377800f0e004',
+    appId: '1:830689119309:ios:da30500c64bdec0bf0e004',
     messagingSenderId: '830689119309',
     projectId: 'mode-print-cd976',
     storageBucket: 'mode-print-cd976.firebasestorage.app',
-    iosBundleId: 'com.example.moodPrints',
+    androidClientId: '830689119309-1g1se8guodhogfd71cvqlqd5cnjv7kki.apps.googleusercontent.com',
+    iosClientId: '830689119309-i7jlgknc5tivvi9b6uffig2emdp7bepm.apps.googleusercontent.com',
+    iosBundleId: 'com.test.moodPrints',
   );
 
 }

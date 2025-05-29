@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>830689119309-i7jlgknc5tivvi9b6uffig2emdp7bepm.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.830689119309-i7jlgknc5tivvi9b6uffig2emdp7bepm</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>830689119309-1g1se8guodhogfd71cvqlqd5cnjv7kki.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBsbiBc4jJ7z7wUa_fFPOzWg4rWFX9lmcY</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.moodPrints</string>
+	<string>com.test.moodPrints</string>
 	<key>PROJECT_ID</key>
 	<string>mode-print-cd976</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:830689119309:ios:f47082be30377800f0e004</string>
+	<string>1:830689119309:ios:da30500c64bdec0bf0e004</string>
 </dict>
 </plist>

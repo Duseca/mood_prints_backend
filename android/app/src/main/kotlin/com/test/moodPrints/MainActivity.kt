@@ -1,4 +1,4 @@
-package com.example.mood_prints
+package com.test.moodPrints
 
 import io.flutter.embedding.android.FlutterActivity
 

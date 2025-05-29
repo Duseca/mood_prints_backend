@@ -54,7 +54,8 @@ dependencies:
   intl_phone_number_input:
   intl_phone_field: ^3.2.0
   pdf: 
-  printing: 
+  printing:
+  change_app_package_name: ^1.5.0 
   # path_provider: 
   # downloads_path_provider_28: 
   

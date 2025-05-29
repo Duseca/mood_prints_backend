@@ -27,7 +27,7 @@ import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthClientController extends GetxController {
-  FirebaseMessaging fcm = FirebaseMessaging.instance;
+  // FirebaseMessaging fcm = FirebaseMessaging.instance;
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -140,7 +140,8 @@ class AuthClientController extends GetxController {
     log("Password ${password}");
     try {
       showLoadingDialog();
-      final fcmToken = await fcm.getToken();
+      // final fcmToken = await fcm.getToken();
+      final fcmToken = await getFcmToken();
 
       Map<String, dynamic> body = {
         'email': email,
@@ -193,7 +194,8 @@ class AuthClientController extends GetxController {
   }) async {
     log("Try Called Social signUp method");
     try {
-      final fcmToken = await fcm.getToken();
+      // final fcmToken = await fcm.getToken();
+      final fcmToken = await getFcmToken();
 
       Map<String, dynamic> body = {
         'email': email,
@@ -243,7 +245,8 @@ class AuthClientController extends GetxController {
     log('User Type ----------- $userType');
     try {
       currentUserType = userType;
-      final fcmToken = await fcm.getToken();
+      // final fcmToken = await fcm.getToken();
+      final fcmToken = await getFcmToken();
 
       Map<String, dynamic> body = {
         'email': email,
@@ -330,7 +333,8 @@ class AuthClientController extends GetxController {
     try {
       showLoadingDialog();
       currentUserType = userType;
-      final fcmToken = await fcm.getToken();
+      // final fcmToken = await fcm.getToken();
+      final fcmToken = await getFcmToken();
 
       Map<String, dynamic> body = {
         'email': email,
@@ -636,46 +640,36 @@ class AuthClientController extends GetxController {
     update();
   }
 
-  
   // ------ Forget Password ---------
 
   Future<void> forgetApi({
     String? email,
-   
   }) async {
+    try {
+      log('Forget Passowrd Api Called');
+      showLoadingDialog();
+      final body = {'email': email};
 
-    try{
+      final response = await apiService.post(forgetPasswordUrl, body, true,
+          showResult: true, successCode: 200);
 
-log('Forget Passowrd Api Called');
-showLoadingDialog();
-    final body = {
-     'email': email
-    };
-  
-    final response = await apiService.post(forgetPasswordUrl, body, true,
-        showResult: true, successCode: 200);
+      if (response != null) {
+        final message = response['message'];
+        if (message != null && message.isNotEmpty) {
+          // Get.to(() => ForgotPassVerification());
 
-    if (response != null) {
-      final message = response['message'];
-      if (message != null && message.isNotEmpty) {
-        // Get.to(() => ForgotPassVerification());
-       
-        displayToast(msg: "$message");
-        log('Message ---> $message');
-        hideLoadingDialog();
-        Get.to(()=>ForgotPassVerification());
+          displayToast(msg: "$message");
+          log('Message ---> $message');
+          hideLoadingDialog();
+          Get.to(() => ForgotPassVerification());
+        }
       }
-    }
-hideLoadingDialog();
-
-    }catch(e){
       hideLoadingDialog();
-       log('Error Occurs during forget password ---> $e');
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error Occurs during forget password ---> $e');
     }
-    
   }
-
-
 
   // ------ Reset Password ---------
 
@@ -685,63 +679,48 @@ hideLoadingDialog();
     String? newPassword,
     required Widget widget,
   }) async {
+    try {
+      log('Reset Passowrd Api Called');
+      showLoadingDialog();
+      final body = {
+        'email': email,
+        'otp': otpCode,
+        'newPassword': newPassword,
+      };
 
-    try{
-
-log('Reset Passowrd Api Called');
-showLoadingDialog();
-    final body = {
-     'email': email,
-     'otp': otpCode,
-     'newPassword': newPassword,
-    };
-
-    log("1. Email ${email}");
-     log("2. otp ${otpCode}");
+      log("1. Email ${email}");
+      log("2. otp ${otpCode}");
       log("3. pass ${newPassword}");
-  
 
-    final response = await apiService.post(resetPasswordUrl, body, true,
-        showResult: true, successCode: 200);
+      final response = await apiService.post(resetPasswordUrl, body, true,
+          showResult: true, successCode: 200);
 
-    if (response != null) {
-      final message = response['message'];
-      if (message != null && message.isNotEmpty) {
-        // Get.to(() => ForgotPassVerification());
+      if (response != null) {
+        final message = response['message'];
+        if (message != null && message.isNotEmpty) {
+          // Get.to(() => ForgotPassVerification());
 
-      
-    log("-----------------------------");
-           log("33. Email ${email}");
-     log("44. otpCode ${otpCode}");
-      log("55. password ${newPassword}");
+          log("-----------------------------");
+          log("33. Email ${email}");
+          log("44. otpCode ${otpCode}");
+          log("55. password ${newPassword}");
 
-
-
-
-
-          
-           displayToast(msg: "$message");
-        log('Message ---> $message');
-        hideLoadingDialog();
-        emailController.clear();
-        otpCode = null;
-        passwordController.clear();
-        passwordVisibility.value = true;
-        // Get.dialog(widget);
-        Get.close(3);
-        // Get.offAll(()=>Login());
-
-       
-       
-       
+          displayToast(msg: "$message");
+          log('Message ---> $message');
+          hideLoadingDialog();
+          emailController.clear();
+          otpCode = null;
+          passwordController.clear();
+          passwordVisibility.value = true;
+          // Get.dialog(widget);
+          Get.close(3);
+          // Get.offAll(()=>Login());
+        }
       }
-    }
-hideLoadingDialog();
-
-    }catch(e){
       hideLoadingDialog();
-       log('Error Occurs during forget password ---> $e');
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error Occurs during forget password ---> $e');
     }
-    
   }
 }
