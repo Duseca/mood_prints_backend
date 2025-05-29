@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mood_prints/constants/app_colors.dart';
-import 'package:mood_prints/main.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
@@ -15,12 +14,17 @@ class ChatBubble extends StatelessWidget {
     required this.msg,
     required this.myImg,
     required this.haveImages,
-    required this.images,
+    this.onImageTap,
+
+    // required this.images,
+    this.imageUrl,
   }) : super(key: key);
 
   final String msg, otherUserName, otherUserImg, msgTime, myImg;
   final bool isMe, haveImages;
-  final List<String> images;
+  // final List<String> images;
+  final String? imageUrl;
+  final VoidCallback? onImageTap;
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +65,14 @@ class ChatBubble extends StatelessWidget {
                     children: [
                       MyText(
                         text: msg,
-                        size: 11.36,
+                        size: 13,
                         color: kPrimaryColor,
-                        paddingBottom: 2,
+                        paddingBottom: 5,
                       ),
                       Text(
                         msgTime,
                         style: TextStyle(
-                          fontSize: 12.39,
+                          fontSize: 10,
                           color: kPrimaryColor,
                         ),
                       ),
@@ -81,7 +85,7 @@ class ChatBubble extends StatelessWidget {
           SizedBox(
             width: 10.31,
           ),
-          _profileImage(dummyImg),
+          // _profileImage(dummyImg),
         ],
       ),
     );
@@ -93,7 +97,7 @@ class ChatBubble extends StatelessWidget {
         bottom: 16,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _profileImage(otherUserImg),
           SizedBox(
@@ -125,7 +129,7 @@ class ChatBubble extends StatelessWidget {
                           alignment: Alignment.topLeft,
                           child: MyText(
                             text: otherUserName,
-                            size: 13.42,
+                            size: 11,
                             weight: FontWeight.w600,
                             color: kSecondaryColor,
                             paddingBottom: 10.32,
@@ -135,8 +139,8 @@ class ChatBubble extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: MyText(
                             text: msg,
-                            size: 11.36,
-                            paddingBottom: 2,
+                            size: 13,
+                            paddingBottom: 5,
                           ),
                         ),
                         Align(
@@ -144,7 +148,7 @@ class ChatBubble extends StatelessWidget {
                           child: Text(
                             msgTime,
                             style: TextStyle(
-                              fontSize: 11.36,
+                              fontSize: 10,
                             ),
                           ),
                         ),
@@ -161,41 +165,56 @@ class ChatBubble extends StatelessWidget {
   }
 
   Widget _leftImageBubble() {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: 16,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _profileImage(otherUserImg),
-          SizedBox(
-            width: 10.39,
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 4.13,
-                mainAxisSpacing: 4.13,
-                mainAxisExtent: 103.23,
-              ),
-              physics: BouncingScrollPhysics(),
-              itemCount: images.length,
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return CommonImageView(
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: 16,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _profileImage(otherUserImg),
+            SizedBox(
+              width: 10.39,
+            ),
+            // Expanded(
+            //   child: GridView.builder(
+            //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //       crossAxisCount: 2,
+            //       crossAxisSpacing: 4.13,
+            //       mainAxisSpacing: 4.13,
+            //       mainAxisExtent: 103.23,
+            //     ),
+            //     physics: BouncingScrollPhysics(),
+            //     itemCount: images.length,
+            //     padding: EdgeInsets.zero,
+            //     shrinkWrap: true,
+            //     itemBuilder: (context, index) {
+            //       return CommonImageView(
+            //         height: 103.23,
+            //         width: 103.23,
+            //         radius: 4.13,
+            //         url: images[index],
+            //       );
+            //     },
+            //   ),
+            // ),
+
+            Visibility(
+              visible: haveImages,
+              child: InkWell(
+                onTap: onImageTap,
+                child: CommonImageView(
                   height: 103.23,
                   width: 103.23,
                   radius: 4.13,
-                  url: images[index],
-                );
-              },
+                  url: imageUrl,
+                ),
+              ),
             ),
-          ),
-          SizedBox(width: 49.48),
-        ],
+            SizedBox(width: 49.48),
+          ],
+        ),
       ),
     );
   }
@@ -206,35 +225,47 @@ class ChatBubble extends StatelessWidget {
         bottom: 16,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          SizedBox(width: 49.48),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 4.13,
-                mainAxisSpacing: 4.13,
-                mainAxisExtent: 103.23,
+          // SizedBox(width: 49.48),
+          // Expanded(
+          //   child: GridView.builder(
+          //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          //       crossAxisCount: 2,
+          //       crossAxisSpacing: 4.13,
+          //       mainAxisSpacing: 4.13,
+          //       mainAxisExtent: 103.23,
+          //     ),
+          //     physics: BouncingScrollPhysics(),
+          //     itemCount: images.length,
+          //     padding: EdgeInsets.zero,
+          //     shrinkWrap: true,
+          //     itemBuilder: (context, index) {
+          //       return CommonImageView(
+          //         height: 103.23,
+          //         width: 103.23,
+          //         radius: 4.13,
+          //         url: images[index],
+          //       );
+          //     },
+          //   ),
+          // ),
+          Visibility(
+            visible: haveImages,
+            child: InkWell(
+              onTap: onImageTap,
+              child: CommonImageView(
+                height: 103.23,
+                width: 103.23,
+                radius: 4.13,
+                url: imageUrl,
               ),
-              physics: BouncingScrollPhysics(),
-              itemCount: images.length,
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return CommonImageView(
-                  height: 103.23,
-                  width: 103.23,
-                  radius: 4.13,
-                  url: images[index],
-                );
-              },
             ),
           ),
           SizedBox(
             width: 10.31,
           ),
-          _profileImage(dummyImg),
+          // _profileImage(dummyImg),
         ],
       ),
     );
@@ -260,10 +291,12 @@ class ChatBubble extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border.all(
                 width: 1.97,
-                color: kPrimaryColor,
+                // color: kPrimaryColor,
+                color: Colors.transparent,
               ),
               shape: BoxShape.circle,
-              color: kSecondaryColor,
+              // color: kSecondaryColor,
+              color: Colors.transparent,
             ),
           ),
         ),

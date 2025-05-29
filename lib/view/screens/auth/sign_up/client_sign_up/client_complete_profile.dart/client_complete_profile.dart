@@ -1,11 +1,11 @@
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
-import 'package:mood_prints/controller/auth/auth_client_controller.dart';
+import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -18,9 +18,11 @@ import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 class ClientCompleteProfile extends StatelessWidget {
-  ClientCompleteProfile({super.key});
+  ClientCompleteProfile({
+    super.key,
+  });
 
-  final ctrl = Get.find<AuthController>();
+  final ctrl = Get.find<AuthClientController>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +50,57 @@ class ClientCompleteProfile extends StatelessWidget {
               padding: AppSizes.DEFAULT,
               physics: BouncingScrollPhysics(),
               children: [
-                //TODO: Profile Image Upload to firebase-storage than get link/URL of the image
                 Center(
                   child: Stack(
                     children: [
-                      CommonImageView(
-                        height: 128,
-                        width: 128,
-                        radius: 100.0,
-                        url: dummyImg,
+                      // Obx(() => InkWell(
+                      //       onTap: () async {
+                      //         await ctrl.profileImagePicker();
+                      //       },
+                      //       child:
+
+                      //     )),
+
+                      // InkWell(onTap: () {
+                      //   ctrl.profileImagePicker();
+                      // }, child: Obx(() {
+                      //   return (ctrl.selectedProfileImage.value != null)
+                      //       ? CommonImageView(
+                      //           height: 128,
+                      //           width: 128,
+                      //           radius: 100.0,
+                      //           file: File(ctrl.selectedProfileImage.value!),
+                      //         )
+                      //       : CommonImageView(
+                      //           height: 128,
+                      //           width: 128,
+                      //           radius: 100.0,
+                      //           url: dummyImg,
+                      //         );
+                      // })),
+
+                      InkWell(
+                        onTap: () async {
+                          await ctrl.profileImagePicker();
+                        },
+                        child: Obx(() {
+                          return (ctrl.selectedProfileImage.value != null &&
+                                  ctrl.selectedProfileImage.value!.isNotEmpty)
+                              ? CommonImageView(
+                                  height: 128,
+                                  width: 128,
+                                  radius: 100.0,
+                                  file: File(ctrl.selectedProfileImage.value!),
+                                )
+                              : CommonImageView(
+                                  height: 128,
+                                  width: 128,
+                                  radius: 100.0,
+                                  url: dummyImg,
+                                );
+                        }),
                       ),
+
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -110,6 +153,7 @@ class ClientCompleteProfile extends StatelessWidget {
                     log("Full Phone Number: ${ctrl.FullPhoneNumber}");
                   },
                 ),
+
                 Obx(
                   () => CustomDropDown(
                     labelText: 'Gender',
@@ -126,7 +170,7 @@ class ClientCompleteProfile extends StatelessWidget {
                     isReadOnly: true,
                     labelText: 'Date of Birth',
                     hintText: (ctrl.dob.value != null)
-                        ? DateFormatorService.instance
+                        ? DateTimeService.instance
                             .getDateUsFormat(ctrl.dob.value!)
                         : "Select date",
                     suffix: InkWell(
@@ -141,6 +185,9 @@ class ClientCompleteProfile extends StatelessWidget {
                                 ctrl.dob.value = dateTime;
 
                                 log("date: ${ctrl.dob.value}");
+                              },
+                              onTap: () {
+                                Get.back();
                               },
                             ),
                           ),
@@ -159,17 +206,32 @@ class ClientCompleteProfile extends StatelessWidget {
                     ),
                   ),
                 ),
-                // MyTextField(
 
-                //   labelText: 'City',
-                // ),
+                // --------- If User type is Therapist than display these fields -------------
+
+                (ctrl.currentUserType == 'therapist')
+                    ? Column(
+                        children: [
+                          MyTextField(
+                            controller: ctrl.countryController,
+                            labelText: 'Country',
+                          ),
+                          MyTextField(
+                            controller: ctrl.stateController,
+                            labelText: 'State',
+                          ),
+                          MyTextField(
+                            controller: ctrl.cityController,
+                            labelText: 'City',
+                          ),
+                        ],
+                      )
+                    : SizedBox.shrink(),
+
                 MyTextField(
                   controller: ctrl.BioController,
                   labelText: 'Bio',
                 ),
-                // MyTextField(
-                //   labelText: 'Therapist Account Number (Optional)',
-                // ),
               ],
             ),
           ),
@@ -179,7 +241,6 @@ class ClientCompleteProfile extends StatelessWidget {
               buttonText: 'Continue',
               onTap: () {
                 ctrl.profileCompletionMethod();
-                // Get.to(() => FillTherapistDetails());
               },
             ),
           ),

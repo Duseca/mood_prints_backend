@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_sign_up.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/sign_up.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -186,7 +185,8 @@ class _GetStartedState extends State<GetStarted> {
                     MyButton(
                       buttonText: 'I am a therapist',
                       onTap: () {
-                        Get.to(() => SignUp());
+                        // Get.to(() => SignUp(type: "therapist"));
+                        Get.to(() => ClientSignUp(type: "therapist"));
                       },
                     ),
                     SizedBox(

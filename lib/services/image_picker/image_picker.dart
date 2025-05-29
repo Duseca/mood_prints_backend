@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerService {
@@ -18,6 +19,7 @@ class ImagePickerService {
 
   final ImagePicker _picker = ImagePicker();
   final ValueNotifier<String> activeMedia = ValueNotifier<String>('');
+  Rxn<String> selectedImage = Rxn<String>(null);
 
   Future<void> pickMedia(
       {required bool isImage, required bool fromGallery}) async {
@@ -35,6 +37,7 @@ class ImagePickerService {
 
     if (pickedFile != null) {
       activeMedia.value = pickedFile.path;
+      selectedImage.value = pickedFile.path;
       log('${isImage ? 'Image' : 'Video'} picked :-----> ${activeMedia.value}');
     } else {
       displayToast(msg: '${isImage ? 'Image' : 'Video'} not picked');

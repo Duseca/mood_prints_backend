@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:country_picker/country_picker.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';
@@ -22,6 +20,7 @@ class MyTextField extends StatefulWidget {
     this.suffix,
     this.isReadOnly,
     this.onTap,
+    this.validator,
   }) : super(key: key);
 
   String? labelText, hintText;
@@ -33,6 +32,7 @@ class MyTextField extends StatefulWidget {
   double? labelSize;
   Widget? prefix, suffix;
   final VoidCallback? onTap;
+  String? Function(String?)? validator;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -65,6 +65,7 @@ class _MyTextFieldState extends State<MyTextField> {
               },
               child: TextFormField(
                 onTap: widget.onTap,
+                validator: widget.validator,
                 textAlignVertical:
                     widget.prefix != null || widget.suffix != null
                         ? TextAlignVertical.center
@@ -124,6 +125,7 @@ class _MyTextFieldState extends State<MyTextField> {
   }
 }
 
+// ignore: must_be_immutable
 class MyTextField2 extends StatefulWidget {
   MyTextField2({
     Key? key,
@@ -387,6 +389,8 @@ class _MyTextField2State extends State<MyTextField2> {
 
 //-----------------------------------------
 
+// ignore: must_be_immutable
+
 class PhoneField extends StatefulWidget {
   PhoneField({
     Key? key,
@@ -401,13 +405,15 @@ class PhoneField extends StatefulWidget {
   ValueChanged<String>? onPhoneNumberChanged; // Callback for full number
   double? marginBottom;
 
+
+
   @override
   State<PhoneField> createState() => _PhoneFieldState();
 }
 
 class _PhoneFieldState extends State<PhoneField> {
   String countryFlag = '🇺🇸';
-  String countryCode = '1'; // Default numeric country code
+  String countryCode =   '1'; // Default numeric country code
   bool isFocused = false;
 
   @override
@@ -546,3 +552,173 @@ class _PhoneFieldState extends State<PhoneField> {
     );
   }
 }
+
+
+class UpdatedPhoneField extends StatefulWidget {
+  UpdatedPhoneField({
+    Key? key,
+    this.controller,
+    this.onChanged,
+    this.marginBottom = 16.0,
+    this.onPhoneNumberChanged,
+    this.initialCountryCode = '1', // New parameter for initial country code
+    this.initialFlag = '🇺🇸',      // New parameter for initial flag
+  }) : super(key: key);
+
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onPhoneNumberChanged; // Callback for full number
+  final double? marginBottom;
+  final String initialCountryCode; // Add initial country code
+  final String initialFlag;        // Add initial flag
+
+  @override
+  State<UpdatedPhoneField> createState() => _UpdatedPhoneFieldState();
+}
+
+class _UpdatedPhoneFieldState extends State<UpdatedPhoneField> {
+  late String countryFlag;
+  late String countryCode;
+  bool isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize country code and flag from the provided initial values
+    countryFlag = widget.initialFlag;
+    countryCode = widget.initialCountryCode;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: widget.marginBottom!),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MyText(
+            text: 'Phone Number',
+            size: 12,
+            paddingBottom: 6,
+            weight: FontWeight.bold,
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Focus(
+              onFocusChange: (focus) {
+                setState(() {
+                  isFocused = focus;
+                });
+              },
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                cursorColor: isFocused ? kQuaternaryColor : kTertiaryColor,
+                controller: widget.controller,
+                onChanged: (value) {
+                  widget.onChanged?.call(value);
+                  String fullNumber = '+$countryCode${widget.controller?.text}';
+                  widget.onPhoneNumberChanged?.call(fullNumber);
+                },
+                textInputAction: TextInputAction.next,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isFocused ? kQuaternaryColor : kTertiaryColor,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: isFocused
+                      ? kQuaternaryColor.withOpacity(0.05)
+                      : kWhiteColor,
+                  prefixIcon: SizedBox(
+                    width: 90,
+                    child: GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          countryListTheme: CountryListThemeData(
+                            flagSize: 25,
+                            backgroundColor: kPrimaryColor,
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              color: kTertiaryColor,
+                              fontFamily: AppFonts.URBANIST,
+                            ),
+                            bottomSheetHeight: 500,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25.0),
+                              topRight: Radius.circular(25.0),
+                            ),
+                            searchTextStyle: TextStyle(
+                              fontSize: 14,
+                              color: kTertiaryColor,
+                              fontFamily: AppFonts.URBANIST,
+                            ),
+                            inputDecoration: InputDecoration(
+                              contentPadding:
+                              EdgeInsets.symmetric(horizontal: 15),
+                              fillColor: kWhiteColor,
+                              filled: true,
+                              hintText: 'Search',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: kHintColor,
+                                fontFamily: AppFonts.URBANIST,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                          onSelect: (Country country) {
+                            setState(() {
+                              countryFlag = country.flagEmoji;
+                              countryCode = country.phoneCode;
+                            });
+                            // Update full number
+                            String fullNumber =
+                                '+$countryCode${widget.controller?.text}';
+                            widget.onPhoneNumberChanged?.call(fullNumber);
+                          },
+                        );
+                      },
+                      child: Center(
+                        child: MyText(
+                          // text: '$countryFlag +$countryCode',
+                          text: '+${countryCode}',
+                          size: 14,
+                          weight: FontWeight.w600,
+                          paddingLeft: 15,
+                          paddingRight: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                  hintText: '000 000 0000',
+                  hintStyle: TextStyle(
+                    fontSize: 12,
+                    color: kHintColor,
+                  ),
+                  border: InputBorder.none,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: isFocused ? kQuaternaryColor : kWhiteColor,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: isFocused ? kQuaternaryColor : kBorderColor,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

@@ -4,12 +4,12 @@ import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-AppBar simpleAppBar({
-  bool haveLeading = true,
-  bool centerTitle = true,
-  String? title,
-  List<Widget>? actions,
-}) {
+AppBar simpleAppBar(
+    {bool haveLeading = true,
+    bool centerTitle = true,
+    String? title,
+    List<Widget>? actions,
+    VoidCallback? onTitleTap}) {
   return AppBar(
     backgroundColor: kWhiteColor,
     automaticallyImplyLeading: false,
@@ -32,6 +32,7 @@ AppBar simpleAppBar({
           )
         : null,
     title: MyText(
+      onTap: onTitleTap,
       text: title ?? '',
       size: 16,
       color: kTertiaryColor,

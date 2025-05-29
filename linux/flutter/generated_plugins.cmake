@@ -3,7 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  emoji_picker_flutter
   file_selector_linux
+  flutter_timezone
+  printing
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

@@ -1,21 +1,87 @@
+import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
-import 'package:mood_prints/main.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
+import 'package:mood_prints/model/client_model/user_model.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
-
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
+import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
+import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class EditProfile extends StatelessWidget {
-  const EditProfile({super.key});
+import '../../widget/intel_phone_field_widget.dart';
+
+class EditProfile extends StatefulWidget {
+  // UserModel? model;
+  EditProfile({
+    super.key,
+  });
+
+  @override
+  State<EditProfile> createState() => _EditProfileState();
+}
+
+class _EditProfileState extends State<EditProfile> {
+  var ctrl = Get.find<ProfileController>();
+  var userModel = UserModel();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    var userModel = UserService.instance.userModel.value;
+
+    if (userModel.authProvider == 'google') {
+      ctrl.fullNameController.text = userModel.fullName!;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+
+      ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+      ctrl.selectedGenderValue.value = userModel.gender ?? '';
+    } else {
+      ctrl.fullNameController.text = userModel.fullName!;
+      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+      ctrl.dob.value = DateTime.parse(userModel.dob!);
+      ctrl.bioController.text = userModel.bio!;
+      ctrl.selectedGenderValue.value = userModel.gender ?? '';
+    }
+    log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
+
+    ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+  }
 
   @override
   Widget build(BuildContext context) {
+    // var userModel = UserService.instance.userModel.value;
+    //
+    //
+    // if (userModel.authProvider == 'google') {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //
+    //   ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
+    // } else {
+    //   ctrl.fullNameController.text = userModel.fullName!;
+    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
+    //   ctrl.dob.value = DateTime.parse(userModel.dob!);
+    //   ctrl.bioController.text = userModel.bio!;
+    // }
+    //
+    //
+    // ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+// setState(() {
+//
+// });
+
     return Scaffold(
       appBar: simpleAppBar(
         title: 'Edit Profile',
@@ -62,7 +128,9 @@ class EditProfile extends StatelessWidget {
                                   textSize: 12,
                                   weight: FontWeight.w600,
                                   buttonText: 'Change',
-                                  onTap: () {},
+                                  onTap: () {
+                                    ctrl.profileImagePicker();
+                                  },
                                 ),
                               ),
                             ],
@@ -73,11 +141,19 @@ class EditProfile extends StatelessWidget {
                     SizedBox(
                       width: 20,
                     ),
-                    CommonImageView(
-                      height: 70,
-                      width: 70,
-                      radius: 100.0,
-                      url: dummyImg,
+                    Obx(
+                      () => (ctrl.selectedProfileImage.value != null)
+                          ? CommonImageView(
+                              height: 70,
+                              width: 70,
+                              radius: 100.0,
+                              file: File(ctrl.selectedProfileImage.value!))
+                          : CommonImageView(
+                              height: 70,
+                              width: 70,
+                              radius: 100.0,
+                              url: UserService.instance.userModel.value.image,
+                            ),
                     ),
                   ],
                 ),
@@ -87,39 +163,142 @@ class EditProfile extends StatelessWidget {
                   color: kBorderColor,
                 ),
                 MyTextField(
+                  controller: ctrl.fullNameController,
                   labelText: 'Full Name',
                   hintText: 'Your full name here...',
                 ),
-                MyTextField(
-                  labelText: 'Email Address',
-                  hintText: 'Your email address...',
+
+                // MyTextField(
+                //   controller: ctrl.emailController,
+                //   labelText: 'Email Address',
+                //   hintText: 'Your email address...',
+                // ),
+                // PhoneField(
+                //   controller: ctrl.phoneNumberController,
+                // ),
+                // Obx(
+                //   ()=> UpdatedPhoneField(
+                //     // initialFlag: ,
+                //     initialCountryCode: ctrl.countryCode.value,
+                //     controller: ctrl.phoneNumberController,
+                //
+                //     onPhoneNumberChanged: (value) {
+                //       ctrl.completePhoneNumber = value;
+                //       log("Complete Phone Number: ${value}");
+                //     },
+                //   ),
+                // ),
+
+                IntlPhoneFieldWidget(
+                  initialCountryCode: ctrl.initialCountryCodeValue.value,
+                  controller: ctrl.phoneNumberController,
+                  onChanged: (v) {
+                    ctrl.completePhoneNumber = v.completeNumber;
+
+                    log("onChanged -------> ${ctrl.completePhoneNumber}");
+                  },
                 ),
-                PhoneField(),
-                CustomDropDown(
-                  labelText: 'Gender',
-                  hint: 'Select',
-                  items: [
-                    'Select',
-                    'Male',
-                    'Female',
-                  ],
-                  selectedValue: 'Select',
-                  onChanged: (v) {},
+                SizedBox(height: 16.0),
+
+                Obx(
+                  () => (ctrl.selectedGenderValue.value == 'male')
+                      ? CustomDropDown(
+                          labelText: 'Gender',
+                          hint: ctrl.selectedGenderValue.value,
+                          items: ['male', 'female'],
+                          selectedValue: ctrl.selectedGenderValue.value,
+                          onChanged: (v) {
+                            ctrl.selectedGenderValue.value = v;
+                          },
+                        )
+                      : CustomDropDown(
+                          labelText: 'Gender',
+                          hint: ctrl.selectedGenderValue.value,
+                          items: ['female', 'male'],
+                          selectedValue: ctrl.selectedGenderValue.value,
+                          onChanged: (v) {
+                            ctrl.selectedGenderValue.value = v;
+                          },
+                        ),
                 ),
-                MyTextField(
-                  labelText: 'Date of Birth',
-                  suffix: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        Assets.imagesCalendarA,
-                        height: 20,
-                        color: kSecondaryColor,
+
+                // - Centerd -
+
+                // Obx(
+                //   () => CustomDropDown(
+                //     labelText: 'Gender',
+                //     hint: ctrl.selectedGenderValue.value.isEmpty
+                //         ? 'Select Gender'
+                //         : ctrl.selectedGenderValue.value,
+                //     items: ctrl.genderList,
+                //     selectedValue: ctrl.selectedGenderValue.value,
+
+                //     // ctrl.genderList.contains(ctrl.selectedGenderValue.value.toString())
+                //     //     ? ctrl.selectedGenderValue.value
+                //     //     : null, // Ensure selected value exists in list
+                //     onChanged: (v) {
+                //       ctrl.selectedGenderValue.value = v;
+                //     },
+                //   ),
+                // ),
+
+                // MyTextField(
+                //   labelText: 'Date of Birth',
+                //   hintText: (ctrl.dob.value != null)
+                //       ? ctrl.dob.value.toString()
+                //       : 'Select date of birth',
+                //   suffix: Column(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Image.asset(
+                //         Assets.imagesCalendarA,
+                //         height: 20,
+                //         color: kSecondaryColor,
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
+                Obx(
+                  () => MyTextField(
+                    isReadOnly: true,
+                    labelText: 'Date of Birth',
+                    hintText: (ctrl.dob.value != null)
+                        ? DateTimeService.instance
+                            .getDateUsFormat(ctrl.dob.value!)
+                        : "Select date",
+                    suffix: InkWell(
+                      onTap: () {
+                        Get.bottomSheet(
+                          isScrollControlled: true,
+                          CustomBottomSheet(
+                            height: Get.height * 0.49,
+                            child: DobPicker(
+                              initialDateTime: DateTime.now(),
+                              onDateTimeChanged: (dateTime) {
+                                ctrl.dob.value = dateTime;
+
+                                log("date: ${ctrl.dob.value}");
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            Assets.imagesCalendarA,
+                            height: 20,
+                            color: kSecondaryColor,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 MyTextField(
+                  controller: ctrl.bioController,
                   labelText: 'Bio',
                   maxLines: 4,
                 ),
@@ -130,7 +309,13 @@ class EditProfile extends StatelessWidget {
             padding: AppSizes.DEFAULT,
             child: MyButton(
               buttonText: 'Save changes',
-              onTap: () {},
+              onTap: () {
+                log("User-ID: ${UserService.instance.userModel.value.id.toString()}");
+                ctrl.updateUserProfile(
+                    userId: UserService.instance.userModel.value.id.toString(),
+                    oldProfileImageUrl:
+                        UserService.instance.userModel.value.image.toString());
+              },
             ),
           ),
         ],

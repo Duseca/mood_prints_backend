@@ -1,11 +1,30 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mood_prints/core/binding/binding.dart';
+import 'package:mood_prints/firebase_options.dart';
+import 'package:mood_prints/services/notification/notification_services.dart';
 import 'config/routes/routes.dart';
 import 'config/theme/light_theme.dart';
 
-void main() {
+Future<void> backgroundHandler(RemoteMessage message) async {
+  print("Background message received: ${message.notification?.title}");
+}
+
+void main() async {
+  await GetStorage.init();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  NotificationServices().initLocalNotification();
+  NotificationServices().notificationPermission();
+  NotificationServices().firebaseInit();
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+
   runApp(MyApp());
 }
 

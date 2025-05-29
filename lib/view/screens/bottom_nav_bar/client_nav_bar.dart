@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
@@ -9,9 +8,8 @@ import 'package:mood_prints/view/screens/chat/chat_head.dart';
 import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
-import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
+import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class ClientNavBar extends StatefulWidget {
@@ -25,15 +23,22 @@ class _ClientNavBarState extends State<ClientNavBar> {
         _currentIndex = index;
       });
 
-  void v() async {
-    final pref = await SharedPreferences.getInstance();
-    log("Autherisation Token Key: ${pref.getString('token')}");
-    log("id --->: ${pref.getString('id')}");
-  }
+  // void v() async {
+  //   final pref = await SharedPreferences.getInstance();
+  //   // log("Autherization Token Key: ${pref.getString('token')}");
+  //   // log("id --->: ${pref.getString('id')}");
+  // }
+
+  final List<Widget> _screens = [
+    ClientHome(),
+    ClientStats(),
+    ChatHead(),
+    ClientProfile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    v();
+    // v();
     final List<Map<String, dynamic>> _items = [
       {
         'icon': Assets.imagesHome,
@@ -57,13 +62,6 @@ class _ClientNavBarState extends State<ClientNavBar> {
       },
     ];
 
-    final List<Widget> _screens = [
-      ClientHome(),
-      ClientStats(),
-      ChatHead(),
-      ClientProfile(),
-    ];
-
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -76,7 +74,8 @@ class _ClientNavBarState extends State<ClientNavBar> {
         child: FloatingActionButton(
           elevation: 3,
           onPressed: () {
-            Get.to(() => CustomizeRecording());
+            // Get.to(() => CustomizeRecording());
+            Get.to(() => ModeManager());
           },
           backgroundColor: Color(0xffFFD6A5),
           child: Icon(

@@ -1,14 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
-
 import 'package:mood_prints/constants/app_sizes.dart';
-import 'package:mood_prints/controller/auth/auth_client_controller.dart';
-import 'package:mood_prints/main.dart';
-import 'package:mood_prints/view/screens/client/client_profile/edit_therapist.dart';
+import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/services/user/user_services.dart';
+import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
@@ -20,7 +18,7 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 class ClientProfile extends StatelessWidget {
-  const ClientProfile({super.key});
+  ClientProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +35,14 @@ class ClientProfile extends StatelessWidget {
         children: [
           Row(
             children: [
-              CommonImageView(
-                height: 70,
-                width: 70,
-                radius: 100.0,
-                url: dummyImg,
-              ),
+              Obx(() => CommonImageView(
+                  height: 70,
+                  width: 70,
+                  radius: 100.0,
+                  url: UserService.instance.userModel.value.image
+                  //userModel.image,
+                  // dummyImg,
+                  )),
               SizedBox(
                 width: 20,
               ),
@@ -50,18 +50,20 @@ class ClientProfile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    MyText(
-                      text: 'John Doe Williams',
-                      size: 20,
-                      paddingBottom: 4,
-                      weight: FontWeight.w700,
-                    ),
-                    MyText(
-                      text: 'johndoew@gmail.com',
-                      size: 14,
-                      color: kQuaternaryColor,
-                      weight: FontWeight.w500,
-                    ),
+                    Obx(() => MyText(
+                          text:
+                              '${UserService.instance.userModel.value.fullName}',
+                          // text: '${userodel?.fullName}',
+                          size: 20,
+                          paddingBottom: 4,
+                          weight: FontWeight.w700,
+                        )),
+                    Obx(() => MyText(
+                          text: '${UserService.instance.userModel.value.email}',
+                          size: 14,
+                          color: kQuaternaryColor,
+                          weight: FontWeight.w500,
+                        )),
                   ],
                 ),
               ),
@@ -89,7 +91,11 @@ class ClientProfile extends StatelessWidget {
                       paddingBottom: 4,
                     ),
                     MyText(
-                      text: 'January 2024',
+                      // text: '${}',
+                      text: (UserService.instance.userModel.value.createdAt !=
+                              null)
+                          ? '${DateTimeService.instance.getMonthYearFormat(UserService.instance.userModel.value.createdAt!)}'
+                          : '',
                       size: 14,
                       color: kGreyColor,
                       paddingLeft: 8,
@@ -113,14 +119,16 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesProfile,
             title: 'Edit Profile',
             onTap: () {
-              Get.to(() => EditProfile());
+              Get.to(() => EditProfile(
+                  // model: userModel,
+                  ));
             },
           ),
           _ProfileTile(
             icon: Assets.imagesProfile,
-            title: 'Edit Therapist',
+            title: 'My Therapist',
             onTap: () {
-              Get.to(() => EditTherapist());
+              Get.to(() => MyTherapist());
             },
           ),
           _ProfileTile(
@@ -170,9 +178,10 @@ class ClientProfile extends StatelessWidget {
                 onCancelTap: () {
                   Get.back();
                 },
-                onLogoutTap: () {
-                  log('work logout');
-                  Get.find<AuthController>().logOutMethod();
+                onLogoutTap: () async {
+                  await Get.find<AuthClientController>().logOutMethod();
+                  UserService.instance.relationWithClients.clear();
+                  UserService.instance.relationWithTherapist.clear();
                 },
               ));
             },

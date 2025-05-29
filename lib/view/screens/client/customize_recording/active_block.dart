@@ -1,21 +1,34 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
-import 'package:mood_prints/view/screens/client/customize_recording/customize_recording.dart';
+import 'package:mood_prints/constants/common_maps.dart';
+import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
+import 'package:mood_prints/model/client_model/mood_models/block_model.dart';
+import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/alert_dialogs/delete_dialog.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_card_widget.dart';
+import 'package:mood_prints/view/widget/emoji_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class ActiveBlock extends StatelessWidget {
+class ActiveBlock extends StatefulWidget {
   const ActiveBlock({
     super.key,
   });
+
+  @override
+  State<ActiveBlock> createState() => _ActiveBlockState();
+}
+
+class _ActiveBlockState extends State<ActiveBlock> {
+  int selectedFeeling = 0;
+  final modeCtrl = Get.find<ModeManagerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +63,51 @@ class ActiveBlock extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // ----------> Create New Block Button <----------
+
                 onTap: () {
                   Get.bottomSheet(
-                    _CreateNewBlockBottomSheet(),
+                    _CreateNewBlockBottomSheet(
+                      textController: modeCtrl.commonTextController,
+
+                      // ----------> On Bottom sheet Done button Tap <----------
+
+                      onTap: () {
+                        // ----------> Add new block into Local storage using getStorage <----------
+
+                        String uniqueId =
+                            DateTime.now().millisecondsSinceEpoch.toString();
+
+                        modeCtrl.addBlock(BlockModel(
+                          id: uniqueId,
+                          type: modeCtrl.commonTextController.text.trim(),
+                          title: modeCtrl.commonTextController.text
+                              .trim()
+                              .toString(),
+                        ));
+
+                        modeCtrl.commonTextController.clear();
+                        Get.back();
+
+                        log('work');
+                      },
+                    ),
                     isScrollControlled: true,
                   );
+
+                  //   String uniqueId =
+                  // DateTime.now().millisecondsSinceEpoch.toString();
+
+                  // modeCtrl.addWidget(BlockModel(
+                  //     id: uniqueId,
+                  //     type: "emotions",
+                  //     title: 'Emotions',
+                  //     data: [
+                  //       {'emoji': '😁', 'text': 'Proud'},
+                  //       {'emoji': '😢', 'text': 'Sad'},
+                  //       {'emoji': '😡', 'text': 'Fear'},
+                  //     ]));
                 },
               ),
               SizedBox(
@@ -80,22 +133,13 @@ class ActiveBlock extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        9,
+                        stressItems.length,
                         (index) {
-                          final List<String> _items = [
-                            Assets.imagesExtremeCrying,
-                            Assets.imagesLittleCrying,
-                            Assets.imagesSad,
-                            Assets.imagesSad1,
-                            Assets.imagesLittleSad,
-                            Assets.imagesHappy,
-                            Assets.imagesSmile,
-                            Assets.imagesLittleSmiling,
-                            Assets.imagesLaughing,
-                          ];
-                          return Image.asset(
-                            _items[index],
-                            height: 44,
+                          return InkWell(
+                            child: Image.asset(
+                              stressItems[index].unselectedIcon,
+                              height: 44,
+                            ),
                           );
                         },
                       ),
@@ -106,77 +150,227 @@ class ActiveBlock extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              CustomCard(
-                title: 'Emotions*',
-                onEdit: () {
-                  Get.bottomSheet(
-                    _EditBottomSheet(),
-                    isScrollControlled: true,
-                  );
-                },
-                onMore: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 62,
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) {
-                              return SizedBox(
-                                width: 16,
-                              );
-                            },
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return SizedBox(
-                                height: Get.height,
-                                width: 44,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 44,
-                                      width: 44,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: kLightGreyColor,
-                                      ),
-                                      child: Center(
-                                        child: MyText(
-                                          text: '😁',
-                                          size: 24,
+
+              // ------------------ Creating New Block Widegts -------------------
+
+              Container(
+                  child: Obx(() => (modeCtrl.activeWidgets.isNotEmpty)
+                      ? Column(
+                          children: List.generate(modeCtrl.activeWidgets.length,
+                              (headIndex) {
+                            return Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: GetBuilder<ModeManagerController>(
+                                  builder: (controller) {
+                                    return CustomCard(
+                                      title:
+                                          '${modeCtrl.activeWidgets[headIndex].title}',
+                                      onEdit: () {
+                                        // ------- Crud Operations -------
+                                        Get.bottomSheet(EditBottomSheet(
+                                          title: modeCtrl
+                                              .activeWidgets[headIndex].title,
+
+                                          // ---- Edit Block Name Button ----
+
+                                          onEditBlockNameTap: () {
+                                            log('work');
+                                            modeCtrl.commonTextController.text =
+                                                modeCtrl
+                                                    .activeWidgets[headIndex]
+                                                    .title;
+
+                                            Get.bottomSheet(
+                                              _EditBlockNameBottomSheet(
+                                                onTap: () {
+                                                  modeCtrl.updateBlockTitle(
+                                                      headIndex,
+                                                      modeCtrl
+                                                          .commonTextController
+                                                          .text);
+                                                  Get.close(2);
+
+                                                  modeCtrl.commonTextController
+                                                      .clear();
+                                                },
+                                                editBlockNameController:
+                                                    modeCtrl
+                                                        .commonTextController,
+                                              ),
+                                              isScrollControlled: true,
+                                            );
+                                          },
+
+                                          // ---- Hide Button ----
+
+                                          onHideORUnHideTap: () {
+                                            modeCtrl.hideBlock(headIndex);
+                                            Get.back();
+                                          },
+
+                                          // ---- Delete Button ----
+
+                                          onDeleteTap: () {
+                                            modeCtrl.deleteBlockFromActive(
+                                                headIndex);
+                                            Get.close(2);
+                                          },
+                                        ));
+                                      },
+                                      onMore: () {
+                                        log('work');
+                                      },
+
+                                      // The Emotions Widgets
+
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 16),
+                                        child: Row(
+                                          children: [
+                                            // ----- Nested List to display icons & text
+
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 62,
+                                                child: ListView.separated(
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return SizedBox(
+                                                      width: 16,
+                                                    );
+                                                  },
+                                                  shrinkWrap: true,
+                                                  padding: EdgeInsets.zero,
+                                                  physics:
+                                                      BouncingScrollPhysics(),
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount:
+                                                      // emotionsItems.length + 1,
+                                                      modeCtrl
+                                                              .activeWidgets[
+                                                                  headIndex]
+                                                              .data
+                                                              .length +
+                                                          1,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    // if (index ==
+                                                    //     modeCtrl
+                                                    //         .activeWidgets[
+                                                    //             headIndex]
+                                                    //         .data
+                                                    //         .isNotEmpty) {
+                                                    //   return AddMoreEmojiButton(
+                                                    //     onTap: () {
+                                                    //       log(" Add Button Index : ${modeCtrl.activeWidgets[headIndex].data.length}");
+                                                    //       log("-----> Add More List is Empty");
+
+                                                    //       // ----- Icon & Name Bottom Sheet -----
+
+                                                    //       Get.bottomSheet(
+                                                    //           _IconNameBottomSheet(
+                                                    //         index: headIndex,
+                                                    //         blockName: modeCtrl
+                                                    //             .activeWidgets[
+                                                    //                 index]
+                                                    //             .title,
+                                                    //       ));
+                                                    //     },
+                                                    //   );
+                                                    // }
+
+                                                    // ---------- Add more emojis button in the last index ------------
+
+                                                    if (index ==
+                                                        modeCtrl
+                                                            .activeWidgets[
+                                                                headIndex]
+                                                            .data
+                                                            .length) {
+                                                      return AddMoreEmojiButton(
+                                                        onTap: () {
+                                                          log("Add More");
+                                                          Get.bottomSheet(
+                                                              _IconNameBottomSheet(
+                                                            index: headIndex,
+                                                            blockName: modeCtrl
+                                                                .activeWidgets[
+                                                                    headIndex]
+                                                                .title,
+                                                          ));
+                                                        },
+                                                      );
+                                                    } else {
+                                                      // ---------- Emojis & Text ------------
+
+                                                      return SizedBox(
+                                                        height: Get.height,
+                                                        // width: 44,
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Container(
+                                                              height: 44,
+                                                              width: 44,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                color:
+                                                                    kLightGreyColor,
+                                                              ),
+                                                              child: Center(
+                                                                child: MyText(
+                                                                  // text: modeCtrl
+                                                                  //     .activeWidgets[
+                                                                  //         headIndex]
+                                                                  //     .data[
+                                                                  //         index]
+                                                                  //     .emoji
+                                                                  text:
+                                                                      '${modeCtrl.activeWidgets[headIndex].data[index].emoji}',
+
+                                                                  size: 24,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            MyText(
+                                                              text: modeCtrl
+                                                                  .activeWidgets[
+                                                                      headIndex]
+                                                                  .data[index]
+                                                                  .text
+                                                                  .toString(),
+                                                              // '${emotionsItems[index]['text']}',
+                                                              size: 12,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                    MyText(
-                                      text: 'Proud',
-                                      size: 12,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                                    );
+                                  },
+                                ));
+                          }),
+                        )
+                      : SizedBox.shrink())),
+
               SizedBox(
                 height: 12,
               ),
               CustomCard(
                 title: 'Today’s note*',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: MyTextField2(
@@ -190,8 +384,7 @@ class ActiveBlock extends StatelessWidget {
               ),
               CustomCard(
                 title: 'Today’s Photo',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -212,8 +405,7 @@ class ActiveBlock extends StatelessWidget {
               ),
               CustomCard(
                 title: 'Sleep',
-                onEdit: () {},
-                onMore: () {},
+                haveEditButton: false,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: MyButton(
@@ -242,88 +434,19 @@ class ActiveBlock extends StatelessWidget {
               SizedBox(
                 height: 12,
               ),
-              CustomCard(
-                title: 'New',
-                onEdit: () {},
-                onMore: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 62,
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) {
-                              return SizedBox(
-                                width: 16,
-                              );
-                            },
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 2,
-                            itemBuilder: (context, index) {
-                              if (index == 1) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Get.bottomSheet(
-                                      _IconNameBottomSheet(),
-                                      isScrollControlled: true,
-                                    );
-                                  },
-                                  child: Image.asset(
-                                    Assets.imagesAddIconRounded,
-                                    height: 62,
-                                  ),
-                                );
-                              }
-                              return SizedBox(
-                                height: Get.height,
-                                width: 44,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 44,
-                                      width: 44,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: kLightGreyColor,
-                                      ),
-                                      child: Center(
-                                        child: MyText(
-                                          text: '🍇',
-                                          size: 24,
-                                        ),
-                                      ),
-                                    ),
-                                    MyText(
-                                      text: 'Grape',
-                                      size: 12,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),
+
+        // -------------- Save Changes Button -----------------
+
         Padding(
           padding: AppSizes.DEFAULT,
           child: MyButton(
             buttonText: 'Save Changes',
             onTap: () {
-              Get.to(() => CustomizeRecording());
+              modeCtrl.saveBlocks();
+              Get.back();
             },
           ),
         ),
@@ -333,7 +456,16 @@ class ActiveBlock extends StatelessWidget {
 }
 
 class _IconNameBottomSheet extends StatelessWidget {
-  const _IconNameBottomSheet({super.key});
+  final String blockName;
+  final int index;
+
+  _IconNameBottomSheet({
+    super.key,
+    required this.blockName,
+    required this.index,
+  });
+
+  final modeCtrl = Get.find<ModeManagerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -353,17 +485,15 @@ class _IconNameBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: () {
-                  Get.back();
-                },
-                child: Image.asset(
-                  Assets.imagesArrowBackSimple,
-                  width: 20,
-                  height: 20,
-                ),
+                // onTap: () {
+                //   Get.back();
+                // },
+                child: Container(
+                    color: kPrimaryColor,
+                    child: SizedBox(width: 20, height: 20)),
               ),
               MyText(
-                text: 'Create new block',
+                text: '$blockName',
                 weight: FontWeight.w600,
                 size: 16,
               ),
@@ -391,21 +521,37 @@ class _IconNameBottomSheet extends StatelessWidget {
                 SizedBox(
                   height: 16,
                 ),
+                // ---- Emoji Picker ----
+
                 Center(
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Container(
-                        height: 44,
-                        width: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: kLightGreyColor,
-                        ),
-                        child: Center(
-                          child: MyText(
-                            text: '🍇',
-                            size: 24,
+                      GestureDetector(
+                        onTap: () {
+                          Get.bottomSheet(EmojiCustomWidget(
+                              onEmojiSelected: (category, emoji) {
+                            modeCtrl.selectedEmoji.value = emoji.emoji;
+                            Get.back();
+                            log("Selected Emoji: $modeCtrl.selectedEmoji.value");
+                          }));
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: kLightGreyColor,
+                          ),
+                          child: Center(
+                            child: Obx(
+                              () => MyText(
+                                text: (modeCtrl.selectedEmoji.isNotEmpty)
+                                    ? '${modeCtrl.selectedEmoji.value}'
+                                    : '🌼',
+                                size: 24,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -424,6 +570,7 @@ class _IconNameBottomSheet extends StatelessWidget {
                   height: 16,
                 ),
                 MyTextField2(
+                  controller: modeCtrl.commonTextController,
                   hintText: '14 characters max.',
                   marginBottom: 6,
                 ),
@@ -440,7 +587,17 @@ class _IconNameBottomSheet extends StatelessWidget {
           ),
           MyButton(
             buttonText: 'Done',
-            onTap: () {},
+            onTap: () {
+              modeCtrl.addNewEmojiAndTitleToList(
+                  newEmoji: modeCtrl.selectedEmoji.value,
+                  newTitle: modeCtrl.commonTextController.text.trim(),
+                  mainIndex: index);
+              Get.back();
+              modeCtrl.selectedEmoji.value = '';
+              modeCtrl.commonTextController.clear();
+
+              log('My Done Button WOrks');
+            },
           ),
         ],
       ),
@@ -448,8 +605,11 @@ class _IconNameBottomSheet extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _CreateNewBlockBottomSheet extends StatelessWidget {
-  const _CreateNewBlockBottomSheet({super.key});
+  final VoidCallback? onTap;
+  TextEditingController? textController = TextEditingController();
+  _CreateNewBlockBottomSheet({super.key, this.onTap, this.textController});
 
   @override
   Widget build(BuildContext context) {
@@ -502,6 +662,7 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
                   height: 20,
                 ),
                 MyTextField2(
+                  controller: textController,
                   hintText: '14 characters max.',
                   marginBottom: 6,
                 ),
@@ -517,10 +678,9 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
             height: 16,
           ),
           MyButton(
-            buttonText: 'Done',
-            onTap: () {
-              // Get.to(() => NewBlockAdded());
-            },
+            buttonText: 'Done', onTap: onTap,
+
+            // Get.to(() => NewBlockAdded());
           ),
         ],
       ),
@@ -528,13 +688,26 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
   }
 }
 
-class _EditBottomSheet extends StatelessWidget {
-  const _EditBottomSheet({super.key});
+class EditBottomSheet extends StatelessWidget {
+  final VoidCallback? onHideORUnHideTap;
+  final VoidCallback? onDeleteTap;
+  final String? commonButtonText;
+  final String? title;
+  final VoidCallback? onEditBlockNameTap;
+
+  EditBottomSheet({
+    super.key,
+    this.onHideORUnHideTap,
+    this.commonButtonText,
+    this.title,
+    this.onDeleteTap,
+    this.onEditBlockNameTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 260,
+      height: 200,
       padding: AppSizes.DEFAULT,
       decoration: BoxDecoration(
         color: kWhiteColor,
@@ -553,7 +726,7 @@ class _EditBottomSheet extends StatelessWidget {
                 height: 20,
               ),
               MyText(
-                text: 'Edit',
+                text: title ?? 'Catagory Name',
                 weight: FontWeight.w600,
                 size: 16,
               ),
@@ -570,49 +743,30 @@ class _EditBottomSheet extends StatelessWidget {
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 20,
           ),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: BouncingScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                MyText(
-                  onTap: () {
-                    Get.back();
-                    Get.bottomSheet(
-                      _EditBlockNameBottomSheet(),
-                      isScrollControlled: true,
-                    );
-                  },
-                  text: 'Edit block name',
-                  paddingBottom: 20,
-                ),
-                MyText(
-                  text: 'Unhide',
-                  paddingBottom: 20,
-                ),
-                MyText(
-                  onTap: () {
-                    Get.dialog(DeleteDialog());
-                  },
-                  text: 'Delete',
-                  paddingBottom: 20,
-                  color: kRedColor,
-                ),
-              ],
-            ),
+          MyText(
+            onTap: onEditBlockNameTap,
+            text: 'Edit block name',
+            paddingBottom: 20,
+          ),
+          MyText(
+            onTap: onHideORUnHideTap,
+            text: commonButtonText ?? 'Hide from recording page',
+            paddingBottom: 20,
+          ),
+          MyText(
+            onTap: () {
+              Get.dialog(DeleteDialog(
+                onDeleteTap: onDeleteTap,
+              ));
+            },
+            text: 'Delete',
+            paddingBottom: 20,
+            color: kRedColor,
           ),
           SizedBox(
             height: 16,
-          ),
-          MyButton(
-            buttonText: 'Done',
-            onTap: () {},
           ),
         ],
       ),
@@ -620,8 +774,12 @@ class _EditBottomSheet extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _EditBlockNameBottomSheet extends StatelessWidget {
-  const _EditBlockNameBottomSheet({super.key});
+  TextEditingController? editBlockNameController = TextEditingController();
+  final VoidCallback? onTap;
+  _EditBlockNameBottomSheet(
+      {super.key, this.onTap, this.editBlockNameController});
 
   @override
   Widget build(BuildContext context) {
@@ -674,6 +832,7 @@ class _EditBlockNameBottomSheet extends StatelessWidget {
                   height: 20,
                 ),
                 MyTextField2(
+                  controller: editBlockNameController,
                   hintText: '14 characters max.',
                   marginBottom: 6,
                 ),
@@ -688,12 +847,7 @@ class _EditBlockNameBottomSheet extends StatelessWidget {
           SizedBox(
             height: 16,
           ),
-          MyButton(
-            buttonText: 'Done',
-            onTap: () {
-              // Get.to(() => NewBlockAdded());
-            },
-          ),
+          MyButton(buttonText: 'Done', onTap: onTap),
         ],
       ),
     );

@@ -6,7 +6,8 @@ import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 class DeleteDialog extends StatelessWidget {
-  const DeleteDialog({super.key});
+  final VoidCallback? onDeleteTap;
+  const DeleteDialog({super.key, this.onDeleteTap});
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +58,9 @@ class DeleteDialog extends StatelessWidget {
                     ),
                     Expanded(
                       child: MyButton(
-                        buttonText: 'Delete',
-                        bgColor: kRedColor,
-                        onTap: () {
-                          Get.back();
-                        },
-                      ),
+                          buttonText: 'Delete',
+                          bgColor: kRedColor,
+                          onTap: onDeleteTap),
                     ),
                   ],
                 ),
