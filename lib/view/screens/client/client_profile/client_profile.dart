@@ -169,6 +169,29 @@ class ClientProfile extends StatelessWidget {
             mBottom: 24,
           ),
           _ProfileTile(
+            haveTrailing: true,
+            isRed: false,
+            icon: Assets.imagesLogout,
+            title: 'Delete Account',
+            onTap: () {
+
+
+              Get.dialog(DeleteAccountDialog(
+                onCancelTap: () {
+                  Get.back();
+                },
+                onLogoutTap: () async {
+                   await Get.find<AuthClientController>().logOutMethod();
+                  await Get.find<AuthClientController>().deleteAccountMethod(UserService.instance.userModel.value.id.toString());
+
+                  UserService.instance.relationWithClients.clear();
+                  UserService.instance.relationWithTherapist.clear();
+                },
+              ));
+            },
+            mBottom: 24,
+          ),
+          _ProfileTile(
             haveTrailing: false,
             isRed: true,
             icon: Assets.imagesLogout,
@@ -304,6 +327,85 @@ class _LogoutDialog extends StatelessWidget {
                       child: MyButton(
                         bgColor: kRedColor,
                         buttonText: 'Logout',
+                        onTap: onLogoutTap,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+
+
+class DeleteAccountDialog extends StatelessWidget {
+  final VoidCallback onCancelTap;
+  final VoidCallback onLogoutTap;
+
+  const DeleteAccountDialog({
+    super.key,
+    required this.onCancelTap,
+    required this.onLogoutTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: Container(
+            margin: AppSizes.DEFAULT,
+            padding: AppSizes.DEFAULT,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: kPrimaryColor,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                MyText(
+                  text: 'Delete Account.',
+                  size: 16,
+                  textAlign: TextAlign.center,
+                  weight: FontWeight.w600,
+                ),
+                MyText(
+                  textAlign: TextAlign.center,
+                  paddingTop: 6,
+                  text: 'Are you sure you want to delete account?',
+                  size: 13,
+                  color: kGreyColor,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        textColor: kTertiaryColor,
+                        bgColor: kWhiteColor,
+                        buttonText: 'Cancel',
+                        onTap: onCancelTap,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: MyButton(
+                        bgColor: kRedColor,
+                        buttonText: 'Delete',
                         onTap: onLogoutTap,
                       ),
                     ),

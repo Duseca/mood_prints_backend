@@ -371,7 +371,7 @@ class ModeManagerController extends GetxController {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final timePassed = now - lastEntryTime;
-    final totalDuration = Duration(hours: 8, minutes: 0).inMilliseconds;
+    final totalDuration = Duration(hours: 12, minutes: 0).inMilliseconds;
 
     if (timePassed >= totalDuration) {
       // Time is up, enable button
@@ -402,7 +402,7 @@ class ModeManagerController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     final lastEntryTime = prefs.getInt('last_entry_time') ?? 0;
     final now = DateTime.now().millisecondsSinceEpoch;
-    final totalDuration = Duration(hours: 8, minutes: 0).inMilliseconds;
+    final totalDuration = Duration(hours: 12, minutes: 0).inMilliseconds;
 
     final timePassed = now - lastEntryTime;
     remainingTime.value = totalDuration - timePassed;

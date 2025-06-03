@@ -145,9 +145,9 @@ class _ClientHomeState extends State<ClientHome> {
                                     log('Board ID: ${model.id}');
                                     homeCtrl.deleteBoard(model.id);
                                   },
-                                  onEditTap: () {
-                                    Get.to(() => EditModeManager(model: model));
-                                  },
+                                  // onEditTap: () {
+                                  //   // Get.to(() => EditModeManager(model: model));
+                                  // },
                                 );
                               }),
                             )
@@ -196,9 +196,9 @@ class _ClientHomeState extends State<ClientHome> {
                                     log('Board ID: ${model.id}');
                                     homeCtrl.deleteBoard(model.id);
                                   },
-                                  onEditTap: () {
-                                    Get.to(() => EditModeManager(model: model));
-                                  },
+                                  // onEditTap: () {
+                                  //   Get.to(() => EditModeManager(model: model));
+                                  // },
                                 );
                               }),
                             );
@@ -368,7 +368,7 @@ class DetailCard extends StatelessWidget {
   final String riseTime;
   final DateTime dateTime;
   final VoidCallback onDeleteTap;
-  final VoidCallback onEditTap;
+   VoidCallback? onEditTap;
   final Widget emotionWidget;
   // final int stressLevel;
 
@@ -380,16 +380,16 @@ class DetailCard extends StatelessWidget {
     required this.riseTime,
     required this.dateTime,
     required this.onDeleteTap,
-    required this.onEditTap,
+     this.onEditTap,
     required this.emotionWidget,
     // required this.stressLevel,
   });
 
-  List<String> icons = [
-    // Assets.imagesShareIcon,
-    Assets.imagesEditIcon,
-    Assets.imagesBinIcon,
-  ];
+  // List<String> icons = [
+  //   // Assets.imagesShareIcon,
+  //   Assets.imagesEditIcon,
+  //   Assets.imagesBinIcon,
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -399,17 +399,32 @@ class DetailCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: List.generate(
-                  2,
-                  (index) => Padding(
-                        padding: EdgeInsets.only(left: 30),
-                        child: InkWell(
-                          child: CommonImageView(
-                              imagePath: icons[index], height: 20),
-                          onTap: (index == 1) ? onDeleteTap : onEditTap,
-                        ),
-                      ))),
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                            padding: EdgeInsets.only(left: 30),
+                            child: InkWell(
+                              child: CommonImageView(
+                                  imagePath: Assets.imagesBinIcon, height: 20),
+                              onTap:  onDeleteTap ,
+                            ),
+                          ),
+            ],
+          ),
+          // Row(
+          //     mainAxisAlignment: MainAxisAlignment.end,
+          //     children: List.generate(
+          //         2,
+          //         (index) => Padding(
+          //               padding: EdgeInsets.only(left: 30),
+          //               child: InkWell(
+          //                 child: CommonImageView(
+          //                     imagePath: icons[index], height: 20),
+          //                 onTap: (index == 1) ? onDeleteTap : onEditTap,
+          //               ),
+          //             )
+                      
+          //             )),
           Container(
             height: 270,
             margin: EdgeInsets.only(top: 10),

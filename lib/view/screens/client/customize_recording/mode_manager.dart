@@ -226,7 +226,9 @@ class _ModeManagerState extends State<ModeManager> {
                                   onTap: () {
                                     modeCtrl.stressedSelector(index);
                                   },
-                                  child: Image.asset(
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
                                     (modeCtrl.stressIconHandler.value == index)
                                         ? stressItems[index]
                                             .selectedIcon // Highlighted icon
@@ -234,6 +236,12 @@ class _ModeManagerState extends State<ModeManager> {
                                             .unselectedIcon, // Normal icon
                                     height: 44,
                                   ),
+
+                                  MyText(
+                                    paddingTop: 8,
+                                    text: "${index}" , size: 12,color: kGreyColor2),
+                                    ],
+                                  )
                                 ),
                               );
                             },
@@ -278,7 +286,11 @@ class _ModeManagerState extends State<ModeManager> {
                                   onTap: () {
                                     modeCtrl.irritableSelector(index);
                                   },
-                                  child: Image.asset(
+                                  child:
+
+                                  Column(
+                                    children: [
+                                       Image.asset(
                                     (modeCtrl.irritateIconHandler.value ==
                                             index)
                                         ? irritateItems[index]
@@ -287,6 +299,16 @@ class _ModeManagerState extends State<ModeManager> {
                                             .unselectedIcon, // Normal icon
                                     height: 44,
                                   ),
+
+
+                                      MyText(
+                                    paddingTop: 8,
+                                    text: "${index}" , size: 12,color: kGreyColor2,),
+                                    ],
+                                  )
+                                  
+                                  
+                                  
                                 ),
                               );
                             },
@@ -640,7 +662,7 @@ class _ModeManagerState extends State<ModeManager> {
                   // ------- Sleep --------
 
                   _CustomCard(
-                    title: 'Sleep*',
+                    title: "Record Last Night's Sleep*",
                     visiblity: true,
                     traillingWidget: SizedBox(),
                     onMore: () {},

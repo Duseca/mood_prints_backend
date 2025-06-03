@@ -11,6 +11,9 @@ String getAllTherapistUrl = "${baseUrl}/user/getAllUsers?userType=therapist";
 String getChangePasswordUrl = "${baseUrl}user/change-password";
 String checkEmailUrl = "${baseUrl}user/email";
 
+// ------------ Delete Account Urls ----------------
+String deleteAccountUrl = "${baseUrl}user/";
+
 // ------------ Forget Password Urls ----------------
 String forgetPasswordUrl = "${baseUrl}user/forget-password";
 String resetPasswordUrl = "${baseUrl}user/reset-password";

@@ -9,6 +9,7 @@ import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
+import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
@@ -167,6 +168,39 @@ class Profile extends StatelessWidget {
               },
               mBottom: 24,
             ),
+             _ProfileTile(
+            haveTrailing: true,
+            isRed: false,
+            icon: Assets.imagesLogout,
+            title: 'Delete Account',
+            onTap: () {
+
+
+               Get.dialog(DeleteAccountDialog(
+                onCancelTap: () {
+                  Get.back();
+                },
+                onLogoutTap: () async {
+                   await Get.find<AuthClientController>().logOutMethod();
+                  await Get.find<AuthClientController>().deleteAccountMethod(UserService.instance.therapistDetailModel.value.id.toString());
+
+                  UserService.instance.relationWithClients.clear();
+                  UserService.instance.relationWithTherapist.clear();
+                },
+              ));
+              // Get.dialog(_LogoutDialog(
+              //   onCancelTap: () {
+              //     Get.back();
+              //   },
+              //   onLogoutTap: () async {
+              //     await Get.find<AuthClientController>().logOutMethod();
+              //     UserService.instance.relationWithClients.clear();
+              //     UserService.instance.relationWithTherapist.clear();
+              //   },
+              // ));
+            },
+            mBottom: 24,
+          ),
             _ProfileTile(
               haveTrailing: false,
               isRed: true,

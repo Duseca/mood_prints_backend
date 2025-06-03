@@ -24,6 +24,7 @@ import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
+import 'package:mood_prints/view/screens/launch/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthClientController extends GetxController {
@@ -721,6 +722,45 @@ class AuthClientController extends GetxController {
     } catch (e) {
       hideLoadingDialog();
       log('Error Occurs during forget password ---> $e');
+    }
+  }
+
+
+
+  // ------ Delete Account ---------
+
+  Future<void> deleteAccountMethod(id
+   
+  ) async {
+    try {
+      log('Delete account method Called');
+      showLoadingDialog();
+     
+      final url = deleteAccountUrl + id;
+      final response = await apiService.delete(url,  true,
+          showResult: true, successCode: 200);
+
+      if (response != null) {
+        final message = response['message'];
+        if (message != null && message.isNotEmpty) {
+          // Get.to(() => ForgotPassVerification());
+
+          displayToast(msg: "$message");
+          log('Message ---> $message');
+          hideLoadingDialog();
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('id');
+    await prefs.remove('token');
+    await prefs.remove('userType');
+    Get.offAll(() => GetStarted());
+          
+        }
+      }
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error Occurs during delete account ---> $e');
     }
   }
 }
