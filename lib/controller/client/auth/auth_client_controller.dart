@@ -344,6 +344,8 @@ class AuthClientController extends GetxController {
         'fullName': fullName,
         'authProvider': 'email',
         'deviceToken': fcmToken,
+        'authorizeTherapistAccess': true,
+        'authorizeMoodPrintsAccess': true,
       };
 
       final response = await apiService.post(signUpUrl, body, true,
@@ -725,19 +727,15 @@ class AuthClientController extends GetxController {
     }
   }
 
-
-
   // ------ Delete Account ---------
 
-  Future<void> deleteAccountMethod(id
-   
-  ) async {
+  Future<void> deleteAccountMethod(id) async {
     try {
       log('Delete account method Called');
       showLoadingDialog();
-     
+
       final url = deleteAccountUrl + id;
-      final response = await apiService.delete(url,  true,
+      final response = await apiService.delete(url, true,
           showResult: true, successCode: 200);
 
       if (response != null) {
@@ -750,11 +748,10 @@ class AuthClientController extends GetxController {
           hideLoadingDialog();
 
           SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('id');
-    await prefs.remove('token');
-    await prefs.remove('userType');
-    Get.offAll(() => GetStarted());
-          
+          await prefs.remove('id');
+          await prefs.remove('token');
+          await prefs.remove('userType');
+          Get.offAll(() => GetStarted());
         }
       }
       hideLoadingDialog();

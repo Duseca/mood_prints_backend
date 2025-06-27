@@ -9,6 +9,7 @@ import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pdf_view.dart';
 import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
@@ -155,6 +156,13 @@ class ClientProfile extends StatelessWidget {
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
+            title: 'HIPPA',
+            onTap: () {
+              Get.to(() => PdfViewerScreen());
+            },
+          ),
+          _ProfileTile(
+            icon: Assets.imagesPrivacy,
             title: 'Privacy Policy',
             onTap: () {
               Get.to(() => PrivacyPolicy());
@@ -174,15 +182,14 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesLogout,
             title: 'Delete Account',
             onTap: () {
-
-
               Get.dialog(DeleteAccountDialog(
                 onCancelTap: () {
                   Get.back();
                 },
                 onLogoutTap: () async {
-                   await Get.find<AuthClientController>().logOutMethod();
-                  await Get.find<AuthClientController>().deleteAccountMethod(UserService.instance.userModel.value.id.toString());
+                  await Get.find<AuthClientController>().logOutMethod();
+                  await Get.find<AuthClientController>().deleteAccountMethod(
+                      UserService.instance.userModel.value.id.toString());
 
                   UserService.instance.relationWithClients.clear();
                   UserService.instance.relationWithTherapist.clear();
@@ -340,10 +347,6 @@ class _LogoutDialog extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 class DeleteAccountDialog extends StatelessWidget {
   final VoidCallback onCancelTap;

@@ -43,6 +43,10 @@ class ProfileController extends GetxController {
   RxBool visiblityOld = false.obs;
   RxBool visiblityNew = false.obs;
   RxBool visiblityConfrim = false.obs;
+  RxBool moodPrintAccess = false.obs;
+  // Rxn<bool> moodPrintAccess = Rxn<bool>(null);
+  // Rxn<bool> therapistAccess = Rxn<bool>(null);
+  RxBool therapistAccess = false.obs;
   RxString countryCode = '1'.obs;
   RxString initialCountryCodeValue = ''.obs;
 
@@ -105,6 +109,50 @@ class ProfileController extends GetxController {
           Get.back();
         }
         displayToast(msg: 'User Profile Updated');
+      }
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error occurs during updating user profile:-> $e');
+    }
+  }
+
+  // ✅ ✅ --------- Update Access varibles -------- ✅ ✅
+
+  //-------------- Update user profile information --------------
+
+  Future<void> updateUserAccess() async {
+    try {
+      showLoadingDialog();
+
+      UserModel body = UserModel(
+        authorizeTherapistAccess: therapistAccess.value,
+        authorizeMoodPrintsAccess: moodPrintAccess.value,
+      );
+
+      log("✅ Therapist - Access value: ${therapistAccess.value}");
+      log("✅ Mood - Access value: ${moodPrintAccess.value}");
+
+      final url =
+          updateUserUrl + UserService.instance.userModel.value.id.toString();
+
+      final response = await apiService.putWithBody(url, body.toJson(), false,
+          showResult: true, successCode: 200);
+
+      hideLoadingDialog();
+
+      if (response != null) {
+        final message = response['message'];
+        final user = response['user'];
+
+        if (message != null && message.isNotEmpty) {
+          if (UserTypeService.instance.userType == UserType.client.name) {
+            final model = UserModel.fromJson(user);
+            UserService.instance.userModel.value = model;
+          }
+          Get.back();
+        }
+        displayToast(msg: 'User Access Updated');
       }
       hideLoadingDialog();
     } catch (e) {
@@ -434,11 +482,4 @@ class ProfileController extends GetxController {
     initialCountryCodeValue.value = number.isoCode ?? '';
     log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
   }
-
-
-
-
-
-
-  
 }
