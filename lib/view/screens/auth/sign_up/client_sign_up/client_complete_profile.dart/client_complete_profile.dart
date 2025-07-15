@@ -165,47 +165,47 @@ class ClientCompleteProfile extends StatelessWidget {
                     },
                   ),
                 ),
-                Obx(
-                  () => MyTextField(
-                    isReadOnly: true,
-                    labelText: 'Date of Birth',
-                    hintText: (ctrl.dob.value != null)
-                        ? DateTimeService.instance
-                            .getDateUsFormat(ctrl.dob.value!)
-                        : "Select date",
-                    suffix: InkWell(
-                      onTap: () {
-                        Get.bottomSheet(
-                          isScrollControlled: true,
-                          CustomBottomSheet(
-                            height: Get.height * 0.49,
-                            child: DobPicker(
-                              initialDateTime: ctrl.dob.value,
-                              onDateTimeChanged: (dateTime) {
-                                ctrl.dob.value = dateTime;
+                // Obx(
+                //   () => MyTextField(
+                //     isReadOnly: true,
+                //     labelText: 'Date of Birth',
+                //     hintText: (ctrl.dob.value != null)
+                //         ? DateTimeService.instance
+                //             .getDateUsFormat(ctrl.dob.value!)
+                //         : "Select date",
+                //     suffix: InkWell(
+                //       onTap: () {
+                //         Get.bottomSheet(
+                //           isScrollControlled: true,
+                //           CustomBottomSheet(
+                //             height: Get.height * 0.49,
+                //             child: DobPicker(
+                //               initialDateTime: ctrl.dob.value,
+                //               onDateTimeChanged: (dateTime) {
+                //                 ctrl.dob.value = dateTime;
 
-                                log("date: ${ctrl.dob.value}");
-                              },
-                              onTap: () {
-                                Get.back();
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            Assets.imagesCalendarA,
-                            height: 20,
-                            color: kSecondaryColor,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                //                 log("date: ${ctrl.dob.value}");
+                //               },
+                //               onTap: () {
+                //                 Get.back();
+                //               },
+                //             ),
+                //           ),
+                //         );
+                //       },
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           Image.asset(
+                //             Assets.imagesCalendarA,
+                //             height: 20,
+                //             color: kSecondaryColor,
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
                 // --------- If User type is Therapist than display these fields -------------
 

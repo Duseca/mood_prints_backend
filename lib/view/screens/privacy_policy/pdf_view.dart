@@ -15,12 +15,12 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 
-class PdfViewerScreen extends StatefulWidget {
+class HippaScreen extends StatefulWidget {
   @override
-  _PdfViewerScreenState createState() => _PdfViewerScreenState();
+  _HippaScreenState createState() => _HippaScreenState();
 }
 
-class _PdfViewerScreenState extends State<PdfViewerScreen> {
+class _HippaScreenState extends State<HippaScreen> {
   PdfViewerController _pdfViewerController = PdfViewerController();
   Uint8List? _pdfData;
   ProfileController profileController = Get.find();

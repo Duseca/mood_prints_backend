@@ -10,7 +10,6 @@ import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
-import 'package:mood_prints/view/screens/client/edit_mode_manager/edit_mode_manager.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
@@ -368,7 +367,7 @@ class DetailCard extends StatelessWidget {
   final String riseTime;
   final DateTime dateTime;
   final VoidCallback onDeleteTap;
-   VoidCallback? onEditTap;
+  VoidCallback? onEditTap;
   final Widget emotionWidget;
   // final int stressLevel;
 
@@ -380,7 +379,7 @@ class DetailCard extends StatelessWidget {
     required this.riseTime,
     required this.dateTime,
     required this.onDeleteTap,
-     this.onEditTap,
+    this.onEditTap,
     required this.emotionWidget,
     // required this.stressLevel,
   });
@@ -402,13 +401,13 @@ class DetailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
-                            padding: EdgeInsets.only(left: 30),
-                            child: InkWell(
-                              child: CommonImageView(
-                                  imagePath: Assets.imagesBinIcon, height: 20),
-                              onTap:  onDeleteTap ,
-                            ),
-                          ),
+                padding: EdgeInsets.only(left: 30),
+                child: InkWell(
+                  child: CommonImageView(
+                      imagePath: Assets.imagesBinIcon, height: 20),
+                  onTap: onDeleteTap,
+                ),
+              ),
             ],
           ),
           // Row(
@@ -423,7 +422,7 @@ class DetailCard extends StatelessWidget {
           //                 onTap: (index == 1) ? onDeleteTap : onEditTap,
           //               ),
           //             )
-                      
+
           //             )),
           Container(
             height: 270,

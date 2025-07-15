@@ -38,9 +38,12 @@ class DobPicker extends StatelessWidget {
 
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: MyButton(buttonText: 'Done', onTap: (){
-            Get.back();
-          }),
+          child: MyButton(
+              buttonText: 'Done',
+              onTap: onTap ??
+                  () {
+                    Get.back();
+                  }),
         )
       ],
     );

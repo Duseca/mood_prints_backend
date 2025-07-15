@@ -126,9 +126,9 @@ class ProfileController extends GetxController {
       showLoadingDialog();
 
       UserModel body = UserModel(
-        authorizeTherapistAccess: therapistAccess.value,
-        authorizeMoodPrintsAccess: moodPrintAccess.value,
-      );
+          authorizeTherapistAccess: therapistAccess.value,
+          authorizeMoodPrintsAccess: moodPrintAccess.value,
+          updatedAt: DateTime.now());
 
       log("✅ Therapist - Access value: ${therapistAccess.value}");
       log("✅ Mood - Access value: ${moodPrintAccess.value}");
@@ -481,5 +481,11 @@ class ProfileController extends GetxController {
     countryCode.value = number.dialCode ?? '';
     initialCountryCodeValue.value = number.isoCode ?? '';
     log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
+  }
+
+  bool isTenDaysCompleted(DateTime updatedDateTime) {
+    final DateTime now = DateTime.now();
+    final Duration difference = now.difference(updatedDateTime);
+    return difference.inDays >= 10;
   }
 }

@@ -4,11 +4,14 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/chat/chat_head.dart';
 import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pdf_view.dart';
+import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 // ignore: must_be_immutable
@@ -19,6 +22,14 @@ class ClientNavBar extends StatefulWidget {
 
 class _ClientNavBarState extends State<ClientNavBar> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserService.instance.isTenDaysCompleted();
+  }
+
   void _getCurrentIndex(int index) => setState(() {
         _currentIndex = index;
       });
@@ -62,85 +73,89 @@ class _ClientNavBarState extends State<ClientNavBar> {
       },
     ];
 
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      floatingActionButton: SizedBox(
-        child: FloatingActionButton(
-          elevation: 3,
-          onPressed: () {
-            // Get.to(() => CustomizeRecording());
-            Get.to(() => ModeManager());
-          },
-          backgroundColor: Color(0xffFFD6A5),
-          child: Icon(
-            Icons.add,
-            color: kTertiaryColor,
+    return Obx(
+      () => Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: false,
+        body: (UserService.instance.isAccountAccessBlocked.value)
+            ? BlockAppAccessScreen()
+            : IndexedStack(
+                index: _currentIndex,
+                children: _screens,
+              ),
+        floatingActionButton: SizedBox(
+          child: FloatingActionButton(
+            elevation: 3,
+            onPressed: () {
+              // Get.to(() => CustomizeRecording());
+              Get.to(() => ModeManager());
+            },
+            backgroundColor: Color(0xffFFD6A5),
+            child: Icon(
+              Icons.add,
+              color: kTertiaryColor,
+            ),
           ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
-        child: BottomAppBar(
-          height: Platform.isIOS ? null : 70,
-          color: kSecondaryColor,
-          notchMargin: 6.0,
-          padding: AppSizes.HORIZONTAL,
-          shape: CircularNotchedRectangle(),
-          shadowColor: kTertiaryColor.withOpacity(0.10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _NavItem(
-                    icon: _currentIndex == 0
-                        ? _items[0]['iconA']
-                        : _items[0]['icon'],
-                    isSelected: false,
-                    onTap: () => _getCurrentIndex(0),
-                    title: _items[0]['label'],
-                  ),
-                  _NavItem(
-                    icon: _currentIndex == 1
-                        ? _items[1]['iconA']
-                        : _items[1]['icon'],
-                    isSelected: false,
-                    onTap: () => _getCurrentIndex(1),
-                    title: _items[1]['label'],
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                  _NavItem(
-                    icon: _currentIndex == 2
-                        ? _items[2]['iconA']
-                        : _items[2]['icon'],
-                    isSelected: false,
-                    onTap: () => _getCurrentIndex(2),
-                    title: _items[2]['label'],
-                  ),
-                  _NavItem(
-                    icon: _currentIndex == 3
-                        ? _items[3]['iconA']
-                        : _items[3]['icon'],
-                    isSelected: false,
-                    onTap: () => _getCurrentIndex(3),
-                    title: _items[3]['label'],
-                  ),
-                ],
-              ),
-            ],
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: ClipRRect(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(16),
+          ),
+          child: BottomAppBar(
+            height: Platform.isIOS ? null : 70,
+            color: kSecondaryColor,
+            notchMargin: 6.0,
+            padding: AppSizes.HORIZONTAL,
+            shape: CircularNotchedRectangle(),
+            shadowColor: kTertiaryColor.withOpacity(0.10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _NavItem(
+                      icon: _currentIndex == 0
+                          ? _items[0]['iconA']
+                          : _items[0]['icon'],
+                      isSelected: false,
+                      onTap: () => _getCurrentIndex(0),
+                      title: _items[0]['label'],
+                    ),
+                    _NavItem(
+                      icon: _currentIndex == 1
+                          ? _items[1]['iconA']
+                          : _items[1]['icon'],
+                      isSelected: false,
+                      onTap: () => _getCurrentIndex(1),
+                      title: _items[1]['label'],
+                    ),
+                    SizedBox(
+                      width: 50,
+                    ),
+                    _NavItem(
+                      icon: _currentIndex == 2
+                          ? _items[2]['iconA']
+                          : _items[2]['icon'],
+                      isSelected: false,
+                      onTap: () => _getCurrentIndex(2),
+                      title: _items[2]['label'],
+                    ),
+                    _NavItem(
+                      icon: _currentIndex == 3
+                          ? _items[3]['iconA']
+                          : _items[3]['icon'],
+                      isSelected: false,
+                      onTap: () => _getCurrentIndex(3),
+                      title: _items[3]['label'],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -186,6 +201,47 @@ class _NavItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class BlockAppAccessScreen extends StatefulWidget {
+  const BlockAppAccessScreen({super.key});
+
+  @override
+  State<BlockAppAccessScreen> createState() => _BlockAppAccessScreenState();
+}
+
+class _BlockAppAccessScreenState extends State<BlockAppAccessScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppSizes.DEFAULT,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          MyText(
+            text: "App Access Blocked",
+            size: 25,
+            weight: FontWeight.w600,
+          ),
+          MyText(
+            textAlign: TextAlign.center,
+            paddingTop: 6,
+            paddingBottom: 40,
+            text:
+                "You cannot use the app right now. Please go to HiPPA settings and enable both Mood Prints Access and Therapist Access to continue.",
+            size: 15,
+          ),
+          MyButton(
+            buttonText: "Open HiPPA Settings",
+            onTap: () {
+              Get.to(() => HippaScreen());
+            },
+          )
+        ],
       ),
     );
   }

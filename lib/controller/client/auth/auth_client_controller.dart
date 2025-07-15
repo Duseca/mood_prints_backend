@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mood_prints/constants/all_urls.dart';
@@ -10,6 +10,7 @@ import 'package:mood_prints/constants/firebase_const.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
+import 'package:mood_prints/core/enums/user_age_status.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/model/client_model/user_model.dart';
@@ -24,7 +25,6 @@ import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
-import 'package:mood_prints/view/screens/launch/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthClientController extends GetxController {
@@ -35,6 +35,7 @@ class AuthClientController extends GetxController {
   final TextEditingController countryController = TextEditingController();
   final TextEditingController stateController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
+  final TextEditingController npiNumberController = TextEditingController();
   RxString otpMessage = ''.obs;
   String? otpCode;
   String? newUserTempId;
@@ -42,6 +43,8 @@ class AuthClientController extends GetxController {
   // --- Profile Setup ---
   final TextEditingController phoneNumberController = TextEditingController();
   String? FullPhoneNumber;
+  String? gradianFullPhoneNumber;
+  String? emergencyFullPhoneNumber;
   RxString selectedGenderValue = 'Male'.obs;
   RxList<String> gender = <String>['Male', 'Female', 'Not Preferred'].obs;
   Rx<DateTime?> dob = Rx<DateTime?>(null);
@@ -52,7 +55,45 @@ class AuthClientController extends GetxController {
   var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
   RxBool acceptTermsAndCondition = false.obs;
+  RxBool ageRestriction = false.obs;
+  RxBool usCitizen = false.obs;
   RxBool passwordVisibility = true.obs;
+  // ------ User Age Status variable ---------
+  Rxn<String> userAgeStatus = Rxn(null);
+  // ------ Gardian checks ---------
+  RxBool gradian1 = false.obs;
+  RxBool gradian2 = false.obs;
+  RxBool gradian3 = false.obs;
+  RxBool gradian4 = false.obs;
+  RxBool gradian5 = false.obs;
+  RxBool gradian6 = false.obs;
+  RxBool gradian7 = false.obs;
+  // ------ 18+ checks ---------
+  RxBool adult1 = false.obs;
+  RxBool adult2 = false.obs;
+  RxBool adult3 = false.obs;
+  RxBool adult4 = false.obs;
+  RxBool adult5 = false.obs;
+  RxBool adult6 = false.obs;
+  // ------ therapist ---------
+  RxBool therapist1 = false.obs;
+  RxBool therapist2 = false.obs;
+  RxBool therapist3 = false.obs;
+  RxBool therapist4 = false.obs;
+  RxBool therapist5 = false.obs;
+  // -------- Text Controllers -------
+
+  final TextEditingController guardianNameController = TextEditingController();
+  final TextEditingController guardianEmailController = TextEditingController();
+  final TextEditingController guardianPhoneNumberController =
+      TextEditingController();
+  Rx<DateTime?> guardianDob = Rx<DateTime?>(null);
+
+  final TextEditingController emergencyNameController = TextEditingController();
+  final TextEditingController emergencyEmailController =
+      TextEditingController();
+  final TextEditingController emergencyPhoneNumberController =
+      TextEditingController();
 
   //  -------------- Google Authentication with Firebase ------------------
 
@@ -328,6 +369,23 @@ class AuthClientController extends GetxController {
     required String email,
     required String password,
     required String userType,
+    required String dob,
+    String? npiNumber,
+
+    // Emergency
+    String? emergencyName,
+    String? emergencyEmail,
+    String? emergencyPhone,
+
+    // Gradian
+    String? gradianName,
+    String? gradianEmail,
+    String? gradianPhone,
+    String? gradianDOB,
+
+    // US Citizen
+    bool isUsCitizien = true,
+    bool guardianInfoComplete = false,
   }) async {
     log("Try Called SignUp");
     log('User Type ----------- $userType');
@@ -337,16 +395,60 @@ class AuthClientController extends GetxController {
       // final fcmToken = await fcm.getToken();
       final fcmToken = await getFcmToken();
 
-      Map<String, dynamic> body = {
-        'email': email,
-        'password': password,
-        'userType': userType,
-        'fullName': fullName,
-        'authProvider': 'email',
-        'deviceToken': fcmToken,
-        'authorizeTherapistAccess': true,
-        'authorizeMoodPrintsAccess': true,
-      };
+      // Map<String, dynamic> body = {
+      //   'email': email,
+      //   'password': password,
+      //   'userType': userType,
+      //   'fullName': fullName,
+      //   'authProvider': 'email',
+      //   'deviceToken': fcmToken,
+      //   'authorizeTherapistAccess': true,
+      //   'authorizeMoodPrintsAccess': true,
+      // };
+
+      Map<String, dynamic> body;
+
+      if (userType == UserType.therapist.name) {
+        body = {
+          'email': email,
+          'password': password,
+          'userType': userType,
+          'fullName': fullName,
+          'dob': dob,
+          'authProvider': 'email',
+          'deviceToken': fcmToken,
+          'npiNumber': npiNumber,
+          'emergencyName': emergencyName ?? '',
+          'emergencyEmail': emergencyEmail ?? '',
+          'emergencyPhone': emergencyPhone ?? '',
+          'confirmUSResidency': isUsCitizien,
+        };
+      } else {
+        body = {
+          'email': email,
+          'password': password,
+          'userType': userType,
+          'fullName': fullName,
+          'dob': dob,
+          'authProvider': 'email',
+          'deviceToken': fcmToken,
+          'authorizeTherapistAccess': true,
+          'authorizeMoodPrintsAccess': true,
+          // Gradian
+          'guardianName': gradianName ?? '',
+          'guardianEmail': gradianEmail ?? '',
+          'guardianPhone': gradianPhone ?? '',
+          'guardianDOB': gradianDOB ?? '',
+          // Emergency
+          'emergencyName': emergencyName ?? '',
+          'emergencyEmail': emergencyEmail ?? '',
+          'emergencyPhone': emergencyPhone ?? '',
+
+          // US Residency
+          'confirmUSResidency': isUsCitizien,
+          'guardianInfoComplete': guardianInfoComplete
+        };
+      }
 
       final response = await apiService.post(signUpUrl, body, true,
           showResult: true, successCode: 201);
@@ -437,7 +539,7 @@ class AuthClientController extends GetxController {
     try {
       if (fullNameController.text.isNotEmpty &&
           FullPhoneNumber != null &&
-          dob.value != null &&
+          // dob.value != null &&
           BioController.text.isNotEmpty) {
         log('Fields Are Not Empty');
 
@@ -455,12 +557,17 @@ class AuthClientController extends GetxController {
           log('Current User Type (if)------- $currentUserType ------ Profile Updated');
 
           UserModel model = UserModel(
-              fullName: fullNameController.text.trim(),
-              phoneNumber: FullPhoneNumber,
-              dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-              gender: selectedGenderValue.value.toLowerCase(),
-              bio: BioController.text,
-              image: (downloadImageUrl != null) ? downloadImageUrl : dummyImg);
+            fullName: fullNameController.text.trim(),
+            phoneNumber: FullPhoneNumber,
+            // dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+            gender: selectedGenderValue.value.toLowerCase(),
+            bio: BioController.text,
+            image: (downloadImageUrl != null) ? downloadImageUrl : dummyImg,
+            authorizeMoodPrintsAccess: true,
+            authorizeTherapistAccess: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          );
 
           final url = updateUserUrl + newUserTempId.toString();
 
@@ -495,7 +602,7 @@ class AuthClientController extends GetxController {
           TherapistDetailModel model = TherapistDetailModel(
               fullName: fullNameController.text.trim(),
               phoneNumber: FullPhoneNumber,
-              dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+              // dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
               gender: selectedGenderValue.value.toLowerCase(),
               city: cityController.text.trim(),
               state: stateController.text.trim(),
@@ -619,6 +726,24 @@ class AuthClientController extends GetxController {
     update();
   }
 
+  void checkBoxToggel(RxBool checkValue) {
+    if (checkValue == true) {
+      checkValue.value = false;
+    } else {
+      checkValue.value = true;
+    }
+    update();
+  }
+
+  // void checkBoxValueUSCitizen() {
+  //   if (usCitizen == true) {
+  //     usCitizen.value = false;
+  //   } else {
+  //     usCitizen.value = true;
+  //   }
+  //   update();
+  // }
+
   passwordVisibityMethod() {
     passwordVisibility.value == true
         ? passwordVisibility.value = false
@@ -635,10 +760,39 @@ class AuthClientController extends GetxController {
     countryController.clear();
     cityController.clear();
     BioController.clear();
+    npiNumberController.clear();
     acceptTermsAndCondition.value = false;
     selectedProfileImage.value = null;
     dob.value = null;
     phoneNumberController.clear();
+
+    guardianNameController.clear();
+    guardianEmailController.clear();
+    guardianPhoneNumberController.clear();
+    guardianDob.value = null;
+
+    emergencyEmailController.clear();
+    emergencyNameController.clear();
+    emergencyPhoneNumberController.clear();
+
+    adult1.value = false;
+    adult2.value = false;
+    adult3.value = false;
+    adult4.value = false;
+    adult5.value = false;
+
+    gradian1.value = false;
+    gradian2.value = false;
+    gradian3.value = false;
+    gradian4.value = false;
+    gradian5.value = false;
+    gradian6.value = false;
+
+    therapist1.value = false;
+    therapist2.value = false;
+    therapist3.value = false;
+    therapist4.value = false;
+    therapist5.value = false;
 
     update();
   }
@@ -758,6 +912,74 @@ class AuthClientController extends GetxController {
     } catch (e) {
       hideLoadingDialog();
       log('Error Occurs during delete account ---> $e');
+    }
+  }
+
+  // Checking User age if the user is between 13 to 17 display toast message make varibale to ture;
+
+  // void checkIfGuardianRequired(DateTime userDob) {
+  //   try {
+  //     final DateTime now = DateTime.now();
+  //     log(" my dob :::: $userDob");
+  //     // DateTimeService.instance.getDateIsoFormat(ctrl.dob)
+
+  //     int age = now.year - userDob.year;
+  //     if (now.month < userDob.month ||
+  //         (now.month == userDob.month && now.day < userDob.day)) {
+  //       age--;
+  //     }
+
+  //     if (age >= 13 && age <= 17) {
+  //       Fluttertoast.showToast(
+  //         msg:
+  //             "User is between 13-17 years old, you need to add guardian information.",
+  //         toastLength: Toast.LENGTH_LONG,
+  //       );
+  //       isUserAgeBetween13And17.value = true;
+  //       log("✅ Age is between 13 - 17 ${isUserAgeBetween13And17.value}");
+  //     }
+
+  //     isUserAgeBetween13And17.value = false;
+  //   } catch (e) {
+  //     isUserAgeBetween13And17.value = false;
+  //     log("❌ Error while calculating age");
+  //   }
+  // }
+
+  void checkIfGuardianRequired(DateTime userDob) {
+    try {
+      final DateTime now = DateTime.now();
+      log("📅 User DOB: $userDob");
+
+      int age = now.year - userDob.year;
+      if (now.month < userDob.month ||
+          (now.month == userDob.month && now.day < userDob.day)) {
+        age--;
+      }
+
+      if (age < 13) {
+        Fluttertoast.showToast(
+          msg: "User under 13, cannot create account.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        log("🚫 User under 13, cannot create account.");
+        userAgeStatus.value = UserAgeStatus.ageLessThan13.name;
+      } else if (age >= 13 && age <= 17) {
+        Fluttertoast.showToast(
+          msg:
+              "User is between 13-17 years old, you need to add guardian information.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        log("✅ User is between 13-17, guardian info required.");
+        userAgeStatus.value = UserAgeStatus.age13To17.name;
+      } else {
+        log("✅ User is 18+, normal flow.");
+        userAgeStatus.value = UserAgeStatus.age18Plus.name;
+      }
+    } catch (e) {
+      log("❌ Error while calculating age: $e");
+      userAgeStatus.value =
+          UserAgeStatus.age18Plus.name; // default safe fallback
     }
   }
 }

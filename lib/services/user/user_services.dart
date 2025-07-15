@@ -90,4 +90,42 @@ class UserService {
       return '';
     }
   }
+
+  // -------- User App Use ----------
+
+  // bool isTenDaysCompleted(DateTime updatedDateTime) {
+  //   final DateTime now = DateTime.now();
+  //   final Duration difference = now.difference(updatedDateTime);
+  //   return difference.inDays >= 10;
+  // }
+
+  RxBool isAccountAccessBlocked = false.obs;
+
+  void isTenDaysCompleted() {
+    bool? appAccess =
+        UserService.instance.userModel.value.authorizeMoodPrintsAccess;
+    bool? therapistAccess =
+        UserService.instance.userModel.value.authorizeTherapistAccess;
+
+    DateTime? updatedDateTime = UserService.instance.userModel.value.updatedAt;
+
+    if (appAccess == false && therapistAccess == false) {
+      final DateTime now = DateTime.now();
+      final Duration difference = now.difference(
+          updatedDateTime != null ? updatedDateTime : DateTime.now());
+
+      isAccountAccessBlocked.value = difference.inDays >= 10;
+      log("✅ Updated DateTime: ${updatedDateTime}");
+      log("✅ 10 Days completed app access blocked: ${isAccountAccessBlocked.value}");
+    }
+    log("❌ 10 Days not completed yet you can use app for now.");
+
+    isAccountAccessBlocked.value = false;
+  }
 }
+
+
+// bool isTenDaysCompleted(DateTime updatedDateTime) {
+ 
+// }
+

@@ -158,7 +158,7 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesPrivacy,
             title: 'HIPPA',
             onTap: () {
-              Get.to(() => PdfViewerScreen());
+              Get.to(() => HippaScreen());
             },
           ),
           _ProfileTile(
