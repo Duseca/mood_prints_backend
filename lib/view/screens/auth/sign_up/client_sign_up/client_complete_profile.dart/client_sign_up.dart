@@ -156,6 +156,10 @@ class ClientSignUp extends StatelessWidget {
                           log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
                         },
                       ),
+                      MyTextField(
+                          controller: ctrl.signatureController,
+                          labelText: "Signature",
+                          hintText: "Signature"),
                       Padding(
                         padding: EdgeInsets.only(bottom: 10),
                         child: Row(
@@ -465,6 +469,11 @@ class ClientSignUp extends StatelessWidget {
                             log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
                           },
                         ),
+
+                        MyTextField(
+                            controller: ctrl.signatureController,
+                            labelText: "Signature",
+                            hintText: "Signature"),
 
                         // Padding(
                         //   padding: EdgeInsets.only(bottom: 10),
@@ -1045,15 +1054,23 @@ class ClientSignUp extends StatelessWidget {
                         displayToast(msg: "Please set the checkboxs to true.");
                       } else {
                         if (formKey2.currentState!.validate()) {
+                          if (ctrl.signatureController.text.isEmpty) {
+                            displayToast(
+                                msg: "Please add the your signature/typedName");
+
+                            return;
+                          }
                           ctrl.signUpClientMethod(
-                              dob: DateTimeService.instance
-                                  .getDateIsoFormat(ctrl.dob.value!),
-                              npiNumber: ctrl.npiNumberController.text,
-                              email: ctrl.emailController.text.trim(),
-                              password: ctrl.passwordController.text.trim(),
-                              fullName: ctrl.fullNameController.text.trim(),
-                              userType: type,
-                              isUsCitizien: true);
+                            dob: DateTimeService.instance
+                                .getDateIsoFormat(ctrl.dob.value!),
+                            npiNumber: ctrl.npiNumberController.text,
+                            email: ctrl.emailController.text.trim(),
+                            password: ctrl.passwordController.text.trim(),
+                            fullName: ctrl.fullNameController.text.trim(),
+                            userType: type,
+                            isUsCitizien: true,
+                            signature: ctrl.signatureController.text.trim(),
+                          );
                         }
                       }
                     },
@@ -1123,6 +1140,7 @@ class ClientSignUp extends StatelessWidget {
                                     ctrl.emergencyEmailController.text.trim(),
                                 emergencyPhone: ctrl.emergencyFullPhoneNumber,
                                 guardianInfoComplete: true,
+                                signature: ctrl.signatureController.text.trim(),
                               );
 
                               log("DOB ---- --- : ${DateTimeService.instance.getDateIsoFormat(ctrl.guardianDob.value!)}");
@@ -1141,6 +1159,13 @@ class ClientSignUp extends StatelessWidget {
                                 msg: "Please set the checkbox to true.");
                           } else {
                             if (formKey2.currentState!.validate()) {
+                              if (ctrl.signatureController.text.isEmpty) {
+                                displayToast(
+                                    msg:
+                                        "Please add the your signature/typedName");
+
+                                return;
+                              }
                               ctrl.signUpClientMethod(
                                 dob: DateTimeService.instance
                                     .getDateIsoFormat(ctrl.dob.value!),
@@ -1155,6 +1180,7 @@ class ClientSignUp extends StatelessWidget {
                                     ctrl.emergencyEmailController.text.trim(),
                                 emergencyPhone: ctrl.emergencyFullPhoneNumber,
                                 guardianInfoComplete: true,
+                                signature: ctrl.signatureController.text.trim(),
                               );
                             }
                           }

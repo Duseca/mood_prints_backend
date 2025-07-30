@@ -50,6 +50,8 @@ class ProfileController extends GetxController {
   RxString countryCode = '1'.obs;
   RxString initialCountryCodeValue = ''.obs;
 
+  TextEditingController signatureController = TextEditingController();
+
   // Image Picker
 
   void profileImagePicker() async {
@@ -346,11 +348,12 @@ class ProfileController extends GetxController {
   // ---------- Creating a notification request ---------------
 
   Future<void> requestNotification(
-      {String? therapistID, String? clientID}) async {
+      {String? therapistID, String? clientID, String? signature}) async {
     if (therapistID != null) {
-      log('Request Therapist Called');
-      log("Therapist ID: $therapistID");
-      log("Client ID: ${UserService.instance.userModel.value.id}");
+      log('✅Request Therapist Called');
+      log("✅Therapist ID: $therapistID");
+      log("✅Client ID: ${UserService.instance.userModel.value.id}");
+      log("✅signatureText: ${signature}");
 
       showLoadingDialog();
 
@@ -358,9 +361,12 @@ class ProfileController extends GetxController {
         'therapistId': therapistID,
         'clientId': clientID ?? UserService.instance.userModel.value.id,
         'action': ActionType.create.name,
+        'signatureText': signature.toString()
       };
+      // log("✅--Request Body: ${body.toString()}");
 
-      final response = await apiService.post(requestNotificationUrl, body, true,
+      final response = await apiService.post(
+          requestNotificationUrl, body, false,
           showResult: true, successCode: 201);
 
       if (response != null) {
@@ -393,6 +399,7 @@ class ProfileController extends GetxController {
           Get.back();
           log('Request Send: $message');
           displayToast(msg: 'Request send to therapist!');
+          signatureController.clear();
         }
       }
 
@@ -421,6 +428,7 @@ class ProfileController extends GetxController {
       'title': title,
       'fullName': fullName,
       'body': "${fullName} ${notificationMsg}",
+
       // 'body': '$fullName has requested to select you as their therapist.',
     };
 

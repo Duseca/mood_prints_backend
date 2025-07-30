@@ -15,7 +15,6 @@ import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/model/client_model/user_model.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
-import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
@@ -90,10 +89,12 @@ class AuthClientController extends GetxController {
   Rx<DateTime?> guardianDob = Rx<DateTime?>(null);
 
   final TextEditingController emergencyNameController = TextEditingController();
+
   final TextEditingController emergencyEmailController =
       TextEditingController();
   final TextEditingController emergencyPhoneNumberController =
       TextEditingController();
+  final TextEditingController signatureController = TextEditingController();
 
   //  -------------- Google Authentication with Firebase ------------------
 
@@ -371,6 +372,7 @@ class AuthClientController extends GetxController {
     required String userType,
     required String dob,
     String? npiNumber,
+    required String signature,
 
     // Emergency
     String? emergencyName,
@@ -422,7 +424,11 @@ class AuthClientController extends GetxController {
           'emergencyEmail': emergencyEmail ?? '',
           'emergencyPhone': emergencyPhone ?? '',
           'confirmUSResidency': isUsCitizien,
+          // Signature
+          'signatureText': signature,
         };
+
+        log("🔥 signatureText At Therapist Side: ${signature}");
       } else {
         body = {
           'email': email,
@@ -446,13 +452,18 @@ class AuthClientController extends GetxController {
 
           // US Residency
           'confirmUSResidency': isUsCitizien,
-          'guardianInfoComplete': guardianInfoComplete
+          'guardianInfoComplete': guardianInfoComplete,
+          // Signature
+          'signatureText': signature,
         };
+        log("🔥 signatureText At Client Side: ${signature}");
       }
 
       final response = await apiService.post(signUpUrl, body, true,
           showResult: true, successCode: 201);
       hideLoadingDialog();
+
+      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
 
       if (response != null) {
         final token = response['token'];
@@ -466,7 +477,12 @@ class AuthClientController extends GetxController {
                 token: token,
               ));
         }
+        log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+
+        log("🔥🔥🔥🔥 signatureText Submitted: ${signature}");
       }
+      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+
       hideLoadingDialog();
     } catch (e) {
       hideLoadingDialog();
@@ -793,6 +809,8 @@ class AuthClientController extends GetxController {
     therapist3.value = false;
     therapist4.value = false;
     therapist5.value = false;
+
+    signatureController.clear();
 
     update();
   }
