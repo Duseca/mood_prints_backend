@@ -4,8 +4,8 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-class PrivacyPolicy extends StatelessWidget {
-  const PrivacyPolicy({super.key});
+class PrivacyPolicyPage extends StatelessWidget {
+  const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,10 @@ import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
-import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
+import 'package:mood_prints/view/screens/privacy_policy/b_a.dart';
+import 'package:mood_prints/view/screens/privacy_policy/p_s.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
 import 'package:mood_prints/view/screens/profile/edit_therapist_profile.dart';
@@ -153,11 +156,29 @@ class Profile extends StatelessWidget {
               color: kQuaternaryColor,
               paddingBottom: 16,
             ),
+            // ------ BAA
+            _ProfileTile(
+              icon: Assets.imagesPrivacy,
+              title: 'Business Associate Agreement',
+              onTap: () {
+                Get.to(() => BAPage());
+              },
+            ),
+
+            // ------ PSA
+            _ProfileTile(
+              icon: Assets.imagesPrivacy,
+              title: 'Platform Services Agreement',
+              onTap: () {
+                Get.to(() => PSPage());
+              },
+            ),
+
             _ProfileTile(
               icon: Assets.imagesPrivacy,
               title: 'Privacy Policy',
               onTap: () {
-                Get.to(() => PrivacyPolicy());
+                Get.to(() => PrivacyPolicyPage());
               },
             ),
             _ProfileTile(
@@ -168,39 +189,39 @@ class Profile extends StatelessWidget {
               },
               mBottom: 24,
             ),
-             _ProfileTile(
-            haveTrailing: true,
-            isRed: false,
-            icon: Assets.imagesLogout,
-            title: 'Delete Account',
-            onTap: () {
+            _ProfileTile(
+              haveTrailing: true,
+              isRed: false,
+              icon: Assets.imagesLogout,
+              title: 'Delete Account',
+              onTap: () {
+                Get.dialog(DeleteAccountDialog(
+                  onCancelTap: () {
+                    Get.back();
+                  },
+                  onLogoutTap: () async {
+                    await Get.find<AuthClientController>().logOutMethod();
+                    await Get.find<AuthClientController>().deleteAccountMethod(
+                        UserService.instance.therapistDetailModel.value.id
+                            .toString());
 
-
-               Get.dialog(DeleteAccountDialog(
-                onCancelTap: () {
-                  Get.back();
-                },
-                onLogoutTap: () async {
-                   await Get.find<AuthClientController>().logOutMethod();
-                  await Get.find<AuthClientController>().deleteAccountMethod(UserService.instance.therapistDetailModel.value.id.toString());
-
-                  UserService.instance.relationWithClients.clear();
-                  UserService.instance.relationWithTherapist.clear();
-                },
-              ));
-              // Get.dialog(_LogoutDialog(
-              //   onCancelTap: () {
-              //     Get.back();
-              //   },
-              //   onLogoutTap: () async {
-              //     await Get.find<AuthClientController>().logOutMethod();
-              //     UserService.instance.relationWithClients.clear();
-              //     UserService.instance.relationWithTherapist.clear();
-              //   },
-              // ));
-            },
-            mBottom: 24,
-          ),
+                    UserService.instance.relationWithClients.clear();
+                    UserService.instance.relationWithTherapist.clear();
+                  },
+                ));
+                // Get.dialog(_LogoutDialog(
+                //   onCancelTap: () {
+                //     Get.back();
+                //   },
+                //   onLogoutTap: () async {
+                //     await Get.find<AuthClientController>().logOutMethod();
+                //     UserService.instance.relationWithClients.clear();
+                //     UserService.instance.relationWithTherapist.clear();
+                //   },
+                // ));
+              },
+              mBottom: 24,
+            ),
             _ProfileTile(
               haveTrailing: false,
               isRed: true,

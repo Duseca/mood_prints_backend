@@ -9,8 +9,11 @@ import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
+import 'package:mood_prints/view/screens/privacy_policy/nopp.dart';
 import 'package:mood_prints/view/screens/privacy_policy/pdf_view.dart';
-import 'package:mood_prints/view/screens/privacy_policy/privacy_policy.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/terms_and_telehealth_consent.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -163,9 +166,23 @@ class ClientProfile extends StatelessWidget {
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
+            title: 'Terms and Telehealth Consent',
+            onTap: () {
+              Get.to(() => ClientAndTeleHealthConsentPage());
+            },
+          ),
+          _ProfileTile(
+            icon: Assets.imagesPrivacy,
+            title: 'NOPP',
+            onTap: () {
+              Get.to(() => NOPPPage());
+            },
+          ),
+          _ProfileTile(
+            icon: Assets.imagesPrivacy,
             title: 'Privacy Policy',
             onTap: () {
-              Get.to(() => PrivacyPolicy());
+              Get.to(() => PPPage());
             },
           ),
           _ProfileTile(
