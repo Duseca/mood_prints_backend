@@ -74,12 +74,16 @@ class AuthClientController extends GetxController {
   RxBool adult4 = false.obs;
   RxBool adult5 = false.obs;
   RxBool adult6 = false.obs;
+  RxBool adult7 = false.obs;
+  RxBool adult8 = false.obs;
   // ------ therapist ---------
   RxBool therapist1 = false.obs;
   RxBool therapist2 = false.obs;
   RxBool therapist3 = false.obs;
   RxBool therapist4 = false.obs;
   RxBool therapist5 = false.obs;
+  RxBool therapist6 = false.obs;
+  RxBool therapist7 = false.obs;
   // -------- Text Controllers -------
 
   final TextEditingController guardianNameController = TextEditingController();

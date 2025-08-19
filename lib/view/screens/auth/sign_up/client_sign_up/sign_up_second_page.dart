@@ -1,9 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
@@ -12,6 +9,9 @@ import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/core/enums/user_age_status.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/view/screens/privacy_policy/general_terms.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
@@ -95,16 +95,16 @@ class SignUpSecondPage extends StatelessWidget {
                         ),
                         MyTextField(
                           controller: ctrl.emergencyNameController,
-                          labelText: 'Emergency Name',
-                          hintText: 'Emergency Name',
+                          labelText: 'Emergency Contact’s Full Name',
+                          hintText: 'Emergency Contact’s Full Name',
                         ),
                         MyTextField(
                           controller: ctrl.emergencyEmailController,
-                          labelText: 'Emergency Email',
-                          hintText: 'Emergency Email',
+                          labelText: 'Emergency Contact’s Email',
+                          hintText: 'Emergency Contact’s Email',
                         ),
                         PhoneField(
-                          title: "Emergency Phone Number",
+                          title: "Emergency Contact’s Phone Number”",
                           controller: ctrl.emergencyPhoneNumberController,
                           onPhoneNumberChanged: (value) {
                             ctrl.emergencyFullPhoneNumber = value;
@@ -238,6 +238,104 @@ class SignUpSecondPage extends StatelessWidget {
                             ],
                           ),
                         ),
+
+                        // // ------- Adding ""Services Consent"" 18-Aug-2025 ----------
+
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: MyText(
+                              paddingTop: 10,
+                              paddingBottom: 15,
+                              text: "Services Consent",
+                              weight: FontWeight.w700,
+                            )),
+
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Obx(
+                                    () => CustomCheckBox(
+                                      isActive: ctrl.therapist6.value,
+                                      onTap: () {
+                                        ctrl.checkBoxToggel(ctrl.therapist6);
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: MyText(
+                                      paddingLeft: 8,
+                                      text:
+                                          ' Please review and agree to the terms that allow us to provide our services.',
+                                      size: 13,
+                                      weight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              MyText(
+                                paddingTop: 2,
+                                paddingLeft: 26,
+                                text:
+                                    'Your consent to these terms is considered legally binding.',
+                                size: 13,
+                                weight: FontWeight.w500,
+                                color: kSecondaryColor,
+                                decoration: TextDecoration.underline,
+                                onTap: () {
+                                  Get.to(() => PPPage());
+                                  // Handle the tap event
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Obx(
+                                    () => CustomCheckBox(
+                                      isActive: ctrl.therapist7.value,
+                                      onTap: () {
+                                        ctrl.checkBoxToggel(ctrl.therapist7);
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: MyText(
+                                      paddingLeft: 8,
+                                      text:
+                                          'By typing my name below, I adopt this as my electronic signature. I agree that this signature applies to all documents I have acknowledged above,',
+                                      size: 13,
+                                      weight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              MyText(
+                                paddingTop: 2,
+                                paddingLeft: 26,
+                                text:
+                                    'which are incorporated by reference and enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).',
+                                size: 13,
+                                weight: FontWeight.w500,
+                                color: kSecondaryColor,
+                                decoration: TextDecoration.underline,
+                                onTap: () {
+                                  Get.to(() => GeneralTermsPage());
+                                  // Handle the tap event
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                         MyTextField(
                             controller: ctrl.signatureController,
                             labelText: "Signature",
@@ -305,7 +403,7 @@ class SignUpSecondPage extends StatelessWidget {
                               ? MyText(
                                   paddingBottom: 20,
                                   text:
-                                      "User is between 13-17 years old, you need to add guardian information.",
+                                      "Users between 13-17 years old need to add parent / guardian information.",
                                   color: Colors.blue.shade800,
                                   size: 12,
                                 )
@@ -328,15 +426,14 @@ class SignUpSecondPage extends StatelessWidget {
                                     MyTextField(
                                       controller: ctrl.guardianNameController,
                                       labelText:
-                                          'Parent / Guardian’s full name',
-                                      hintText: 'Parent / Guardian’s full name',
+                                          'Parent / Guardian’s Full Name”',
+                                      hintText:
+                                          'Parent / Guardian’s Full Name”',
                                     ),
                                     MyTextField(
                                       controller: ctrl.guardianEmailController,
-                                      labelText:
-                                          'Parent / Guardian’s email address',
-                                      hintText:
-                                          'Parent / Guardian’s email address',
+                                      labelText: 'Parent / Guardian’s Email',
+                                      hintText: 'Parent / Guardian’s Email',
                                     ),
                                     // MyTextField(
                                     //   controller: ctrl.npiNumberController,
@@ -411,16 +508,16 @@ class SignUpSecondPage extends StatelessWidget {
 
                           MyTextField(
                             controller: ctrl.emergencyNameController,
-                            labelText: 'Emergency Name',
-                            hintText: 'Emergency Name',
+                            labelText: 'Emergency Contact’s Full Name',
+                            hintText: 'Emergency Contact’s Full Name',
                           ),
                           MyTextField(
                             controller: ctrl.emergencyEmailController,
-                            labelText: 'Emergency Email',
-                            hintText: 'Emergency Email',
+                            labelText: 'Emergency Contact’s Email',
+                            hintText: 'Emergency Contact’s Email',
                           ),
                           PhoneField(
-                            title: "Emergency Phone Number",
+                            title: "Emergency Contact’s Phone Number",
                             controller: ctrl.emergencyPhoneNumberController,
                             onPhoneNumberChanged: (value) {
                               ctrl.emergencyFullPhoneNumber = value;
@@ -712,6 +809,7 @@ class SignUpSecondPage extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+
                                     Padding(
                                       padding: EdgeInsets.only(bottom: 10),
                                       child: Row(
@@ -737,6 +835,37 @@ class SignUpSecondPage extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+
+                                    // // ------- Adding New 18-Aug-2025 ----------
+
+                                    // MyText(text: "Services Consent"),
+
+                                    // Padding(
+                                    //   padding: EdgeInsets.only(bottom: 10),
+                                    //   child: Row(
+                                    //     children: [
+                                    //       Obx(
+                                    //         () => CustomCheckBox(
+                                    //           isActive: ctrl.gradian6.value,
+                                    //           onTap: () {
+                                    //             ctrl.checkBoxToggel(
+                                    //                 ctrl.gradian6);
+                                    //           },
+                                    //         ),
+                                    //       ),
+                                    //       Expanded(
+                                    //         child: MyText(
+                                    //           paddingLeft: 8,
+                                    //           text:
+                                    //               ' I agree to the Acceptable Use Rules described in § 6 of the CTTC.',
+                                    //           size: 13,
+                                    //           weight: FontWeight.w500,
+                                    //         ),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
+
                                     Padding(
                                       padding: EdgeInsets.only(bottom: 10),
                                       child: Row(
@@ -931,6 +1060,112 @@ class SignUpSecondPage extends StatelessWidget {
                                             ],
                                           ),
                                         ),
+
+                                        // // ------- Adding ""Services Consent"" 18-Aug-2025 ----------
+
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: MyText(
+                                              paddingTop: 10,
+                                              paddingBottom: 15,
+                                              text: "Services Consent",
+                                              weight: FontWeight.w700,
+                                            )),
+
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Obx(
+                                                    () => CustomCheckBox(
+                                                      isActive:
+                                                          ctrl.adult7.value,
+                                                      onTap: () {
+                                                        ctrl.checkBoxToggel(
+                                                            ctrl.adult7);
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: MyText(
+                                                      paddingLeft: 8,
+                                                      text:
+                                                          ' Please review and agree to the terms that allow us to provide our services.',
+                                                      size: 13,
+                                                      weight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              MyText(
+                                                paddingTop: 2,
+                                                paddingLeft: 26,
+                                                text:
+                                                    'Your consent to these terms is considered legally binding.',
+                                                size: 13,
+                                                weight: FontWeight.w500,
+                                                color: kSecondaryColor,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                onTap: () {
+                                                  Get.to(() => PPPage());
+                                                  // Handle the tap event
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Obx(
+                                                    () => CustomCheckBox(
+                                                      isActive:
+                                                          ctrl.adult8.value,
+                                                      onTap: () {
+                                                        ctrl.checkBoxToggel(
+                                                            ctrl.adult8);
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: MyText(
+                                                      paddingLeft: 8,
+                                                      text:
+                                                          'By typing my name below, I adopt this as my electronic signature. I agree that this signature applies to all documents I have acknowledged above,',
+                                                      size: 13,
+                                                      weight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              MyText(
+                                                paddingTop: 2,
+                                                paddingLeft: 26,
+                                                text:
+                                                    'which are incorporated by reference and enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).',
+                                                size: 13,
+                                                weight: FontWeight.w500,
+                                                color: kSecondaryColor,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                onTap: () {
+                                                  Get.to(
+                                                      () => GeneralTermsPage());
+                                                  // Handle the tap event
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     )
                                   : SizedBox(),
@@ -1063,7 +1298,9 @@ class SignUpSecondPage extends StatelessWidget {
                                 ctrl.adult3.value == false ||
                                 ctrl.adult4.value == false ||
                                 ctrl.adult5.value == false ||
-                                ctrl.adult6.value == false) {
+                                ctrl.adult6.value == false ||
+                                ctrl.adult7.value == false ||
+                                ctrl.adult8.value == false) {
                               displayToast(
                                   msg: "Please set the checkbox to true.");
                             } else {
