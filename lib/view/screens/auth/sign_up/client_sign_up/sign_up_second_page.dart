@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
+import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
@@ -111,135 +113,78 @@ class SignUpSecondPage extends StatelessWidget {
                             log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
                           },
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              Obx(
-                                () => CustomCheckBox(
-                                  isActive: ctrl.therapist1.value,
-                                  onTap: () {
-                                    ctrl.checkBoxToggel(ctrl.therapist1);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: MyText(
-                                  paddingLeft: 8,
-                                  text:
-                                      'I have read and agree to the Platform Services Agreement (PSA).',
-                                  size: 13,
-                                  weight: FontWeight.w500,
-                                ),
-                              ),
-                              // MyText(
-                              //   text: 'Terms & Conditions',
-                              //   size: 13,
-                              //   weight: FontWeight.w600,
-                              //   color: kQuaternaryColor,
-                              //   decoration: TextDecoration.underline,
-                              // ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              Obx(
-                                () => CustomCheckBox(
-                                  isActive: ctrl.therapist2.value,
-                                  onTap: () {
-                                    ctrl.checkBoxToggel(ctrl.therapist2);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: MyText(
-                                  paddingLeft: 8,
-                                  text:
-                                      'I have executed and agree to the Business Associate Agreement (BAA).',
-                                  size: 13,
-                                  weight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              Obx(
-                                () => CustomCheckBox(
-                                  isActive: ctrl.therapist3.value,
-                                  onTap: () {
-                                    ctrl.checkBoxToggel(ctrl.therapist3);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: MyText(
-                                  paddingLeft: 8,
-                                  text:
-                                      'I have read and agree to the General Terms of Service.',
-                                  size: 13,
-                                  weight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              Obx(
-                                () => CustomCheckBox(
-                                  isActive: ctrl.therapist4.value,
-                                  onTap: () {
-                                    ctrl.checkBoxToggel(ctrl.therapist4);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: MyText(
-                                  paddingLeft: 8,
-                                  text:
-                                      'I have reviewed and acknowledge the Privacy Policy.',
-                                  size: 13,
-                                  weight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              Obx(
-                                () => CustomCheckBox(
-                                  isActive: ctrl.therapist5.value,
-                                  onTap: () {
-                                    ctrl.checkBoxToggel(ctrl.therapist5);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: MyText(
-                                  paddingLeft: 8,
-                                  text:
-                                      'I acknowledge the HIPAA Notice of Privacy Practices.',
-                                  size: 13,
-                                  weight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                        Obx(
+                          () => CheckBoxWithHyperLink(
+                            text1: "I agree to the ",
+                            text2: 'Platform Services Agreement (PSA).',
+                            isActive: ctrl.therapist1.value,
+                            onBoxTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist1);
+                            },
+                            onHyperLinkTap: () {
+                              Get.to(() => PPPage());
+                            },
                           ),
                         ),
 
-                        // // ------- Adding ""Services Consent"" 18-Aug-2025 ----------
+                        Obx(
+                          () => CheckBoxWithHyperLink(
+                            text1: "I agree to the ",
+                            text2: 'Business Associate Agreement (BAA).',
+                            isActive: ctrl.therapist2.value,
+                            onBoxTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist2);
+                            },
+                            onHyperLinkTap: () {
+                              Get.to(() => PPPage());
+                            },
+                          ),
+                        ),
+
+                        Obx(
+                          () => CheckBoxWithHyperLink(
+                            text1: "I agree to the ",
+                            text2: 'General Terms of Service.',
+                            isActive: ctrl.therapist3.value,
+                            onBoxTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist3);
+                            },
+                            onHyperLinkTap: () {
+                              Get.to(() => PPPage());
+                            },
+                          ),
+                        ),
+
+                        Obx(
+                          () => CheckBoxWithHyperLink(
+                            text1: "I have read and agree to the ",
+                            text2: 'Privacy Policy.',
+                            isActive: ctrl.therapist4.value,
+                            onBoxTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist4);
+                            },
+                            onHyperLinkTap: () {
+                              Get.to(() => PPPage());
+                            },
+                          ),
+                        ),
+
+                        // Obx(
+                        //   () => CheckBoxWithHyperLink(
+                        //     text1:
+                        //         "I have received and acknowledge the HIPAA Notice of ",
+                        //     text2: 'Privacy Practices (NOPP).',
+                        //     isActive: ctrl.therapist5.value,
+                        //     onBoxTap: () {
+                        //       ctrl.checkBoxToggel(ctrl.therapist5);
+                        //     },
+                        //     onHyperLinkTap: () {
+                        //       Get.to(() => PPPage());
+                        //     },
+                        //   ),
+                        // ),
+
+                        // ------- Services Consent ----------
 
                         Align(
                             alignment: Alignment.centerLeft,
@@ -250,92 +195,71 @@ class SignUpSecondPage extends StatelessWidget {
                               weight: FontWeight.w700,
                             )),
 
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Obx(
-                                    () => CustomCheckBox(
-                                      isActive: ctrl.therapist6.value,
-                                      onTap: () {
-                                        ctrl.checkBoxToggel(ctrl.therapist6);
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: MyText(
-                                      paddingLeft: 8,
-                                      text:
-                                          ' Please review and agree to the terms that allow us to provide our services.',
-                                      size: 13,
-                                      weight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              MyText(
-                                paddingTop: 2,
-                                paddingLeft: 26,
-                                text:
-                                    'Your consent to these terms is considered legally binding.',
-                                size: 13,
-                                weight: FontWeight.w500,
-                                color: kSecondaryColor,
-                                decoration: TextDecoration.underline,
-                                onTap: () {
-                                  Get.to(() => PPPage());
-                                  // Handle the tap event
-                                },
-                              ),
-                            ],
+                        Obx(
+                          () => CheckBoxWithText(
+                            text:
+                                "I have reviewed and agree to the terms, which are legally binding.",
+                            isActive: ctrl.therapist5.value,
+                            onTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist5);
+                            },
                           ),
                         ),
 
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Obx(
-                                    () => CustomCheckBox(
-                                      isActive: ctrl.therapist7.value,
-                                      onTap: () {
-                                        ctrl.checkBoxToggel(ctrl.therapist7);
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: MyText(
-                                      paddingLeft: 8,
-                                      text:
-                                          'By typing my name below, I adopt this as my electronic signature. I agree that this signature applies to all documents I have acknowledged above,',
-                                      size: 13,
-                                      weight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              MyText(
-                                paddingTop: 2,
-                                paddingLeft: 26,
-                                text:
-                                    'which are incorporated by reference and enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).',
-                                size: 13,
-                                weight: FontWeight.w500,
-                                color: kSecondaryColor,
-                                decoration: TextDecoration.underline,
-                                onTap: () {
-                                  Get.to(() => GeneralTermsPage());
-                                  // Handle the tap event
-                                },
-                              ),
-                            ],
+                        Obx(
+                          () => CheckBoxWithText(
+                            text:
+                                "By typing my name below, I adopt it as my electronic signature. I agree that this electronic signature applies to all documents I have acknowledged above, which are incorporated by reference and are enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).",
+                            isActive: ctrl.therapist6.value,
+                            onTap: () {
+                              ctrl.checkBoxToggel(ctrl.therapist6);
+                            },
                           ),
                         ),
+
+                        // Padding(
+                        //   padding: EdgeInsets.only(bottom: 10),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       Row(
+                        //         children: [
+                        //           Obx(
+                        //             () => CustomCheckBox(
+                        //               isActive: ctrl.therapist7.value,
+                        //               onTap: () {
+                        //                 ctrl.checkBoxToggel(ctrl.therapist7);
+                        //               },
+                        //             ),
+                        //           ),
+                        //           Expanded(
+                        //             child: MyText(
+                        //               paddingLeft: 8,
+                        //               text:
+                        //                   '',
+                        //               size: 13,
+                        //               weight: FontWeight.w500,
+                        //             ),
+                        //           ),
+                        //         ],
+                        //       ),
+                        //       MyText(
+                        //         paddingTop: 2,
+                        //         paddingLeft: 26,
+                        //         text:
+                        //             '',
+                        //         size: 13,
+                        //         weight: FontWeight.w500,
+                        //         color: kSecondaryColor,
+                        //         decoration: TextDecoration.underline,
+                        //         onTap: () {
+                        //           Get.to(() => GeneralTermsPage());
+                        //           // Handle the tap event
+                        //         },
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         MyTextField(
                             controller: ctrl.signatureController,
                             labelText: "Signature",
@@ -684,218 +608,103 @@ class SignUpSecondPage extends StatelessWidget {
                           (ctrl.userAgeStatus == UserAgeStatus.age13To17.name)
                               ? Column(
                                   children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian1.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian1);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I am the legal parent or guardian of the minor named below and have authority to consent.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1: "I agree to the ",
+                                        text2:
+                                            'Terms & Telehealth Consent (CTTC) on the minor’s behalf.',
+                                        isActive: ctrl.gradian1.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian1);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian2.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian2);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I have read and agree to the Client Terms & Telehealth Consent on the minor’s behalf.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1: "I agree to the Client ",
+                                        text2:
+                                            'Terms & Telehealth Consent (CTTC) on the minor’s behalf.',
+                                        isActive: ctrl.gradian2.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian2);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian3.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian3);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I have read and agree to the General Terms of Service on the minor’s behalf.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1: "I agree to the General ",
+                                        text2:
+                                            'Terms of Service on the minor’s behalf.',
+                                        isActive: ctrl.gradian3.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian3);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian4.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian4);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I have reviewed and acknowledge the Privacy Policy.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1: "I have read and agree to the ",
+                                        text2: 'Privacy Policy.',
+                                        isActive: ctrl.gradian4.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian4);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian5.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian5);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I have received and reviewed the HIPAA Notice of Privacy Practices (NOPP).',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1:
+                                            "I acknowledge receipt of the HIPAA Notice of Privacy Practices ",
+                                        text2: '(NOPP).',
+                                        isActive: ctrl.gradian5.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian5);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian6.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian6);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  ' I agree to the Acceptable Use Rules described in § 6 of the CTTC.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1:
+                                            "I agree to the Acceptable Use Rules in § 6 of the ",
+                                        text2: 'CTTC.',
+                                        isActive: ctrl.gradian6.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian6);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-
-                                    // // ------- Adding New 18-Aug-2025 ----------
-
-                                    // MyText(text: "Services Consent"),
-
-                                    // Padding(
-                                    //   padding: EdgeInsets.only(bottom: 10),
-                                    //   child: Row(
-                                    //     children: [
-                                    //       Obx(
-                                    //         () => CustomCheckBox(
-                                    //           isActive: ctrl.gradian6.value,
-                                    //           onTap: () {
-                                    //             ctrl.checkBoxToggel(
-                                    //                 ctrl.gradian6);
-                                    //           },
-                                    //         ),
-                                    //       ),
-                                    //       Expanded(
-                                    //         child: MyText(
-                                    //           paddingLeft: 8,
-                                    //           text:
-                                    //               ' I agree to the Acceptable Use Rules described in § 6 of the CTTC.',
-                                    //           size: 13,
-                                    //           weight: FontWeight.w500,
-                                    //         ),
-                                    //       ),
-                                    //     ],
-                                    //   ),
-                                    // ),
-
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Obx(
-                                            () => CustomCheckBox(
-                                              isActive: ctrl.gradian7.value,
-                                              onTap: () {
-                                                ctrl.checkBoxToggel(
-                                                    ctrl.gradian7);
-                                              },
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: MyText(
-                                              paddingLeft: 8,
-                                              text:
-                                                  'I confirm that I am a US citizen.',
-                                              size: 13,
-                                              weight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                    Obx(
+                                      () => CheckBoxWithHyperLink(
+                                        text1:
+                                            "I confirm that I am a US citizen.",
+                                        text2: '',
+                                        isActive: ctrl.gradian7.value,
+                                        onBoxTap: () {
+                                          ctrl.checkBoxToggel(ctrl.gradian7);
+                                        },
+                                        onHyperLinkTap: () {
+                                          Get.to(() => PPPage());
+                                        },
                                       ),
                                     ),
-                                    // SizedBox(height: 15),
-                                    // MyTextField(
-                                    //     controller: ctrl.signatureController,
-                                    //     labelText: "Signature",
-                                    //     hintText: "Signature"),
                                   ],
                                 )
                               :
@@ -905,163 +714,95 @@ class SignUpSecondPage extends StatelessWidget {
                                       UserAgeStatus.age18Plus.name)
                                   ? Column(
                                       children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult1.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult1);
-                                                  },
-                                                ),
-                                              ),
-                                              MyText(
-                                                paddingLeft: 8,
-                                                text: 'I accept the ',
-                                                size: 13,
-                                                weight: FontWeight.w500,
-                                              ),
-                                              MyText(
-                                                text: 'Terms & Conditions',
-                                                size: 13,
-                                                weight: FontWeight.w600,
-                                                color: kQuaternaryColor,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult2.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult2);
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: MyText(
-                                                  paddingLeft: 8,
-                                                  text:
-                                                      'I have read and agree to the Client Terms & Telehealth Consent (CTTC).',
-                                                  size: 13,
-                                                  weight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult3.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult3);
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: MyText(
-                                                  paddingLeft: 8,
-                                                  text:
-                                                      'I have reviewed and acknowledge the Privacy Policy.',
-                                                  size: 13,
-                                                  weight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult4.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult4);
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: MyText(
-                                                  paddingLeft: 8,
-                                                  text:
-                                                      'I have read the HIPAA Notice of Privacy Practices (NOPP).',
-                                                  size: 13,
-                                                  weight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult5.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult5);
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: MyText(
-                                                  paddingLeft: 8,
-                                                  text:
-                                                      'I agree to the Acceptable Use Rules described in § 6 of the CTTC.',
-                                                  size: 13,
-                                                  weight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Row(
-                                            children: [
-                                              Obx(
-                                                () => CustomCheckBox(
-                                                  isActive: ctrl.adult6.value,
-                                                  onTap: () {
-                                                    ctrl.checkBoxToggel(
-                                                        ctrl.adult6);
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: MyText(
-                                                  paddingLeft: 8,
-                                                  text:
-                                                      'I confirm that I am a US citizen.',
-                                                  size: 13,
-                                                  weight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
+                                        // Obx(
+                                        //   () => CheckBoxWithHyperLink(
+                                        //     text1: "I accept the ",
+                                        //     text2: 'Terms & Conditions',
+                                        //     isActive: ctrl.adult1.value,
+                                        //     onBoxTap: () {
+                                        //       ctrl.checkBoxToggel(ctrl.adult1);
+                                        //     },
+                                        //     onHyperLinkTap: () {
+                                        //       Get.to(() => PPPage());
+                                        //     },
+                                        //   ),
+                                        // ),
+
+                                        Obx(
+                                          () => CheckBoxWithHyperLink(
+                                            text1: "I agree to the ",
+                                            text2:
+                                                'Client Terms & Telehealth Consent (CTTC).',
+                                            isActive: ctrl.adult1.value,
+                                            onBoxTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult1);
+                                            },
+                                            onHyperLinkTap: () {
+                                              Get.to(() => PPPage());
+                                            },
                                           ),
                                         ),
 
-                                        // // ------- Adding ""Services Consent"" 18-Aug-2025 ----------
+                                        Obx(
+                                          () => CheckBoxWithHyperLink(
+                                            text1:
+                                                "I have reviewed and acknowledge receipt of the ",
+                                            text2: 'Privacy Policy.',
+                                            isActive: ctrl.adult2.value,
+                                            onBoxTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult2);
+                                            },
+                                            onHyperLinkTap: () {
+                                              Get.to(() => PPPage());
+                                            },
+                                          ),
+                                        ),
+
+                                        Obx(
+                                          () => CheckBoxWithHyperLink(
+                                            text1:
+                                                "I have read and understood the HIPAA Notice of ",
+                                            text2: 'Privacy Practices (NOPP).',
+                                            isActive: ctrl.adult3.value,
+                                            onBoxTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult3);
+                                            },
+                                            onHyperLinkTap: () {
+                                              Get.to(() => PPPage());
+                                            },
+                                          ),
+                                        ),
+
+                                        Obx(
+                                          () => CheckBoxWithHyperLink(
+                                            text1: "I agree to the ",
+                                            text2: 'General Terms of use.',
+                                            isActive: ctrl.adult4.value,
+                                            onBoxTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult4);
+                                            },
+                                            onHyperLinkTap: () {
+                                              Get.to(() => PPPage());
+                                            },
+                                          ),
+                                        ),
+
+                                        // Obx(
+                                        //   () => CheckBoxWithHyperLink(
+                                        //     text1:
+                                        //         "I confirm that I am a US citizen.",
+                                        //     text2: '',
+                                        //     isActive: ctrl.adult6.value,
+                                        //     onBoxTap: () {
+                                        //       ctrl.checkBoxToggel(ctrl.adult6);
+                                        //     },
+                                        //     onHyperLinkTap: () {
+                                        //       Get.to(() => PPPage());
+                                        //     },
+                                        //   ),
+                                        // ),
+
+                                        // ------- "Services Consent" ----------
 
                                         Align(
                                             alignment: Alignment.centerLeft,
@@ -1072,98 +813,25 @@ class SignUpSecondPage extends StatelessWidget {
                                               weight: FontWeight.w700,
                                             )),
 
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Obx(
-                                                    () => CustomCheckBox(
-                                                      isActive:
-                                                          ctrl.adult7.value,
-                                                      onTap: () {
-                                                        ctrl.checkBoxToggel(
-                                                            ctrl.adult7);
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: MyText(
-                                                      paddingLeft: 8,
-                                                      text:
-                                                          ' Please review and agree to the terms that allow us to provide our services.',
-                                                      size: 13,
-                                                      weight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              MyText(
-                                                paddingTop: 2,
-                                                paddingLeft: 26,
-                                                text:
-                                                    'Your consent to these terms is considered legally binding.',
-                                                size: 13,
-                                                weight: FontWeight.w500,
-                                                color: kSecondaryColor,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                onTap: () {
-                                                  Get.to(() => PPPage());
-                                                  // Handle the tap event
-                                                },
-                                              ),
-                                            ],
+                                        Obx(
+                                          () => CheckBoxWithText(
+                                            text:
+                                                "Please review and agree to the terms that allow us to provide our services. Your consent to these terms is considered legally binding.",
+                                            isActive: ctrl.adult5.value,
+                                            onTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult5);
+                                            },
                                           ),
                                         ),
 
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Obx(
-                                                    () => CustomCheckBox(
-                                                      isActive:
-                                                          ctrl.adult8.value,
-                                                      onTap: () {
-                                                        ctrl.checkBoxToggel(
-                                                            ctrl.adult8);
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: MyText(
-                                                      paddingLeft: 8,
-                                                      text:
-                                                          'By typing my name below, I adopt this as my electronic signature. I agree that this signature applies to all documents I have acknowledged above,',
-                                                      size: 13,
-                                                      weight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              MyText(
-                                                paddingTop: 2,
-                                                paddingLeft: 26,
-                                                text:
-                                                    'which are incorporated by reference and enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).',
-                                                size: 13,
-                                                weight: FontWeight.w500,
-                                                color: kSecondaryColor,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                onTap: () {
-                                                  Get.to(
-                                                      () => GeneralTermsPage());
-                                                  // Handle the tap event
-                                                },
-                                              ),
-                                            ],
+                                        Obx(
+                                          () => CheckBoxWithText(
+                                            text:
+                                                "By typing my name below, I adopt this as my electronic signature. I agree that this signature applies to all documents I have acknowledged above, which are incorporated by reference and enforceable under U.S. e-signature law (15 U.S.C. § 7001 et seq.).",
+                                            isActive: ctrl.adult6.value,
+                                            onTap: () {
+                                              ctrl.checkBoxToggel(ctrl.adult6);
+                                            },
                                           ),
                                         ),
                                       ],
@@ -1187,6 +855,24 @@ class SignUpSecondPage extends StatelessWidget {
                   ? MyButton(
                       buttonText: "Continue",
                       onTap: () {
+                        if (ctrl.fullNameController.text.trim() ==
+                            ctrl.emergencyNameController.text.trim()) {
+                          displayToast(
+                            msg:
+                                "Emergency contact is not same, try different emergency name",
+                          );
+                          return;
+                        }
+
+                        if (ctrl.emailController.text.trim() ==
+                            ctrl.emergencyEmailController.text.trim()) {
+                          displayToast(
+                            msg:
+                                "Emergency email is not same, try different emergency email",
+                          );
+                          return;
+                        }
+
                         if (ctrl.therapist1.value == false ||
                             ctrl.therapist2.value == false ||
                             ctrl.therapist3.value == false ||
@@ -1228,6 +914,24 @@ class SignUpSecondPage extends StatelessWidget {
                             ? kGreyColor.withValues(alpha: 0.5)
                             : kSecondaryColor,
                         onTap: () {
+                          if (ctrl.fullNameController.text.trim() ==
+                              ctrl.emergencyNameController.text.trim()) {
+                            displayToast(
+                              msg:
+                                  "Emergency contact is not same, try different emergency name",
+                            );
+                            return;
+                          }
+
+                          if (ctrl.emailController.text.trim() ==
+                              ctrl.emergencyEmailController.text.trim()) {
+                            displayToast(
+                              msg:
+                                  "Emergency email is not same, try different emergency email",
+                            );
+                            return;
+                          }
+
                           if (type == UserType.client.name &&
                               ctrl.userAgeStatus ==
                                   UserAgeStatus.ageLessThan13.name) {
@@ -1294,13 +998,15 @@ class SignUpSecondPage extends StatelessWidget {
                               ctrl.userAgeStatus ==
                                   UserAgeStatus.age18Plus.name) {
                             if (ctrl.adult1.value == false ||
-                                ctrl.adult2.value == false ||
-                                ctrl.adult3.value == false ||
-                                ctrl.adult4.value == false ||
-                                ctrl.adult5.value == false ||
-                                ctrl.adult6.value == false ||
-                                ctrl.adult7.value == false ||
-                                ctrl.adult8.value == false) {
+                                    ctrl.adult2.value == false ||
+                                    ctrl.adult3.value == false ||
+                                    ctrl.adult4.value == false ||
+                                    ctrl.adult5.value == false ||
+                                    ctrl.adult6.value == false
+                                // ctrl.adult7.value == false ||
+                                // ctrl.adult8.value == false
+
+                                ) {
                               displayToast(
                                   msg: "Please set the checkbox to true.");
                             } else {
@@ -1368,6 +1074,130 @@ class SignUpSecondPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CheckBoxWithText extends StatelessWidget {
+  final String text;
+  final VoidCallback onTap;
+  final bool isActive;
+  CheckBoxWithText({
+    super.key,
+    required this.isActive,
+    required this.onTap,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomCheckBox(
+                isActive: isActive,
+                //  ctrl.adult8.value,
+                onTap: onTap,
+              ),
+              Expanded(
+                child: MyText(
+                  paddingLeft: 8,
+                  text: text,
+                  size: 13,
+                  weight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CheckBoxWithHyperLink extends StatelessWidget {
+  final String text1, text2;
+  final VoidCallback onBoxTap;
+  final bool isActive;
+  bool isTextSimple;
+  final VoidCallback onHyperLinkTap;
+  CheckBoxWithHyperLink({
+    super.key,
+    required this.isActive,
+    required this.onBoxTap,
+    required this.text1,
+    required this.text2,
+    this.isTextSimple = false,
+    required this.onHyperLinkTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomCheckBox(
+                isActive: isActive,
+                //  ctrl.adult8.value,
+                onTap: onBoxTap,
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: RichText(
+                  text: TextSpan(
+                    text: text1,
+                    style: TextStyle(
+                        color: kTertiaryColor,
+                        fontSize: 13,
+                        fontFamily: AppFonts.URBANIST),
+                    children: [
+                      TextSpan(
+                        text: text2,
+                        style: TextStyle(
+                            fontFamily: AppFonts.URBANIST,
+                            color: (isTextSimple)
+                                ? kTertiaryColor
+                                : kSecondaryColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            decoration: (isTextSimple)
+                                ? TextDecoration.none
+                                : TextDecoration.underline),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = onHyperLinkTap,
+
+                        // () {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     const SnackBar(content: Text("Sign Up tapped")),
+                        //   );
+                        // },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Expanded(
+              //   child: MyText(
+              //     paddingLeft: 8,
+              //     text: text,
+              //     size: 13,
+              //     weight: FontWeight.w500,
+              //   ),
+              // ),
+            ],
+          ),
+        ],
       ),
     );
   }

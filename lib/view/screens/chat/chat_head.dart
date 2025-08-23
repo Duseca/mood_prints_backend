@@ -90,10 +90,8 @@ class _ChatHeadState extends State<ChatHead> {
                       textAlign: TextAlign.center,
                       paddingTop: 5,
                       text:
-                          """You have disabled therapist access to your mood and emotional data.
-Your chats with your therapist will be disabled, and your therapist will no longer see your mood entries or updates.
-You can re-enable access anytime in Settings > HIPAA Compliance to resume therapist support.""",
-                      size: 14,
+                          """You have disabled therapist access to your mood and emotional data. Your chats with your therapist will be disabled, and your therapist will no longer see your mood entries or updates.\n\n You can re-enable access anytime in Settings > My Therapist to resume therapist support.""",
+                      size: 13,
                     ),
                   ],
                 ),

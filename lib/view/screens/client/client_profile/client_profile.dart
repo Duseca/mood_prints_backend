@@ -10,9 +10,8 @@ import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/nopp.dart';
-import 'package:mood_prints/view/screens/privacy_policy/pdf_view.dart';
+import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
 import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
-import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
 import 'package:mood_prints/view/screens/privacy_policy/terms_and_telehealth_consent.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
@@ -159,30 +158,30 @@ class ClientProfile extends StatelessWidget {
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
-            title: 'HIPPA',
+            title: 'Privacy Policy',
             onTap: () {
               Get.to(() => HippaScreen());
             },
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
-            title: 'Terms and Telehealth Consent',
+            title: 'Terms & Telehealth Consent (CTTC)',
             onTap: () {
-              Get.to(() => ClientAndTeleHealthConsentPage());
+              Get.to(() => HippaScreen());
             },
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
-            title: 'NOPP',
+            title: 'Privacy Practices (NOPP)',
             onTap: () {
-              Get.to(() => NOPPPage());
+              Get.to(() => HippaScreen());
             },
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
-            title: 'Privacy Policy',
+            title: 'General Terms of use',
             onTap: () {
-              Get.to(() => PPPage());
+              Get.to(() => HippaScreen());
             },
           ),
           _ProfileTile(
@@ -232,7 +231,7 @@ class ClientProfile extends StatelessWidget {
                 },
               ));
             },
-            mBottom: 0,
+            mBottom: 70,
           ),
         ],
       ),

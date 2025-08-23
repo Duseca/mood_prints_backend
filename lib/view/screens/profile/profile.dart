@@ -13,8 +13,8 @@ import 'package:mood_prints/view/screens/client/client_profile/client_profile.da
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/b_a.dart';
+import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
 import 'package:mood_prints/view/screens/privacy_policy/p_s.dart';
-import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
 import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
@@ -156,31 +156,39 @@ class Profile extends StatelessWidget {
               color: kQuaternaryColor,
               paddingBottom: 16,
             ),
-            // ------ BAA
+            // ------ ------------
             _ProfileTile(
               icon: Assets.imagesPrivacy,
-              title: 'Business Associate Agreement',
+              title: 'Privacy Policy',
               onTap: () {
-                Get.to(() => BAPage());
+                Get.to(() => HippaScreen());
+              },
+            ),
+            _ProfileTile(
+              icon: Assets.imagesPrivacy,
+              title: 'Platform Services Agreement (PSA)',
+              onTap: () {
+                Get.to(() => HippaScreen());
               },
             ),
 
             // ------ PSA
             _ProfileTile(
               icon: Assets.imagesPrivacy,
-              title: 'Platform Services Agreement',
+              title: 'Business Associate Agreement (BAA)',
               onTap: () {
-                Get.to(() => PSPage());
+                Get.to(() => HippaScreen());
               },
             ),
 
             _ProfileTile(
               icon: Assets.imagesPrivacy,
-              title: 'Privacy Policy',
+              title: 'General Terms of Service',
               onTap: () {
-                Get.to(() => PrivacyPolicyPage());
+                Get.to(() => HippaScreen());
               },
             ),
+
             _ProfileTile(
               icon: Assets.imagesHelpCenter,
               title: 'FAQs',

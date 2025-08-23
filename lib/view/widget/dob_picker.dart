@@ -26,8 +26,8 @@ class DobPicker extends StatelessWidget {
         SizedBox(
           height: dobWidgetheight ?? Get.height * 0.30,
           child: CupertinoDatePicker(
-              minimumYear: 1995,
-              maximumYear: 2080,
+              // minimumYear: 1995,
+              maximumYear: 3080,
               mode: mode,
               dateOrder: DatePickerDateOrder.dmy,
               //  showDayOfWeek: false,

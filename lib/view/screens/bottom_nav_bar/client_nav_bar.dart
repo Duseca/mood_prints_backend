@@ -10,7 +10,7 @@ import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
 import 'package:mood_prints/view/screens/client/client_profile/client_profile.dart';
 import 'package:mood_prints/view/screens/client/client_stats/client_stats.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
-import 'package:mood_prints/view/screens/privacy_policy/pdf_view.dart';
+import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
