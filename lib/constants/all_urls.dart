@@ -1,4 +1,5 @@
-String baseUrl = "https://mood-prints.vercel.app/";
+// String baseUrl = "https://mood-prints.vercel.app/";
+String baseUrl = "https://api.moodprints.app/";
 String loginUrl = "${baseUrl}user/login";
 String signUpUrl = "${baseUrl}user/signup";
 String otpVerificationUrl = "${baseUrl}user/verify-otp";
