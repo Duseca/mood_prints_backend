@@ -1,0 +1,2 @@
+F:/mood_prints_backend/android/app/.cxx/RelWithDebInfo/u3c6t3dn/armeabi-v7a/CMakeFiles/edit_cache.dir
+F:/mood_prints_backend/android/app/.cxx/RelWithDebInfo/u3c6t3dn/armeabi-v7a/CMakeFiles/rebuild_cache.dir

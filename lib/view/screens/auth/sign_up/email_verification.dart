@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -279,6 +280,15 @@ class _SuccessDialog extends StatelessWidget {
                       // await UserService.instance.getUserInformation();
                       Get.back();
                       Get.back();
+                      final ctrl = Get.find<AuthClientController>();
+
+                      ctrl.fullNameController.text =
+                          UserService.instance.userModel.value.fullName ?? "";
+                      ctrl.emailController.text =
+                          UserService.instance.userModel.value.email ?? "";
+                      ctrl.phoneNumberController.text =
+                          UserService.instance.userModel.value.phoneNumber ??
+                              "";
                       Get.off(() => ClientCompleteProfile());
                     },
                   ),
