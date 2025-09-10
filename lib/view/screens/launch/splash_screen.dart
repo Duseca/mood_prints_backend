@@ -32,29 +32,35 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkUserStatus() async {
-    String? checkingID = await Get.find<AuthClientController>()
-        .getStringSharedPrefMethod(key: 'id');
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await UserTypeService.instance.initUserType();
-    final userType = await prefs.getString('userType');
+    bool? remeberMe = await prefs.getBool('remember_me');
+    if (remeberMe == true) {
+      String? checkingID = await Get.find<AuthClientController>()
+          .getStringSharedPrefMethod(key: 'id');
 
-    if (checkingID.isNotEmpty) {
-      // await Get.put(AuthController()).getCurrentUserDataMethod();
-      await UserService.instance.getUserInformation();
+      await UserTypeService.instance.initUserType();
+      final userType = await prefs.getString('userType');
 
-      if (userType == 'client') {
-        await Get.find<ClientHomeController>().getAllBoard();
-        await Get.find<ClientHomeController>()
-            .allStats(userID: UserService.instance.userModel.value.id);
-        ();
-        Get.offAll(() => ClientNavBar());
-      } else if (userType == 'therapist') {
-        Get.offAll(() => TherapistNavBar());
+      if (checkingID.isNotEmpty) {
+        // await Get.put(AuthController()).getCurrentUserDataMethod();
+        await UserService.instance.getUserInformation();
+
+        if (userType == 'client') {
+          await Get.find<ClientHomeController>().getAllBoard();
+          await Get.find<ClientHomeController>()
+              .allStats(userID: UserService.instance.userModel.value.id);
+          ();
+          Get.offAll(() => ClientNavBar());
+        } else if (userType == 'therapist') {
+          Get.offAll(() => TherapistNavBar());
+        }
+
+        // Get.offAll(() => ClientNavBar());
+      } else {
+        Get.offAll(() => GetStarted());
       }
-
-      // Get.offAll(() => ClientNavBar());
     } else {
+      Get.find<AuthClientController>().logOutMethod();
       Get.offAll(() => GetStarted());
     }
   }

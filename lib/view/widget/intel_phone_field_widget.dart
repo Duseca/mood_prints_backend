@@ -7,7 +7,6 @@ import 'package:mood_prints/constants/app_colors.dart';
 
 import 'my_text_widget.dart';
 
-
 class IntlPhoneFieldWidget extends StatelessWidget {
   final String? lebel;
   final String? initialValue;
@@ -32,7 +31,7 @@ class IntlPhoneFieldWidget extends StatelessWidget {
       children: [
         MyText(
           text: "Phone Number",
-          size:  12,
+          size: 12,
           paddingBottom: 6,
           weight: FontWeight.bold,
         ),
@@ -67,7 +66,6 @@ class IntlPhoneFieldWidget extends StatelessWidget {
                   fontWeight: FontWeight.w500),
               dropdownIconPosition: IconPosition.trailing,
               dropdownDecoration: BoxDecoration(
-
                   color: kSecondaryColor,
                   borderRadius: BorderRadius.circular(24)),
               decoration: InputDecoration(
@@ -79,13 +77,15 @@ class IntlPhoneFieldWidget extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(width: 1, color: Colors.transparent)),
+                    borderSide:
+                        BorderSide(width: 1, color: Colors.transparent)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(width: 1, color: kSecondaryColor)),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(width: 1, color: Colors.transparent)),
+                    borderSide:
+                        BorderSide(width: 1, color: Colors.transparent)),
               ),
               initialCountryCode: initialCountryCode,
             ),

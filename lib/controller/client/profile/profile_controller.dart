@@ -89,6 +89,7 @@ class ProfileController extends GetxController {
         bio: bioController.text,
       );
 
+      log("message::: ${body.toJson()}");
       final url = updateUserUrl + userId;
 
       final response = await apiService.putWithBody(url, body.toJson(), false,
@@ -309,15 +310,16 @@ class ProfileController extends GetxController {
     log("User Type: ${UserTypeService.instance.userType}");
     try {
       showLoadingDialog();
+
       Map<String, dynamic> body = {
-        'email': (UserTypeService.instance.userType == UserType.client)
+        'email': (UserTypeService.instance.userType == UserType.client.name)
             ? UserService.instance.userModel.value.email
             : UserService.instance.therapistDetailModel.value.email,
         'currentPassword': oldPassword,
         'newPassword': newPassword,
       };
-      final response = await apiService.post(getChangePasswordUrl, body, true,
-          showResult: false, successCode: 200);
+      final response = await apiService.post(getChangePasswordUrl, body, false,
+          showResult: true, successCode: 200);
       hideLoadingDialog();
 
       if (response != null) {

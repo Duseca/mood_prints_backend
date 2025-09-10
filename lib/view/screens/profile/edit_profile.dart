@@ -47,12 +47,18 @@ class _EditProfileState extends State<EditProfile> {
 
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
+      if (ctrl.selectedGenderValue.value.isEmpty) {
+        ctrl.selectedGenderValue.value = "male";
+      }
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
       ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
+      if (ctrl.selectedGenderValue.value.isEmpty) {
+        ctrl.selectedGenderValue.value = "male";
+      }
     }
     log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
 
@@ -201,11 +207,11 @@ class _EditProfileState extends State<EditProfile> {
                 SizedBox(height: 16.0),
 
                 Obx(
-                  () => (ctrl.selectedGenderValue.value == 'male')
+                  () => (ctrl.selectedGenderValue.value == 'Male')
                       ? CustomDropDown(
                           labelText: 'Gender',
                           hint: ctrl.selectedGenderValue.value,
-                          items: ['male', 'female'],
+                          items: ['male', 'female', 'other'],
                           selectedValue: ctrl.selectedGenderValue.value,
                           onChanged: (v) {
                             ctrl.selectedGenderValue.value = v;
@@ -214,7 +220,7 @@ class _EditProfileState extends State<EditProfile> {
                       : CustomDropDown(
                           labelText: 'Gender',
                           hint: ctrl.selectedGenderValue.value,
-                          items: ['female', 'male'],
+                          items: ['female', 'male', 'other'],
                           selectedValue: ctrl.selectedGenderValue.value,
                           onChanged: (v) {
                             ctrl.selectedGenderValue.value = v;

@@ -40,8 +40,8 @@ class UserService {
         log('id is Not null -> ${id}');
 
         final url = getClientByIDUrl + id;
-        final response =
-            await apiService.get(url, true, showResult: true, successCode: 200);
+        final response = await apiService.get(url, false,
+            showResult: true, successCode: 200);
         hideLoadingDialog();
 
         if (response != null) {

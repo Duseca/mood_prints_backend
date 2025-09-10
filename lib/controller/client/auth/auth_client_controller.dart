@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
@@ -15,11 +17,13 @@ import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/main.dart';
 import 'package:mood_prints/model/client_model/user_model.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/auth/forgot_pass/forgot_pass_verification.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/sign_up_second_page.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
@@ -45,7 +49,7 @@ class AuthClientController extends GetxController {
   String? gradianFullPhoneNumber;
   String? emergencyFullPhoneNumber;
   RxString selectedGenderValue = 'Male'.obs;
-  RxList<String> gender = <String>['Male', 'Female', 'Not Preferred'].obs;
+  RxList<String> gender = <String>['Male', 'Female', 'Other'].obs;
   Rx<DateTime?> dob = Rx<DateTime?>(null);
   final TextEditingController BioController = TextEditingController();
   final TextEditingController TherapistAccountNumberController =
@@ -53,7 +57,7 @@ class AuthClientController extends GetxController {
   // Rx<String?> selectedProfileImage = Rx<String?>(null);
   var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
-  RxBool acceptTermsAndCondition = false.obs;
+  RxBool acceptTermsAndCondition = false.obs, isRememberMe = false.obs;
   RxBool ageRestriction = false.obs;
   RxBool usCitizen = false.obs;
   RxBool passwordVisibility = true.obs;
@@ -99,7 +103,8 @@ class AuthClientController extends GetxController {
   final TextEditingController emergencyPhoneNumberController =
       TextEditingController();
   final TextEditingController signatureController = TextEditingController();
-
+  Timer? _timer;
+  RxInt remainingSeconds = 0.obs;
   //  -------------- Google Authentication with Firebase ------------------
 
   Future<void> googleAuth({String? userType}) async {
@@ -131,14 +136,10 @@ class AuthClientController extends GetxController {
         idToken: googleAuth?.idToken,
       );
 
-      // auth =
-      // await FirebaseAuth.instance.signInWithCredential(credential);
       await auth.signInWithCredential(credential);
 
       log('User signed in: ${auth.currentUser?.displayName}, ${auth.currentUser?.email}');
       log('Google Auth Id: ${auth.currentUser?.uid}');
-
-      //  TODO: IsEmailExist
 
       bool isEmailExist =
           await isUserExistWithEmail(email: auth.currentUser!.email.toString());
@@ -149,22 +150,26 @@ class AuthClientController extends GetxController {
 
         log("if: Is email exist: $isEmailExist");
       } else {
-        await socialSignUpMethod(
-            fullName: '${auth.currentUser?.displayName}',
-            email: '${auth.currentUser?.email}',
-            userType: userType!,
-            authId: auth.currentUser!.uid);
+        // await socialSignUpMethod(
+        //     fullName: '${auth.currentUser?.displayName}',
+        //     email: '${auth.currentUser?.email}',
+        //     userType: userType!,
+        //     authId: auth.currentUser!.uid);
 
         await UserTypeService.instance.initUserType();
-        if (UserTypeService.instance.userType == UserType.client.name) {
-          log('Go To Client Nav Bar');
-          Get.to(() => ClientNavBar());
-        } else {
-          log('Go To Therapist Nav Bar');
-          Get.to(() => TherapistNavBar());
-        }
+        // if (UserTypeService.instance.userType == UserType.client.name) {
+        //   log('Go To Client Nav Bar');
+        //   Get.to(() => ClientNavBar());
+        // } else {
+        //   log('Go To Therapist Nav Bar');
+        //   Get.to(() => TherapistNavBar());
+        // }
 
         hideLoadingDialog();
+        Get.to(SignUpSecondPage(
+          type: userType!,
+          isSocialSignin: true,
+        ));
 
         log("else: Is email exist: $isEmailExist");
       }
@@ -212,6 +217,7 @@ class AuthClientController extends GetxController {
           await prefs.setString('token', token);
           await prefs.setString('id', userModel.id.toString());
           await prefs.setString('userType', userModel.userType.toString());
+          await prefs.setBool("remember_me", isRememberMe.value);
           await UserService.instance.getUserInformation();
 
           if (userModel.userType == 'client') {
@@ -369,140 +375,186 @@ class AuthClientController extends GetxController {
 
   //  --- SignUp Method ---
 
-  Future<void> signUpClientMethod({
-    required String fullName,
-    required String email,
-    required String password,
-    required String userType,
-    required String dob,
-    String? npiNumber,
-    required String signature,
+  Future<void> signUpClientMethod(
+      {required String fullName,
+      required String email,
+      String? password,
+      required String userType,
+      required String dob,
+      String? npiNumber,
+      required String signature,
 
-    // Emergency
-    String? emergencyName,
-    String? emergencyEmail,
-    String? emergencyPhone,
+      // Emergency
+      String? emergencyName,
+      String? emergencyEmail,
+      String? emergencyPhone,
 
-    // Gradian
-    String? gradianName,
-    String? gradianEmail,
-    String? gradianPhone,
-    String? gradianDOB,
+      // Gradian
+      String? gradianName,
+      String? gradianEmail,
+      String? gradianPhone,
+      String? gradianDOB,
 
-    // US Citizen
-    bool isUsCitizien = true,
-    bool guardianInfoComplete = false,
-  }) async {
+      // US Citizen
+      bool isUsCitizien = true,
+      bool guardianInfoComplete = false,
+      Widget? widget}) async {
     log("Try Called SignUp");
     log('User Type ----------- $userType');
+    // try {
+    //   showLoadingDialog();
+    currentUserType = userType;
+    final fcmToken = await getFcmToken();
+
+    Map<String, dynamic> body;
+
+    if (userType == UserType.therapist.name) {
+      body = {
+        'email': email,
+        if (password != null) 'password': password,
+        'userType': userType,
+        'fullName': fullName,
+        'dob': dob,
+        'authProvider': 'email',
+        'deviceToken': fcmToken,
+        'npiNumber': npiNumber,
+        'emergencyName': emergencyName ?? '',
+        'emergencyEmail': emergencyEmail ?? '',
+        'emergencyPhone': emergencyPhone ?? '',
+        'confirmUSResidency': isUsCitizien,
+        // Signature
+        'signatureText': signature,
+      };
+
+      log("🔥 signatureText At Therapist Side: ${signature}");
+    } else {
+      body = {
+        'email': email,
+        if (password != null) 'password': password,
+        'userType': userType,
+        'fullName': fullName,
+        'dob': dob,
+        'authProvider': 'email',
+        'deviceToken': fcmToken,
+        'authorizeTherapistAccess': true,
+        'authorizeMoodPrintsAccess': true,
+        // Gradian
+        'guardianName': gradianName ?? '',
+        'guardianEmail': gradianEmail ?? '',
+        'guardianPhone': gradianPhone ?? '',
+        'guardianDOB': gradianDOB ?? '',
+        // Emergency
+        'emergencyName': emergencyName ?? '',
+        'emergencyEmail': emergencyEmail ?? '',
+        'emergencyPhone': emergencyPhone ?? '',
+
+        // US Residency
+        'confirmUSResidency': isUsCitizien,
+        'guardianInfoComplete': guardianInfoComplete,
+        // Signature
+        'signatureText': signature,
+      };
+      log("🔥 signatureText At Client Side: ${signature}");
+    }
+
+    if (password == null) {
+      if (Platform.isAndroid) {
+        body["googleId"] = auth.currentUser?.uid;
+        body["authProvider"] = "google";
+      }
+
+      if (Platform.isIOS) {
+        body["authProvider"] = "apple";
+        body["appleId"] = auth.currentUser?.uid;
+      }
+    }
+
+    final response = await apiService.post(signUpUrl, body, true,
+        showResult: true, successCode: 201);
+    hideLoadingDialog();
+
+    log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+
+    if (response != null) {
+      log("Imside if gberrrrrrrrrrrrrrrrrrrrr");
+      final token = response['token'];
+      final user = response['user'];
+      final id = user['_id'];
+
+      if (token != null && token.isNotEmpty) {
+        log("Imside if stateehkgbeg");
+        newUserTempId = id;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('id', newUserTempId!);
+        await prefs.setString('userType', currentUserType!);
+        final model = UserModel.fromJson(user);
+        UserService.instance.userModel.value = model;
+
+        resetValues();
+        Get.dialog(widget!, barrierDismissible: false);
+      }
+
+      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+
+      log("🔥🔥🔥🔥 signatureText Submitted: ${signature}");
+    }
+    log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+    // } catch (e) {
+    //   hideLoadingDialog();
+    //   log('Error:-> $e');
+    // }
+  }
+
+  sendOtp({required String email}) async {
+    log("Try Called resend otp");
+    log("Email ${email}");
+
     try {
       showLoadingDialog();
-      currentUserType = userType;
-      // final fcmToken = await fcm.getToken();
-      final fcmToken = await getFcmToken();
 
-      // Map<String, dynamic> body = {
-      //   'email': email,
-      //   'password': password,
-      //   'userType': userType,
-      //   'fullName': fullName,
-      //   'authProvider': 'email',
-      //   'deviceToken': fcmToken,
-      //   'authorizeTherapistAccess': true,
-      //   'authorizeMoodPrintsAccess': true,
-      // };
+      Map<String, dynamic> body = {
+        'email': email,
+      };
+      final response = await apiService.post(sendOtpUrlUrl, body, true,
+          showResult: true, successCode: 200);
 
-      Map<String, dynamic> body;
-
-      if (userType == UserType.therapist.name) {
-        body = {
-          'email': email,
-          'password': password,
-          'userType': userType,
-          'fullName': fullName,
-          'dob': dob,
-          'authProvider': 'email',
-          'deviceToken': fcmToken,
-          'npiNumber': npiNumber,
-          'emergencyName': emergencyName ?? '',
-          'emergencyEmail': emergencyEmail ?? '',
-          'emergencyPhone': emergencyPhone ?? '',
-          'confirmUSResidency': isUsCitizien,
-          // Signature
-          'signatureText': signature,
-        };
-
-        log("🔥 signatureText At Therapist Side: ${signature}");
-      } else {
-        body = {
-          'email': email,
-          'password': password,
-          'userType': userType,
-          'fullName': fullName,
-          'dob': dob,
-          'authProvider': 'email',
-          'deviceToken': fcmToken,
-          'authorizeTherapistAccess': true,
-          'authorizeMoodPrintsAccess': true,
-          // Gradian
-          'guardianName': gradianName ?? '',
-          'guardianEmail': gradianEmail ?? '',
-          'guardianPhone': gradianPhone ?? '',
-          'guardianDOB': gradianDOB ?? '',
-          // Emergency
-          'emergencyName': emergencyName ?? '',
-          'emergencyEmail': emergencyEmail ?? '',
-          'emergencyPhone': emergencyPhone ?? '',
-
-          // US Residency
-          'confirmUSResidency': isUsCitizien,
-          'guardianInfoComplete': guardianInfoComplete,
-          // Signature
-          'signatureText': signature,
-        };
-        log("🔥 signatureText At Client Side: ${signature}");
-      }
-
-      final response = await apiService.post(signUpUrl, body, true,
-          showResult: true, successCode: 201);
       hideLoadingDialog();
-
-      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
 
       if (response != null) {
-        final token = response['token'];
-        final user = response['user'];
-        final id = user['_id'];
-
-        if (token != null && token.isNotEmpty) {
-          Get.to(() => EmailVerification(
-                email: '$email',
-                id: id,
-                token: token,
-              ));
-        }
-        log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
-
-        log("🔥🔥🔥🔥 signatureText Submitted: ${signature}");
+        otpMessage.value = 'OTP send successfully.';
+        final message = response['message'];
+        log('Message:-> $message');
+        startTimer();
+      } else {
+        otpMessage.value = 'Failed to send otp';
+        log('Invalid OTP');
       }
-      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
-
-      hideLoadingDialog();
     } catch (e) {
       hideLoadingDialog();
       log('Error:-> $e');
     }
   }
 
+  void startTimer() {
+    _timer?.cancel();
+    remainingSeconds.value = 60;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds.value > 0) {
+        remainingSeconds.value--;
+      } else {
+        remainingSeconds.value = 0;
+        timer.cancel();
+      }
+    });
+  }
   // --- OTP-Verification ---
 
-  Future<void> otpVerificationMethod({
-    required String email,
-    required String otp,
-    required Widget widget,
-    required String token,
-    required String id,
-  }) async {
+  Future<void> otpVerificationMethod(
+      {required String email,
+      required String otp,
+      required Widget widget,
+      required String type}) async {
     log("Try Called Otp verification");
     log("Email ${email}");
     log("Otp ${otp}");
@@ -524,15 +576,60 @@ class AuthClientController extends GetxController {
         final message = response['message'];
         log('Message:-> $message');
         if (message != null && message.isNotEmpty) {
-          newUserTempId = id;
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', token);
-          await prefs.setString('id', newUserTempId!);
-          await prefs.setString('userType', currentUserType!);
+          if (type == UserType.therapist.name) {
+            signUpClientMethod(
+                dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+                npiNumber: npiNumberController.text,
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+                fullName: fullNameController.text.trim(),
+                userType: type,
+                isUsCitizien: true,
+                signature: signatureController.text.trim(),
+                widget: widget);
+          } else if (type == UserType.client.name &&
+              userAgeStatus == UserAgeStatus.age13To17.name) {
+            signUpClientMethod(
+              widget: widget,
+              dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+              // npiNumber: ctrl.npiNumberController.text,
+              email: emailController.text.trim(),
+              password: passwordController.text.trim(),
+              fullName: fullNameController.text.trim(),
+              userType: type,
 
-          Get.dialog(widget);
+              isUsCitizien: true,
+
+              gradianName: guardianNameController.text.trim(),
+              gradianEmail: guardianEmailController.text.trim(),
+              gradianPhone: gradianFullPhoneNumber,
+              gradianDOB:
+                  DateTimeService.instance.getDateIsoFormat(guardianDob.value!),
+
+              emergencyName: emergencyNameController.text.trim(),
+              emergencyEmail: emergencyEmailController.text.trim(),
+              emergencyPhone: emergencyFullPhoneNumber,
+              guardianInfoComplete: true,
+              signature: signatureController.text.trim(),
+            );
+          } else if (type == UserType.client.name &&
+              userAgeStatus == UserAgeStatus.age18Plus.name) {
+            signUpClientMethod(
+                dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+                npiNumber: npiNumberController.text,
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+                fullName: fullNameController.text.trim(),
+                userType: type,
+                emergencyName: emergencyNameController.text.trim(),
+                emergencyEmail: emergencyEmailController.text.trim(),
+                emergencyPhone: emergencyFullPhoneNumber,
+                guardianInfoComplete: true,
+                signature: signatureController.text.trim(),
+                widget: widget);
+          }
         }
-        resetValues();
+        // resetValues();
       } else {
         otpMessage.value = 'Invalid OTP';
         log('Invalid OTP');
@@ -725,6 +822,7 @@ class AuthClientController extends GetxController {
     await prefs.remove('id');
     await prefs.remove('token');
     await prefs.remove('userType');
+    await GoogleSignIn().signOut();
     Get.offAll(() => GetStarted());
     hideLoadingDialog();
   }
@@ -738,10 +836,10 @@ class AuthClientController extends GetxController {
   }
 
   void checkBoxValue() {
-    if (acceptTermsAndCondition == true) {
-      acceptTermsAndCondition.value = false;
+    if (isRememberMe == true) {
+      isRememberMe.value = false;
     } else {
-      acceptTermsAndCondition.value = true;
+      isRememberMe.value = true;
     }
     update();
   }
@@ -821,9 +919,7 @@ class AuthClientController extends GetxController {
 
   // ------ Forget Password ---------
 
-  Future<void> forgetApi({
-    String? email,
-  }) async {
+  Future<void> forgetApi({String? email, required String type}) async {
     try {
       log('Forget Passowrd Api Called');
       showLoadingDialog();
@@ -840,7 +936,9 @@ class AuthClientController extends GetxController {
           displayToast(msg: "$message");
           log('Message ---> $message');
           hideLoadingDialog();
-          Get.to(() => ForgotPassVerification());
+          Get.to(() => ForgotPassVerification(
+                type: type,
+              ));
         }
       }
       hideLoadingDialog();

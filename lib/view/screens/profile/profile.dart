@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
@@ -242,6 +243,7 @@ class Profile extends StatelessWidget {
                   },
                   onLogoutTap: () async {
                     await Get.find<AuthClientController>().logOutMethod();
+                    Get.find<ClientHomeController>().clearAllData();
                   },
                 ));
               },

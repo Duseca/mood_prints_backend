@@ -51,31 +51,35 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                   //(UserService.instance.relationWithTherapist.isNotEmpty)
                   // ?
 
-                  (ctrl.selectedTherapistModel.value != null)
-                      ? MyTherapistCard(
-                          imageUrl: ctrl.selectedTherapistModel.value?.image,
-                          fullname: ctrl.selectedTherapistModel.value?.fullName,
-                          email: ctrl.selectedTherapistModel.value?.email,
-                          phoneNumber:
-                              ctrl.selectedTherapistModel.value?.phoneNumber,
-                          location:
-                              "${ctrl.selectedTherapistModel.value?.city}}",
-                        )
-                      : Column(
-                          children: List.generate(
-                              UserService.instance.relationWithTherapist.length,
-                              (index) {
-                            var data = UserService.instance
-                                .relationWithTherapist[index].therapist;
-                            return MyTherapistCard(
-                              imageUrl: data?.image,
-                              fullname: data?.fullName,
-                              email: data?.email,
-                              phoneNumber: data?.phoneNumber,
-                              location: data?.city,
-                            );
-                          }),
-                        )
+                  Obx(
+                      () => (ctrl.selectedTherapistModel.value != null)
+                          ? MyTherapistCard(
+                              imageUrl:
+                                  ctrl.selectedTherapistModel.value?.image,
+                              fullname:
+                                  ctrl.selectedTherapistModel.value?.fullName,
+                              email: ctrl.selectedTherapistModel.value?.email,
+                              phoneNumber: ctrl
+                                  .selectedTherapistModel.value?.phoneNumber,
+                              location:
+                                  "${ctrl.selectedTherapistModel.value?.city}}",
+                            )
+                          : Column(
+                              children: List.generate(
+                                  UserService.instance.relationWithTherapist
+                                      .length, (index) {
+                                var data = UserService.instance
+                                    .relationWithTherapist[index].therapist;
+                                return MyTherapistCard(
+                                  imageUrl: data?.image,
+                                  fullname: data?.fullName,
+                                  email: data?.email,
+                                  phoneNumber: data?.phoneNumber,
+                                  location: data?.city,
+                                );
+                              }),
+                            ),
+                    )
                   : Obx(
                       () => Column(
                         children: [

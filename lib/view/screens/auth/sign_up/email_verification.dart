@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/app_fonts.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
@@ -16,14 +17,8 @@ import 'package:pinput/pinput.dart';
 // ignore: must_be_immutable
 class EmailVerification extends StatefulWidget {
   String? email;
-  String? id;
-  String? token;
-  EmailVerification({
-    Key? key,
-    this.email,
-    this.id,
-    this.token,
-  }) : super(key: key);
+  String? type;
+  EmailVerification({Key? key, this.email, this.type}) : super(key: key);
 
   @override
   State<EmailVerification> createState() => _EmailVerificationState();
@@ -31,6 +26,14 @@ class EmailVerification extends StatefulWidget {
 
 class _EmailVerificationState extends State<EmailVerification> {
   final ctrl = Get.find<AuthClientController>();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ctrl.sendOtp(email: widget.email ?? "");
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -136,23 +139,64 @@ class _EmailVerificationState extends State<EmailVerification> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    MyText(
-                      text: 'Didn’t receive code? ',
-                      size: 14,
-                      weight: FontWeight.w500,
+                Obx(
+                  () => Visibility(
+                    visible: ctrl.remainingSeconds.value == 0,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      children: [
+                        MyText(
+                          text: 'Didn\'t you receive any code? ',
+                          size: 12,
+                          color: kQuaternaryColor,
+                          weight: FontWeight.w500,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            ctrl.sendOtp(email: widget.email ?? "");
+                          },
+                          child: MyText(
+                            text: 'Resend Code',
+                            size: 12,
+                            color: kTertiaryColor,
+                            weight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
                     ),
-                    MyText(
-                      text: 'Resend code',
-                      size: 14,
-                      weight: FontWeight.w600,
-                      color: kQuaternaryColor,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ],
+                  ),
                 ),
+                Obx(
+                  () => Visibility(
+                    visible: ctrl.remainingSeconds.value != 0,
+                    child: MyText(
+                      text:
+                          'Resend in 00:${ctrl.remainingSeconds.value.toString().padLeft(2, '0')}',
+                      size: 12,
+                      weight: FontWeight.w600,
+                      textAlign: TextAlign.center,
+                      paddingTop: 4,
+                    ),
+                  ),
+                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     MyText(
+                //       text: 'Didn’t receive code? ',
+                //       size: 14,
+                //       weight: FontWeight.w500,
+                //     ),
+                //     MyText(
+                //       text: 'Resend code',
+                //       size: 14,
+                //       weight: FontWeight.w600,
+                //       color: kQuaternaryColor,
+                //       decoration: TextDecoration.underline,
+                //     ),
+                //   ],
+                // ),
                 SizedBox(
                   height: 24,
                 ),
@@ -163,8 +207,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                       ctrl.otpVerificationMethod(
                           email: widget.email.toString(),
                           otp: ctrl.otpCode.toString(),
-                          token: widget.token.toString(),
-                          id: widget.id.toString(),
+                          type: widget.type!,
                           widget: _SuccessDialog());
 
                       // UserService.instance.getUserInformation();
@@ -189,57 +232,72 @@ class _SuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Card(
-          margin: AppSizes.DEFAULT,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Image.asset(
-                  Assets.imagesCongrats,
-                  height: 150,
-                ),
-                MyText(
-                  paddingTop: 24,
-                  text: 'Verification Complete!',
-                  size: 24,
-                  weight: FontWeight.bold,
-                  textAlign: TextAlign.center,
-                  paddingBottom: 8,
-                ),
-                MyText(
-                  text:
-                      'Thanks for your patience. Enjoy the all features of app',
-                  size: 14,
-                  color: kGreyColor,
-                  weight: FontWeight.w500,
-                  lineHeight: 1.5,
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                  textAlign: TextAlign.center,
-                  paddingBottom: 24,
-                ),
-                MyButton(
-                  buttonText: 'Done',
-                  onTap: () async {
-                    // await UserService.instance.getUserInformation();
-                    Get.back();
-                    Get.to(() => ClientCompleteProfile());
-                  },
-                ),
-              ],
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Card(
+            margin: AppSizes.DEFAULT,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Image.asset(
+                    Assets.imagesCongrats,
+                    height: 150,
+                  ),
+                  MyText(
+                    paddingTop: 24,
+                    text: 'Verification Complete!',
+                    size: 24,
+                    weight: FontWeight.bold,
+                    textAlign: TextAlign.center,
+                    paddingBottom: 8,
+                  ),
+                  MyText(
+                    text:
+                        'Thanks for your patience. Enjoy the all features of app',
+                    size: 14,
+                    color: kGreyColor,
+                    weight: FontWeight.w500,
+                    lineHeight: 1.5,
+                    paddingLeft: 10,
+                    paddingRight: 10,
+                    textAlign: TextAlign.center,
+                    paddingBottom: 24,
+                  ),
+                  MyButton(
+                    buttonText: 'Done',
+                    onTap: () async {
+                      // await UserService.instance.getUserInformation();
+                      Get.back();
+                      Get.back();
+                      final ctrl = Get.find<AuthClientController>();
+
+                      ctrl.fullNameController.text =
+                          UserService.instance.userModel.value.fullName ?? "";
+                      ctrl.emailController.text =
+                          UserService.instance.userModel.value.email ?? "";
+                      ctrl.phoneNumberController.text =
+                          UserService.instance.userModel.value.phoneNumber ??
+                              "";
+                      Get.off(() => ClientCompleteProfile());
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -16,7 +16,6 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 
 void main() async {
   await GetStorage.init();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
