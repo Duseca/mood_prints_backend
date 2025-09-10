@@ -67,7 +67,31 @@ class ClientHomeController extends GetxController {
     MonthModel(name: "November", number: 11),
     MonthModel(name: "December", number: 12),
   ];
+  clearAllData() {
+    allBoardsData.clear();
+    allboardDates.clear();
+    emotionPercentageStats?.clear();
+    emotionPercentageStatsMonthly?.clear();
+    sleepStats.clear();
+    sleepStatsMontly.clear();
+    moodBySleepStats.clear();
+    moodBySleepStatsMonthly.clear();
+    weekIndex.value = 1;
+    weekFrontUpdate.value = 0;
+    sleepAnalysisModel.value = null;
+    sleepAnalysisMonthModel.value = null;
+    moodFlowStats?.clear();
+    moodFlowStatsMonthly?.clear();
+    filterBoardData.clear();
+    // For Calender
+    focusedDay = DateTime.now().obs;
+    selectedDay = Rxn<DateTime>(null);
 
+    // For Stats get current month and current year
+    currentMonth = DateTime.now().month;
+    currentYear = DateTime.now().year;
+    selectedMonthModel = Rxn<MonthModel>(null);
+  }
   // ------- Get All Boards ------------
 
   Future<void> getAllBoard() async {
@@ -430,67 +454,62 @@ class ClientHomeController extends GetxController {
     hideLoadingDialog();
   }
 
-
   /*
   ----------------------------
   Export Stats 
   ----------------------------
    */
 
-final GlobalKey graph1Key = GlobalKey();
-final GlobalKey graph2Key = GlobalKey();
-final GlobalKey graph3Key = GlobalKey();
+  final GlobalKey graph1Key = GlobalKey();
+  final GlobalKey graph2Key = GlobalKey();
+  final GlobalKey graph3Key = GlobalKey();
 
-
-RxBool graph1Selected = true.obs;
+  RxBool graph1Selected = true.obs;
   RxBool graph2Selected = false.obs;
   RxBool graph3Selected = false.obs;
 
- Future<Uint8List?> captureGraph(GlobalKey key) async {
-    RenderRepaintBoundary boundary = key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  Future<Uint8List?> captureGraph(GlobalKey key) async {
+    RenderRepaintBoundary boundary =
+        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData?.buffer.asUint8List();
   }
-  
+
   Future<void> exportSelectedGraphsToPDF() async {
-  final pdf = pw.Document();
-  final List<Uint8List> images = [];
+    final pdf = pw.Document();
+    final List<Uint8List> images = [];
 
-  // ✅ Wait until the widgets are fully built and rendered
-  await WidgetsBinding.instance.endOfFrame;
+    // ✅ Wait until the widgets are fully built and rendered
+    await WidgetsBinding.instance.endOfFrame;
 
-  if (graph1Selected.value) {
-    final img = await captureGraph(graph1Key);
-    if (img != null) images.add(img);
-  }
-  if (graph2Selected.value) {
-    final img = await captureGraph(graph2Key);
-    if (img != null) images.add(img);
-  }
-  if (graph3Selected.value) {
-    final img = await captureGraph(graph3Key);
-    if (img != null) images.add(img);
-  }
+    if (graph1Selected.value) {
+      final img = await captureGraph(graph1Key);
+      if (img != null) images.add(img);
+    }
+    if (graph2Selected.value) {
+      final img = await captureGraph(graph2Key);
+      if (img != null) images.add(img);
+    }
+    if (graph3Selected.value) {
+      final img = await captureGraph(graph3Key);
+      if (img != null) images.add(img);
+    }
 
-  for (var img in images) {
-    final pwImage = pw.MemoryImage(img);
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Center(child: pw.Image(pwImage)),
-      ),
+    for (var img in images) {
+      final pwImage = pw.MemoryImage(img);
+      pdf.addPage(
+        pw.Page(
+          build: (context) => pw.Center(child: pw.Image(pwImage)),
+        ),
+      );
+    }
+
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: 'selected_graphs_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
   }
-
-  await Printing.sharePdf(
-    bytes: await pdf.save(),
-    filename: 'selected_graphs_${DateTime.now().millisecondsSinceEpoch}.pdf',
-  );
-}
-
-
-
-
 
   // @override
   // void onInit() {

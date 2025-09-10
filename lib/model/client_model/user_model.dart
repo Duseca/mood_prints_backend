@@ -93,27 +93,30 @@ class UserModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'stripeCustomerId': stripeCustomerId,
-      '_id': id,
-      'deviceToken': deviceToken,
-      'email': email,
-      'userType': userType,
-      'fullName': fullName,
-      'username': username,
-      'bio': bio,
-      'image': image,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'dob': dob,
-      'phoneNumber': phoneNumber,
-      'gender': gender,
-      'authProvider': authProvider ?? 'email',
-      'therapistId': therapistId ?? [],
+      if (stripeCustomerId != null) 'stripeCustomerId': stripeCustomerId,
+      if (id != null) '_id': id,
+      if (deviceToken != null) 'deviceToken': deviceToken,
+      if (email != null) 'email': email,
+      if (userType != null) 'userType': userType,
+      if (fullName != null) 'fullName': fullName,
+      if (username != null) 'username': username,
+      if (bio != null) 'bio': bio,
+      if (image != null) 'image': image,
+      if (createdAt != null) 'createdAt': createdAt?.toIso8601String(),
+      if (updatedAt != null) 'updatedAt': updatedAt?.toIso8601String(),
+      if (dob != null) 'dob': dob,
+      if (phoneNumber != null) 'phoneNumber': phoneNumber,
+      if (gender != null) 'gender': gender,
+      if (authProvider != null) 'authProvider': authProvider ?? 'email',
+      if (therapistId != null) 'therapistId': therapistId ?? [],
 
       // 🔹 New variables
-      'authorizeTherapistAccess': authorizeTherapistAccess,
-      'authorizeMoodPrintsAccess': authorizeMoodPrintsAccess,
-      'authorizationDateTime': authorizationDateTime?.toIso8601String(),
+      if (authorizeMoodPrintsAccess != null)
+        'authorizeTherapistAccess': authorizeTherapistAccess,
+      if (authorizeMoodPrintsAccess != null)
+        'authorizeMoodPrintsAccess': authorizeMoodPrintsAccess,
+      if (authorizationDateTime != null)
+        'authorizationDateTime': authorizationDateTime?.toIso8601String(),
     };
   }
 }

@@ -17,18 +17,17 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
 class ForgotPassVerification extends StatefulWidget {
+  final String type;
 
- 
-
-
+  const ForgotPassVerification({super.key, required this.type});
   @override
   State<ForgotPassVerification> createState() => _ForgotPassVerificationState();
 }
 
 class _ForgotPassVerificationState extends State<ForgotPassVerification> {
-    AuthClientController ctrl = Get.find<AuthClientController>();
+  AuthClientController ctrl = Get.find<AuthClientController>();
 
-      int _seconds = 60;
+  int _seconds = 60;
   Timer? _timer;
 
   void startTimer() {
@@ -48,6 +47,7 @@ class _ForgotPassVerificationState extends State<ForgotPassVerification> {
       }
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -103,7 +103,7 @@ class _ForgotPassVerificationState extends State<ForgotPassVerification> {
                 SizedBox(
                   height: 10,
                 ),
-                  Pinput(
+                Pinput(
                   length: 6,
                   onChanged: (value) {
                     ctrl.otpCode = value;
@@ -139,7 +139,7 @@ class _ForgotPassVerificationState extends State<ForgotPassVerification> {
                   },
                   onCompleted: (pin) => print(pin),
                 ),
-                 Obx(
+                Obx(
                   () => Align(
                     alignment: Alignment.center,
                     child: MyText(
@@ -195,12 +195,12 @@ class _ForgotPassVerificationState extends State<ForgotPassVerification> {
                   size: 15,
                   weight: FontWeight.w600,
                   paddingBottom: 12,
-                  onTap: (){
-
-
+                  onTap: () {
                     _seconds = 60;
                     startTimer();
-                    ctrl.forgetApi(email: ctrl.emailController.text.trim());
+                    ctrl.forgetApi(
+                        email: ctrl.emailController.text.trim(),
+                        type: widget.type);
                   },
                 ),
                 Row(
@@ -227,20 +227,13 @@ class _ForgotPassVerificationState extends State<ForgotPassVerification> {
             padding: AppSizes.DEFAULT,
             child: MyButton(
               onTap: () {
-
-
-                if(ctrl.otpCode != null)
-                {
-                   Get.to(() => CreatePassword());
-
-                }
-                else
-                {
+                if (ctrl.otpCode != null) {
+                  Get.to(() => CreatePassword(
+                        type: widget.type,
+                      ));
+                } else {
                   displayToast(msg: "Need Otp code");
                 }
-
-
-               
               },
               buttonText: 'Continue',
             ),

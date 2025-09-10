@@ -44,7 +44,9 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
       ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
-
+      if (ctrl.selectedGenderValue.value.isEmpty) {
+        ctrl.selectedGenderValue.value = "Male";
+      }
       ctrl.countryController.text = userModel.country ?? '';
       ctrl.stateController.text = userModel.state ?? '';
       ctrl.cityController.text = userModel.city ?? '';
@@ -54,7 +56,9 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
-
+      if (ctrl.selectedGenderValue.value.isEmpty) {
+        ctrl.selectedGenderValue.value = "Male";
+      }
       ctrl.countryController.text = userModel.country ?? '';
       ctrl.stateController.text = userModel.state ?? '';
       ctrl.cityController.text = userModel.city ?? '';

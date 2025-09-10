@@ -12,7 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreatePassword extends StatelessWidget {
+  final String type;
   var ctrl = Get.find<AuthClientController>();
+
+  CreatePassword({super.key, required this.type});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,11 +36,11 @@ class CreatePassword extends StatelessWidget {
                   subTitle: 'Please enter something you will remember',
                 ),
                 Obx(
-                  ()=> MyTextField(
+                  () => MyTextField(
                     controller: ctrl.passwordController,
                     hintText: 'Password',
                     suffix: InkWell(
-                      onTap: (){
+                      onTap: () {
                         ctrl.passwordVisibityMethod();
                       },
                       child: Column(
@@ -51,7 +54,6 @@ class CreatePassword extends StatelessWidget {
                       ),
                     ),
                     isObSecure: ctrl.passwordVisibility.value,
-                  
                   ),
                 ),
                 // MyTextField(
@@ -77,9 +79,13 @@ class CreatePassword extends StatelessWidget {
               children: [
                 MyButton(
                   onTap: () {
-
-                    ctrl.ResetPasswordApi(otpCode: ctrl.otpCode , email: ctrl.emailController.text.trim(), newPassword: ctrl.passwordController.text.trim() , widget: _SuccessDialog());
-
+                    ctrl.ResetPasswordApi(
+                        otpCode: ctrl.otpCode,
+                        email: ctrl.emailController.text.trim(),
+                        newPassword: ctrl.passwordController.text.trim(),
+                        widget: _SuccessDialog(
+                          type: type,
+                        ));
 
                     // Get.dialog(_SuccessDialog());
                   },
@@ -95,7 +101,8 @@ class CreatePassword extends StatelessWidget {
 }
 
 class _SuccessDialog extends StatelessWidget {
-  const _SuccessDialog();
+  final String type;
+  const _SuccessDialog({required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +147,9 @@ class _SuccessDialog extends StatelessWidget {
                   buttonText: 'Continue',
                   onTap: () {
                     Get.back();
-                    Get.offAll(() => Login());
+                    Get.offAll(() => Login(
+                          type: type,
+                        ));
                   },
                 ),
               ],

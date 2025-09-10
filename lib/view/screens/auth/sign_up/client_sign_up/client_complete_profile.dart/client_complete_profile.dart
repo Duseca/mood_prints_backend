@@ -101,25 +101,30 @@ class ClientCompleteProfile extends StatelessWidget {
                       Positioned(
                         bottom: 0,
                         right: 0,
-                        child: Container(
-                          height: 32,
-                          width: 32,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kWhiteColor,
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                                color: kBorderColor.withOpacity(0.16),
+                        child: InkWell(
+                          onTap: () async {
+                            await ctrl.profileImagePicker();
+                          },
+                          child: Container(
+                            height: 32,
+                            width: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: kWhiteColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                  color: kBorderColor.withOpacity(0.16),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                Assets.imagesAddImage,
+                                height: 18,
+                                color: kSecondaryColor,
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Image.asset(
-                              Assets.imagesAddImage,
-                              height: 18,
-                              color: kSecondaryColor,
                             ),
                           ),
                         ),

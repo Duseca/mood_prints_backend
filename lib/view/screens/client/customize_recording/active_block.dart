@@ -7,6 +7,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
+import 'package:mood_prints/core/utils/validators.dart';
 import 'package:mood_prints/model/client_model/mood_models/block_model.dart';
 import 'package:mood_prints/view/screens/client/customize_recording/mode_manager.dart';
 import 'package:mood_prints/view/widget/alert_dialogs/delete_dialog.dart';
@@ -610,6 +611,7 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
   final VoidCallback? onTap;
   TextEditingController? textController = TextEditingController();
   _CreateNewBlockBottomSheet({super.key, this.onTap, this.textController});
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -653,35 +655,45 @@ class _CreateNewBlockBottomSheet extends StatelessWidget {
             height: 10,
           ),
           Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: BouncingScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                MyTextField2(
-                  controller: textController,
-                  hintText: '14 characters max.',
-                  marginBottom: 6,
-                ),
-                MyText(
-                  textAlign: TextAlign.end,
-                  text: '0/14',
-                  color: kGreyColor,
-                ),
-              ],
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: BouncingScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  MyTextField2(
+                      controller: textController,
+                      hintText: '14 characters max.',
+                      validator: (value) {
+                        return ValidationService.instance.emptyValidator(value);
+                      },
+                      marginBottom: 6,
+                      maxLength: 14),
+                  // MyText(
+                  //   textAlign: TextAlign.end,
+                  //   text: '0/14',
+                  //   color: kGreyColor,
+                  // ),
+                ],
+              ),
             ),
           ),
           SizedBox(
             height: 16,
           ),
           MyButton(
-            buttonText: 'Done', onTap: onTap,
-
-            // Get.to(() => NewBlockAdded());
-          ),
+              buttonText: 'Done',
+              onTap: () {
+                if (_formKey.currentState!.validate()) {
+                  onTap!();
+                }
+              }
+              // Get.to(() => NewBlockAdded());
+              ),
         ],
       ),
     );
@@ -780,7 +792,7 @@ class _EditBlockNameBottomSheet extends StatelessWidget {
   final VoidCallback? onTap;
   _EditBlockNameBottomSheet(
       {super.key, this.onTap, this.editBlockNameController});
-
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -823,31 +835,44 @@ class _EditBlockNameBottomSheet extends StatelessWidget {
             height: 10,
           ),
           Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: BouncingScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                MyTextField2(
-                  controller: editBlockNameController,
-                  hintText: '14 characters max.',
-                  marginBottom: 6,
-                ),
-                MyText(
-                  textAlign: TextAlign.end,
-                  text: '0/14',
-                  color: kGreyColor,
-                ),
-              ],
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: BouncingScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  MyTextField2(
+                    controller: editBlockNameController,
+                    hintText: '14 characters max.',
+                    marginBottom: 6,
+                    maxLength: 14,
+                    validator: (value) {
+                      return ValidationService.instance.emptyValidator(value);
+                    },
+                  ),
+                  // MyText(
+                  //   textAlign: TextAlign.end,
+                  //   text: '0/14',
+                  //   color: kGreyColor,
+                  // ),
+                ],
+              ),
             ),
           ),
           SizedBox(
             height: 16,
           ),
-          MyButton(buttonText: 'Done', onTap: onTap),
+          MyButton(
+              buttonText: 'Done',
+              onTap: () {
+                if (_formKey.currentState!.validate()) {
+                  onTap!();
+                }
+              }),
         ],
       ),
     );

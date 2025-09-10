@@ -1,6 +1,7 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_fonts.dart';
+import 'package:mood_prints/core/utils/validators.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -137,9 +138,11 @@ class MyTextField2 extends StatefulWidget {
     this.marginBottom = 16.0,
     this.maxLines = 1,
     this.labelSize,
+    this.validator,
     this.prefix,
     this.suffix,
     this.isReadOnly,
+    this.maxLength,
     this.onTap,
   }) : super(key: key);
 
@@ -148,11 +151,13 @@ class MyTextField2 extends StatefulWidget {
   ValueChanged<String>? onChanged;
   bool? isObSecure, isReadOnly;
   double? marginBottom;
-  int? maxLines;
+  int? maxLines, maxLength;
   double? labelSize;
-  Widget? prefix, suffix;
-  final VoidCallback? onTap;
 
+  Widget? prefix, suffix;
+  String? Function(String?)? validator;
+
+  final VoidCallback? onTap;
   @override
   State<MyTextField2> createState() => _MyTextField2State();
 }
@@ -186,7 +191,9 @@ class _MyTextField2State extends State<MyTextField2> {
               readOnly: widget.isReadOnly ?? false,
               controller: widget.controller,
               onChanged: widget.onChanged,
+              validator: widget.validator,
               textInputAction: TextInputAction.next,
+              maxLength: widget.maxLength,
               obscureText: widget.isObSecure!,
               obscuringCharacter: '*',
               style: TextStyle(
@@ -195,7 +202,7 @@ class _MyTextField2State extends State<MyTextField2> {
                 color: kTertiaryColor,
               ),
               decoration: InputDecoration(
-                counterText: '',
+                counterStyle: TextStyle(color: kTertiaryColor),
                 filled: true,
                 fillColor: kOffWhiteColor,
                 prefixIcon: widget.prefix,
@@ -446,9 +453,12 @@ class _PhoneFieldState extends State<PhoneField> {
                   String fullNumber = '+$countryCode${widget.controller?.text}';
                   widget.onPhoneNumberChanged?.call(fullNumber);
                 },
+                validator: (value) {
+                  return ValidationService.instance.digitValidator(value);
+                },
                 textInputAction: TextInputAction.next,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   color: isFocused ? kQuaternaryColor : kTertiaryColor,
                 ),
                 decoration: InputDecoration(
@@ -521,7 +531,7 @@ class _PhoneFieldState extends State<PhoneField> {
                       ),
                     ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                  // contentPadding: EdgeInsets.symmetric(horizontal: 15),
                   hintText: '000 000 0000',
                   hintStyle: TextStyle(
                     fontSize: 12,

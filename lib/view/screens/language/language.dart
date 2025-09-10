@@ -7,7 +7,6 @@ import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
-
 class Language extends StatelessWidget {
   const Language({super.key});
 
@@ -66,13 +65,13 @@ class Language extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: AppSizes.DEFAULT,
-            child: MyButton(
-              buttonText: 'Save changes',
-              onTap: () {},
-            ),
-          ),
+          // Padding(
+          //   padding: AppSizes.DEFAULT,
+          //   child: MyButton(
+          //     buttonText: 'Save changes',
+          //     onTap: () {},
+          //   ),
+          // ),
         ],
       ),
     );

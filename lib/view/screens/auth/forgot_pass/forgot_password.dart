@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ForgotPassword extends StatelessWidget {
-
+  final String type;
   AuthClientController ctrl = Get.find<AuthClientController>();
+
+  ForgotPassword({super.key, required this.type});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,9 +47,8 @@ class ForgotPassword extends StatelessWidget {
               children: [
                 MyButton(
                   onTap: () {
-
-
-                    ctrl.forgetApi(email: ctrl.emailController.text.trim());
+                    ctrl.forgetApi(
+                        email: ctrl.emailController.text.trim(), type: type);
                     // Get.to(() => ForgotPassVerification());
                   },
                   buttonText: 'Send OTP',

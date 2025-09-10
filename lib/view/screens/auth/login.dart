@@ -16,6 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
+  final String type;
+
+  const Login({super.key, required this.type});
   @override
   State<Login> createState() => _LoginState();
 }
@@ -72,7 +75,7 @@ class _LoginState extends State<Login> {
               children: [
                 Obx(
                   () => CustomCheckBox(
-                    isActive: ctrl.acceptTermsAndCondition.value,
+                    isActive: ctrl.isRememberMe.value,
                     onTap: () {
                       ctrl.checkBoxValue();
                     },
@@ -87,7 +90,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 MyText(
-                  onTap: () => Get.to(() => ForgotPassword()),
+                  onTap: () => Get.to(() => ForgotPassword(type: widget.type)),
                   text: 'Forgot password?',
                   size: 14,
                   weight: FontWeight.w600,
@@ -149,7 +152,11 @@ class _LoginState extends State<Login> {
               children: [
                 Expanded(
                   child: SocialLogin(
-                    onTap: () {},
+                    onTap: () {
+                      ctrl.googleAuth(
+                        userType: widget.type,
+                      );
+                    },
                     icon: Assets.imagesGoogle,
                     title: 'Google',
                   ),

@@ -4,13 +4,14 @@ String loginUrl = "${baseUrl}user/login";
 String signUpUrl = "${baseUrl}user/signup";
 String otpVerificationUrl = "${baseUrl}user/verify-otp";
 String updateUserUrl = "${baseUrl}user/update/";
-String getClientByIDUrl = "${baseUrl}/user?userId=";
+String getClientByIDUrl = "${baseUrl}user?userId=";
 String createBoardUrl = "${baseUrl}board";
 String getAllBoardUrl = "${baseUrl}board";
 String updateBoardUrl = "${baseUrl}board/";
-String getAllTherapistUrl = "${baseUrl}/user/getAllUsers?userType=therapist";
+String getAllTherapistUrl = "${baseUrl}user/getAllUsers?userType=therapist";
 String getChangePasswordUrl = "${baseUrl}user/change-password";
 String checkEmailUrl = "${baseUrl}user/email";
+String sendOtpUrlUrl = "${baseUrl}user/resend-otp";
 
 // ------------ Delete Account Urls ----------------
 String deleteAccountUrl = "${baseUrl}user/";
@@ -18,6 +19,7 @@ String deleteAccountUrl = "${baseUrl}user/";
 // ------------ Forget Password Urls ----------------
 String forgetPasswordUrl = "${baseUrl}user/forget-password";
 String resetPasswordUrl = "${baseUrl}user/reset-password";
+String faqsUrl = "${baseUrl}faq";
 
 // ------------ Stats Urls ----------------
 

@@ -4,6 +4,8 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
@@ -188,7 +190,7 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesHelpCenter,
             title: 'FAQs',
             onTap: () {
-              Get.to(() => HelpCenter());
+              Get.to(() => HelpCenter(), binding: FAQsBinding());
             },
             mBottom: 24,
           ),
@@ -226,6 +228,7 @@ class ClientProfile extends StatelessWidget {
                 },
                 onLogoutTap: () async {
                   await Get.find<AuthClientController>().logOutMethod();
+                  Get.find<ClientHomeController>().clearAllData();
                   UserService.instance.relationWithClients.clear();
                   UserService.instance.relationWithTherapist.clear();
                 },
