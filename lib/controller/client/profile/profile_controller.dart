@@ -43,8 +43,14 @@ class ProfileController extends GetxController {
   RxBool visiblityOld = false.obs;
   RxBool visiblityNew = false.obs;
   RxBool visiblityConfrim = false.obs;
+  RxBool moodPrintAccess = false.obs;
+  // Rxn<bool> moodPrintAccess = Rxn<bool>(null);
+  // Rxn<bool> therapistAccess = Rxn<bool>(null);
+  RxBool therapistAccess = false.obs;
   RxString countryCode = '1'.obs;
   RxString initialCountryCodeValue = ''.obs;
+
+  TextEditingController signatureController = TextEditingController();
 
   // Image Picker
 
@@ -105,6 +111,50 @@ class ProfileController extends GetxController {
           Get.back();
         }
         displayToast(msg: 'User Profile Updated');
+      }
+      hideLoadingDialog();
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error occurs during updating user profile:-> $e');
+    }
+  }
+
+  // ✅ ✅ --------- Update Access varibles -------- ✅ ✅
+
+  //-------------- Update user profile information --------------
+
+  Future<void> updateUserAccess() async {
+    try {
+      showLoadingDialog();
+
+      UserModel body = UserModel(
+          authorizeTherapistAccess: therapistAccess.value,
+          authorizeMoodPrintsAccess: moodPrintAccess.value,
+          updatedAt: DateTime.now());
+
+      log("✅ Therapist - Access value: ${therapistAccess.value}");
+      log("✅ Mood - Access value: ${moodPrintAccess.value}");
+
+      final url =
+          updateUserUrl + UserService.instance.userModel.value.id.toString();
+
+      final response = await apiService.putWithBody(url, body.toJson(), false,
+          showResult: true, successCode: 200);
+
+      hideLoadingDialog();
+
+      if (response != null) {
+        final message = response['message'];
+        final user = response['user'];
+
+        if (message != null && message.isNotEmpty) {
+          if (UserTypeService.instance.userType == UserType.client.name) {
+            final model = UserModel.fromJson(user);
+            UserService.instance.userModel.value = model;
+          }
+          Get.back();
+        }
+        displayToast(msg: 'User Access Updated');
       }
       hideLoadingDialog();
     } catch (e) {
@@ -298,11 +348,12 @@ class ProfileController extends GetxController {
   // ---------- Creating a notification request ---------------
 
   Future<void> requestNotification(
-      {String? therapistID, String? clientID}) async {
+      {String? therapistID, String? clientID, String? signature}) async {
     if (therapistID != null) {
-      log('Request Therapist Called');
-      log("Therapist ID: $therapistID");
-      log("Client ID: ${UserService.instance.userModel.value.id}");
+      log('✅Request Therapist Called');
+      log("✅Therapist ID: $therapistID");
+      log("✅Client ID: ${UserService.instance.userModel.value.id}");
+      log("✅signatureText: ${signature}");
 
       showLoadingDialog();
 
@@ -310,9 +361,12 @@ class ProfileController extends GetxController {
         'therapistId': therapistID,
         'clientId': clientID ?? UserService.instance.userModel.value.id,
         'action': ActionType.create.name,
+        'signatureText': signature.toString()
       };
+      // log("✅--Request Body: ${body.toString()}");
 
-      final response = await apiService.post(requestNotificationUrl, body, true,
+      final response = await apiService.post(
+          requestNotificationUrl, body, false,
           showResult: true, successCode: 201);
 
       if (response != null) {
@@ -345,6 +399,7 @@ class ProfileController extends GetxController {
           Get.back();
           log('Request Send: $message');
           displayToast(msg: 'Request send to therapist!');
+          signatureController.clear();
         }
       }
 
@@ -373,6 +428,7 @@ class ProfileController extends GetxController {
       'title': title,
       'fullName': fullName,
       'body': "${fullName} ${notificationMsg}",
+
       // 'body': '$fullName has requested to select you as their therapist.',
     };
 
@@ -435,10 +491,9 @@ class ProfileController extends GetxController {
     log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
   }
 
-
-
-
-
-
-  
+  bool isTenDaysCompleted(DateTime updatedDateTime) {
+    final DateTime now = DateTime.now();
+    final Duration difference = now.difference(updatedDateTime);
+    return difference.inDays >= 10;
+  }
 }

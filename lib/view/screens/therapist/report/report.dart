@@ -1311,7 +1311,7 @@ class _MoodFlowChart extends StatelessWidget {
         xValueMapper: (MoodFlowModel data, _) {
           // Format the date as "day/month"
           if (data.date != null) {
-            return DateFormat('d/M').format(DateTime.parse(data.date!));
+            return DateFormat('M/d').format(DateTime.parse(data.date!));
           }
           return '';
         },

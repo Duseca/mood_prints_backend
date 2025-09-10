@@ -68,10 +68,10 @@ String? validatePassword(String? value) {
   return null;
 }
 
-displayToast({required String msg}) {
+displayToast({required String msg, Toast toastLength = Toast.LENGTH_SHORT}) {
   Fluttertoast.showToast(
     msg: msg,
-    toastLength: Toast.LENGTH_SHORT,
+    toastLength: toastLength,
     gravity: ToastGravity.TOP,
     timeInSecForIosWeb: 1,
     backgroundColor: kSecondaryColor,

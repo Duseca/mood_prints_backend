@@ -398,14 +398,14 @@ class PhoneField extends StatefulWidget {
     this.onChanged,
     this.marginBottom = 16.0,
     this.onPhoneNumberChanged,
+    this.title,
   }) : super(key: key);
 
   TextEditingController? controller;
   ValueChanged<String>? onChanged;
   ValueChanged<String>? onPhoneNumberChanged; // Callback for full number
   double? marginBottom;
-
-
+  String? title;
 
   @override
   State<PhoneField> createState() => _PhoneFieldState();
@@ -413,7 +413,7 @@ class PhoneField extends StatefulWidget {
 
 class _PhoneFieldState extends State<PhoneField> {
   String countryFlag = '🇺🇸';
-  String countryCode =   '1'; // Default numeric country code
+  String countryCode = '1'; // Default numeric country code
   bool isFocused = false;
 
   @override
@@ -424,7 +424,7 @@ class _PhoneFieldState extends State<PhoneField> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           MyText(
-            text: 'Phone Number',
+            text: widget.title ?? 'Phone Number',
             size: 12,
             paddingBottom: 6,
             weight: FontWeight.bold,
@@ -553,7 +553,6 @@ class _PhoneFieldState extends State<PhoneField> {
   }
 }
 
-
 class UpdatedPhoneField extends StatefulWidget {
   UpdatedPhoneField({
     Key? key,
@@ -562,7 +561,7 @@ class UpdatedPhoneField extends StatefulWidget {
     this.marginBottom = 16.0,
     this.onPhoneNumberChanged,
     this.initialCountryCode = '1', // New parameter for initial country code
-    this.initialFlag = '🇺🇸',      // New parameter for initial flag
+    this.initialFlag = '🇺🇸', // New parameter for initial flag
   }) : super(key: key);
 
   final TextEditingController? controller;
@@ -570,7 +569,7 @@ class UpdatedPhoneField extends StatefulWidget {
   final ValueChanged<String>? onPhoneNumberChanged; // Callback for full number
   final double? marginBottom;
   final String initialCountryCode; // Add initial country code
-  final String initialFlag;        // Add initial flag
+  final String initialFlag; // Add initial flag
 
   @override
   State<UpdatedPhoneField> createState() => _UpdatedPhoneFieldState();
@@ -655,7 +654,7 @@ class _UpdatedPhoneFieldState extends State<UpdatedPhoneField> {
                             ),
                             inputDecoration: InputDecoration(
                               contentPadding:
-                              EdgeInsets.symmetric(horizontal: 15),
+                                  EdgeInsets.symmetric(horizontal: 15),
                               fillColor: kWhiteColor,
                               filled: true,
                               hintText: 'Search',
@@ -721,4 +720,3 @@ class _UpdatedPhoneFieldState extends State<UpdatedPhoneField> {
     );
   }
 }
-

@@ -34,10 +34,6 @@ class _ClientStatsState extends State<ClientStats> {
   var ctrl = Get.find<ClientHomeController>();
   // GlobalKey _globalKey = GlobalKey();
 
-
-
-
-
   // final List<DateWiseStressStats> stats = modeStatsModel.dateWiseStressStats ?? [];
   @override
   Widget build(BuildContext context) {
@@ -110,7 +106,7 @@ class _ClientStatsState extends State<ClientStats> {
                 if (index == 1) {
                   ctrl.allmonthlyStats(
                       userID: UserService.instance.userModel.value.id);
-        
+
                   setState(() {});
                 }
               },
@@ -253,7 +249,6 @@ class _WeeklyState extends State<_Weekly> {
   Widget build(BuildContext context) {
     var ctrl = Get.find<ClientHomeController>();
 
-
     return ListView(
       shrinkWrap: true,
       padding: EdgeInsets.fromLTRB(20, 16, 20, 120),
@@ -316,7 +311,7 @@ class _WeeklyState extends State<_Weekly> {
 // ----------- Mode Flow Card ------------
 
         RepaintBoundary(
-         key: ctrl.graph1Key,
+          key: ctrl.graph1Key,
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: AppStyling.CUSTOM_CARD,
@@ -347,14 +342,14 @@ class _WeeklyState extends State<_Weekly> {
                     SizedBox(
                       width: 5,
                     ),
-          
+
                     // ------- Model Flow Chat ------
-          
+
                     Expanded(
                         child: _MoodFlowChart(
-                                            stats: ctrl.moodFlowStats,
-                                          )
-          
+                      stats: ctrl.moodFlowStats,
+                    )
+
                         // Obx(
                         //   () => (ctrl.moodFlowStats != null &&
                         //           ctrl.moodFlowStats!.isNotEmpty)
@@ -405,7 +400,6 @@ class _WeeklyState extends State<_Weekly> {
 
         RepaintBoundary(
           key: ctrl.graph2Key,
-
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: AppStyling.CUSTOM_CARD,
@@ -430,7 +424,7 @@ class _WeeklyState extends State<_Weekly> {
                     (index) {
                       // Extract stress level for the current item
                       String stressLevel = stressItems[index].level.toString();
-          
+
                       // Safely get the percentage for the current stress level
                       String? percentage = ctrl.emotionPercentageStats
                           ?.firstWhere(
@@ -439,9 +433,9 @@ class _WeeklyState extends State<_Weekly> {
                                 stressLevel: null, percentage: null),
                           )
                           .percentage;
-          
+
                       // log('Stress Level: $stressLevel, Percentage: $percentage');
-          
+
                       return Column(
                         children: [
                           // Display iconA if percentage exists, otherwise iconB
@@ -452,7 +446,7 @@ class _WeeklyState extends State<_Weekly> {
                             height: 44,
                           ),
                           const SizedBox(height: 8),
-          
+
                           // Progress bar using Container with text
                           Stack(
                             alignment: Alignment.center,
@@ -468,12 +462,13 @@ class _WeeklyState extends State<_Weekly> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                               ),
-          
+
                               MyText(
                                 text: percentage ?? '0%',
                                 size: 12,
-                                color:
-                                    percentage != null ? kWhiteColor : kGreyColor,
+                                color: percentage != null
+                                    ? kWhiteColor
+                                    : kGreyColor,
                               ),
                             ],
                           ),
@@ -620,8 +615,7 @@ class _WeeklyState extends State<_Weekly> {
           height: 12,
         ),
         RepaintBoundary(
-          key:ctrl.graph3Key,
-
+          key: ctrl.graph3Key,
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: AppStyling.CUSTOM_CARD,
@@ -656,7 +650,7 @@ class _WeeklyState extends State<_Weekly> {
                               size: 12,
                               color: kGreyColor,
                             ),
-          
+
                             // ------ Average Bed Time -------
                             MyText(
                               paddingTop: 4,
@@ -713,7 +707,7 @@ class _WeeklyState extends State<_Weekly> {
                   height: 16,
                 ),
                 // --------- Sleep Duration Graph ------------
-          
+
                 SleepAnalysis(
                     // sleepStats: ctrl.sleepStats,
                     ),
@@ -1162,7 +1156,7 @@ class _MoodFlowChart extends StatelessWidget {
         xValueMapper: (MoodFlowModel data, _) {
           // Format the date as "day/month"
           if (data.date != null) {
-            return DateFormat('d/M').format(DateTime.parse(data.date!));
+            return DateFormat('M/d').format(DateTime.parse(data.date!));
           }
           return '';
         },
@@ -2124,10 +2118,6 @@ class SleepAnalysisMonthlyWidget extends StatelessWidget {
   }
 }
 
-
-
-
-
 // Export Poup
 
 void showExportPopup(controller) {
@@ -2136,20 +2126,20 @@ void showExportPopup(controller) {
     content: Column(
       children: [
         Obx(() => CheckboxListTile(
-          title: Text('Graph 1'),
-          value: controller.graph1Selected.value,
-          onChanged: (val) => controller.graph1Selected.value = val!,
-        )),
+              title: Text('Graph 1'),
+              value: controller.graph1Selected.value,
+              onChanged: (val) => controller.graph1Selected.value = val!,
+            )),
         Obx(() => CheckboxListTile(
-          title: Text('Graph 2'),
-          value: controller.graph2Selected.value,
-          onChanged: (val) => controller.graph2Selected.value = val!,
-        )),
+              title: Text('Graph 2'),
+              value: controller.graph2Selected.value,
+              onChanged: (val) => controller.graph2Selected.value = val!,
+            )),
         Obx(() => CheckboxListTile(
-          title: Text('Graph 3'),
-          value: controller.graph3Selected.value,
-          onChanged: (val) => controller.graph3Selected.value = val!,
-        )),
+              title: Text('Graph 3'),
+              value: controller.graph3Selected.value,
+              onChanged: (val) => controller.graph3Selected.value = val!,
+            )),
         SizedBox(height: 10),
         ElevatedButton(
           onPressed: () async {

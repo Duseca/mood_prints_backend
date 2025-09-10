@@ -4,9 +4,15 @@ import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
+import 'package:mood_prints/core/enums/user_age_status.dart';
+import 'package:mood_prints/core/enums/user_type.dart';
+import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/view/screens/auth/login.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/sign_up_second_page.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
+import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
+import 'package:mood_prints/view/widget/dob_picker.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
@@ -22,6 +28,8 @@ class ClientSignUp extends StatelessWidget {
 
   final ctrl = Get.find<AuthClientController>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
+
+  DateTime? dob, parentDob;
 
   @override
   Widget build(BuildContext context) {
@@ -76,55 +84,254 @@ class ClientSignUp extends StatelessWidget {
                 marginBottom: 12.0,
               ),
             ),
-            Row(
-              children: [
-                Obx(
-                  () => CustomCheckBox(
-                    isActive: ctrl.acceptTermsAndCondition.value,
-                    onTap: () {
-                      ctrl.checkBoxValue();
-                    },
-                  ),
-                ),
-                MyText(
-                  paddingLeft: 8,
-                  text: 'I accept the ',
-                  size: 13,
-                  weight: FontWeight.w500,
-                ),
-                MyText(
-                  text: 'Terms & Conditions',
-                  size: 13,
-                  weight: FontWeight.w600,
-                  color: kQuaternaryColor,
-                  decoration: TextDecoration.underline,
-                ),
-              ],
-            ),
+
+            // Row(
+            //   children: [
+            //     Obx(
+            //       () => CustomCheckBox(
+            //         isActive: ctrl.acceptTermsAndCondition.value,
+            //         onTap: () {
+            //           ctrl.checkBoxValue();
+            //         },
+            //       ),
+            //     ),
+            //     MyText(
+            //       paddingLeft: 8,
+            //       text: 'I accept the ',
+            //       size: 13,
+            //       weight: FontWeight.w500,
+            //     ),
+            //     MyText(
+            //       text: 'Terms & Conditions',
+            //       size: 13,
+            //       weight: FontWeight.w600,
+            //       color: kQuaternaryColor,
+            //       decoration: TextDecoration.underline,
+            //     ),
+            //   ],
+            // ),
+
+            // SizedBox(height: 10),
+            // Row(
+            //   children: [
+            //     Obx(
+            //       () => CustomCheckBox(
+            //         isActive: ctrl.ageRestriction.value,
+            //         onTap: () {
+            //           ctrl.checkBoxValueAgeRestriction();
+            //         },
+            //       ),
+            //     ),
+            //     MyText(
+            //       paddingLeft: 8,
+            //       text: 'I am at least 13 years old.',
+            //       size: 13,
+            //       weight: FontWeight.w500,
+            //     ),
+            //   ],
+            // ),
+            // SizedBox(height: 10),
+            // Row(
+            //   children: [
+            //     Obx(
+            //       () => CustomCheckBox(
+            //         isActive: ctrl.usCitizen.value,
+            //         onTap: () {
+            //           ctrl.checkBoxValueUSCitizen();
+            //         },
+            //       ),
+            //     ),
+            //     MyText(
+            //       paddingLeft: 8,
+            //       text: 'I am a U.S. citizen.',
+            //       size: 13,
+            //       weight: FontWeight.w500,
+            //     ),
+            //   ],
+            // ),
             SizedBox(
               height: 16,
             ),
+
             MyButton(
+              buttonText: "Next",
               onTap: () {
                 if (formKey2.currentState!.validate()) {
-                  if (ctrl.acceptTermsAndCondition == true) {
-                    ctrl.signUpClientMethod(
-                        email: ctrl.emailController.text.trim(),
-                        password: ctrl.passwordController.text.trim(),
-                        fullName: ctrl.fullNameController.text.trim(),
-                        userType: type);
-                  } else {
-                    displayToast(
-                        msg:
-                            "Please accept the terms and conditions to proceed.");
-                  }
-                }
-
-                // Get.to(() => ClientCompleteProfile());
-                // Get.to(() => EmailVerification());
+                  Get.to(() => SignUpSecondPage(type: type));
+                } else {}
               },
-              buttonText: 'Continue',
             ),
+
+            // (type == UserType.therapist.name)
+            //     ? MyButton(
+            //         buttonText: "Continue",
+            //         onTap: () {
+            //           if (ctrl.therapist1.value == false ||
+            //               ctrl.therapist2.value == false ||
+            //               ctrl.therapist3.value == false ||
+            //               ctrl.therapist4.value == false ||
+            //               ctrl.therapist5.value == false) {
+            //             displayToast(msg: "Please set the checkboxs to true.");
+            //           } else {
+            //             if (formKey2.currentState!.validate()) {
+            //               if (ctrl.signatureController.text.isEmpty) {
+            //                 displayToast(
+            //                     msg: "Please add the your signature/typedName");
+
+            //                 return;
+            //               }
+            //               ctrl.signUpClientMethod(
+            //                 dob: DateTimeService.instance
+            //                     .getDateIsoFormat(ctrl.dob.value!),
+            //                 npiNumber: ctrl.npiNumberController.text,
+            //                 email: ctrl.emailController.text.trim(),
+            //                 password: ctrl.passwordController.text.trim(),
+            //                 fullName: ctrl.fullNameController.text.trim(),
+            //                 userType: type,
+            //                 isUsCitizien: true,
+            //                 signature: ctrl.signatureController.text.trim(),
+            //               );
+            //             }
+            //           }
+            //         },
+            //       )
+            //     :
+
+            //     //-------------------------------------------
+            //     //---------- Client Side Button -------------
+            //     //-------------------------------------------
+            //     Obx(
+            //         () => MyButton(
+            //           bgColor: (type == UserType.client.name &&
+            //                   ctrl.userAgeStatus ==
+            //                       UserAgeStatus.ageLessThan13.name)
+            //               ? kGreyColor.withValues(alpha: 0.5)
+            //               : kSecondaryColor,
+            //           onTap: () {
+            //             if (type == UserType.client.name &&
+            //                 ctrl.userAgeStatus ==
+            //                     UserAgeStatus.ageLessThan13.name) {
+            //               displayToast(
+            //                   msg:
+            //                       "Users under 13 years old cannot create an account.");
+            //               log("Users under 13 years old cannot create an account.");
+            //             } else if (type == UserType.client.name &&
+            //                 ctrl.userAgeStatus ==
+            //                     UserAgeStatus.age13To17.name) {
+            //               if (ctrl.gradian1.value == false ||
+            //                   ctrl.gradian2.value == false ||
+            //                   ctrl.gradian3.value == false ||
+            //                   ctrl.gradian4.value == false ||
+            //                   ctrl.gradian5.value == false ||
+            //                   ctrl.gradian6.value == false ||
+            //                   ctrl.gradian7.value == false) {
+            //                 displayToast(
+            //                     msg: "Please set the checkbox to true.");
+            //               } else {
+            //                 if (formKey2.currentState!.validate()) {
+            //                   ctrl.signUpClientMethod(
+            //                     dob: DateTimeService.instance
+            //                         .getDateIsoFormat(ctrl.dob.value!),
+            //                     // npiNumber: ctrl.npiNumberController.text,
+            //                     email: ctrl.emailController.text.trim(),
+            //                     password: ctrl.passwordController.text.trim(),
+            //                     fullName: ctrl.fullNameController.text.trim(),
+            //                     userType: type,
+
+            //                     isUsCitizien: true,
+
+            //                     gradianName:
+            //                         ctrl.guardianNameController.text.trim(),
+            //                     gradianEmail:
+            //                         ctrl.guardianEmailController.text.trim(),
+            //                     gradianPhone: ctrl.gradianFullPhoneNumber,
+            //                     gradianDOB: DateTimeService.instance
+            //                         .getDateIsoFormat(ctrl.guardianDob.value!),
+
+            //                     // gradianDOB: (ctrl.guardianDob.value != null)
+            //                     //     ? DateTimeService.instance.getDateIsoFormat(
+            //                     //         ctrl.guardianDob.value!)
+            //                     //     : DateTimeService.instance
+            //                     //         .getDateIsoFormat(DateTime.now()),
+
+            //                     emergencyName:
+            //                         ctrl.emergencyNameController.text.trim(),
+            //                     emergencyEmail:
+            //                         ctrl.emergencyEmailController.text.trim(),
+            //                     emergencyPhone: ctrl.emergencyFullPhoneNumber,
+            //                     guardianInfoComplete: true,
+            //                     signature: ctrl.signatureController.text.trim(),
+            //                   );
+
+            //                   log("DOB ---- --- : ${DateTimeService.instance.getDateIsoFormat(ctrl.guardianDob.value!)}");
+            //                 }
+            //               }
+            //             } else if (type == UserType.client.name &&
+            //                 ctrl.userAgeStatus ==
+            //                     UserAgeStatus.age18Plus.name) {
+            //               if (ctrl.adult1.value == false ||
+            //                   ctrl.adult2.value == false ||
+            //                   ctrl.adult3.value == false ||
+            //                   ctrl.adult4.value == false ||
+            //                   ctrl.adult5.value == false ||
+            //                   ctrl.adult6.value == false) {
+            //                 displayToast(
+            //                     msg: "Please set the checkbox to true.");
+            //               } else {
+            //                 if (formKey2.currentState!.validate()) {
+            //                   if (ctrl.signatureController.text.isEmpty) {
+            //                     displayToast(
+            //                         msg:
+            //                             "Please add the your signature/typedName");
+
+            //                     return;
+            //                   }
+            //                   ctrl.signUpClientMethod(
+            //                     dob: DateTimeService.instance
+            //                         .getDateIsoFormat(ctrl.dob.value!),
+            //                     npiNumber: ctrl.npiNumberController.text,
+            //                     email: ctrl.emailController.text.trim(),
+            //                     password: ctrl.passwordController.text.trim(),
+            //                     fullName: ctrl.fullNameController.text.trim(),
+            //                     userType: type,
+            //                     emergencyName:
+            //                         ctrl.emergencyNameController.text.trim(),
+            //                     emergencyEmail:
+            //                         ctrl.emergencyEmailController.text.trim(),
+            //                     emergencyPhone: ctrl.emergencyFullPhoneNumber,
+            //                     guardianInfoComplete: true,
+            //                     signature: ctrl.signatureController.text.trim(),
+            //                   );
+            //                 }
+            //               }
+            //             } else {
+            //               // if (formKey2.currentState!.validate()) {
+            //               //   if (ctrl.acceptTermsAndCondition == true) {
+            //               //     ctrl.signUpClientMethod(
+            //               //         npiNumber: ctrl.npiNumberController.text,
+            //               //         email: ctrl.emailController.text.trim(),
+            //               //         password: ctrl.passwordController.text.trim(),
+            //               //         fullName: ctrl.fullNameController.text.trim(),
+            //               //         userType: type);
+            //               //   } else {
+            //               //     displayToast(
+            //               //         msg:
+            //               //             "Please accept the terms and conditions to proceed.");
+            //               //     // if (ctrl.acceptTermsAndCondition.value == false) {
+
+            //               //     // } else if (ctrl.ageRestriction.value == false) {
+            //               //     //   displayToast(msg: "i am 13.");
+            //               //     // }
+            //               //   }
+            //               // }
+            //             }
+
+            //             // Get.to(() => ClientCompleteProfile());
+            //             // Get.to(() => EmailVerification());
+            //           },
+            //           buttonText: 'Continue',
+            //         ),
+            //       ),
             Padding(
               padding: EdgeInsets.fromLTRB(0, 21.82, 0, 20.77),
               child: Row(
