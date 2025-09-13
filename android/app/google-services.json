@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "830689119309-aoerqvnnjmm48kdtha57kbgthpkj8hv7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.test.moodPrints",
+            "certificate_hash": "2a1126a6c56c3d9f9f056de078cf7e96ce935ab8"
+          }
+        },
+        {
           "client_id": "830689119309-lh3c1m2tog9p18mbq9s9aujkcslgrj9c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

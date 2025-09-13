@@ -68,12 +68,12 @@ String? validatePassword(String? value) {
   return null;
 }
 
-displayToast({required String msg, Toast toastLength = Toast.LENGTH_SHORT}) {
+displayToast({required String msg, Toast toastLength = Toast.LENGTH_LONG}) {
   Fluttertoast.showToast(
     msg: msg,
     toastLength: toastLength,
     gravity: ToastGravity.TOP,
-    timeInSecForIosWeb: 1,
+    timeInSecForIosWeb: 3,
     backgroundColor: kSecondaryColor,
     textColor: kPrimaryColor,
     fontSize: 14.0,

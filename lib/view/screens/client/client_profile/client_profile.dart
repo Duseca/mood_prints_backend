@@ -205,9 +205,9 @@ class ClientProfile extends StatelessWidget {
                   Get.back();
                 },
                 onLogoutTap: () async {
-                  await Get.find<AuthClientController>().logOutMethod();
                   await Get.find<AuthClientController>().deleteAccountMethod(
                       UserService.instance.userModel.value.id.toString());
+                  await Get.find<AuthClientController>().logOutMethod();
 
                   UserService.instance.relationWithClients.clear();
                   UserService.instance.relationWithTherapist.clear();

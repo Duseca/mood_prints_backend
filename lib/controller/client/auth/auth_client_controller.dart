@@ -401,109 +401,113 @@ class AuthClientController extends GetxController {
       Widget? widget}) async {
     log("Try Called SignUp");
     log('User Type ----------- $userType');
-    // try {
-    //   showLoadingDialog();
-    currentUserType = userType;
-    final fcmToken = await getFcmToken();
+    try {
+      showLoadingDialog();
+      currentUserType = userType;
+      final fcmToken = await getFcmToken();
 
-    Map<String, dynamic> body;
+      Map<String, dynamic> body;
 
-    if (userType == UserType.therapist.name) {
-      body = {
-        'email': email,
-        if (password != null) 'password': password,
-        'userType': userType,
-        'fullName': fullName,
-        'dob': dob,
-        'authProvider': 'email',
-        'deviceToken': fcmToken,
-        'npiNumber': npiNumber,
-        'emergencyName': emergencyName ?? '',
-        'emergencyEmail': emergencyEmail ?? '',
-        'emergencyPhone': emergencyPhone ?? '',
-        'confirmUSResidency': isUsCitizien,
-        // Signature
-        'signatureText': signature,
-      };
+      if (userType == UserType.therapist.name) {
+        body = {
+          'email': email,
+          if (password != null) 'password': password,
+          'userType': userType,
+          'fullName': fullName,
+          'dob': dob,
+          'authProvider': 'email',
+          'deviceToken': fcmToken,
+          'npiNumber': npiNumber,
+          'emergencyName': emergencyName ?? '',
+          'emergencyEmail': emergencyEmail ?? '',
+          'emergencyPhone': emergencyPhone ?? '',
+          'confirmUSResidency': isUsCitizien,
+          // Signature
+          'signatureText': signature,
+        };
 
-      log("🔥 signatureText At Therapist Side: ${signature}");
-    } else {
-      body = {
-        'email': email,
-        if (password != null) 'password': password,
-        'userType': userType,
-        'fullName': fullName,
-        'dob': dob,
-        'authProvider': 'email',
-        'deviceToken': fcmToken,
-        'authorizeTherapistAccess': true,
-        'authorizeMoodPrintsAccess': true,
-        // Gradian
-        'guardianName': gradianName ?? '',
-        'guardianEmail': gradianEmail ?? '',
-        'guardianPhone': gradianPhone ?? '',
-        'guardianDOB': gradianDOB ?? '',
-        // Emergency
-        'emergencyName': emergencyName ?? '',
-        'emergencyEmail': emergencyEmail ?? '',
-        'emergencyPhone': emergencyPhone ?? '',
+        log("🔥 signatureText At Therapist Side: ${signature}");
+      } else {
+        body = {
+          'email': email,
+          if (password != null) 'password': password,
+          'userType': userType,
+          'fullName': fullName,
+          'dob': dob,
+          'authProvider': 'email',
+          'deviceToken': fcmToken,
+          'authorizeTherapistAccess': true,
+          'authorizeMoodPrintsAccess': true,
+          // Gradian
+          'guardianName': gradianName ?? '',
+          'guardianEmail': gradianEmail ?? '',
+          'guardianPhone': gradianPhone ?? '',
+          'guardianDOB': gradianDOB ?? '',
+          // Emergency
+          'emergencyName': emergencyName ?? '',
+          'emergencyEmail': emergencyEmail ?? '',
+          'emergencyPhone': emergencyPhone ?? '',
 
-        // US Residency
-        'confirmUSResidency': isUsCitizien,
-        'guardianInfoComplete': guardianInfoComplete,
-        // Signature
-        'signatureText': signature,
-      };
-      log("🔥 signatureText At Client Side: ${signature}");
-    }
-
-    if (password == null) {
-      if (Platform.isAndroid) {
-        body["googleId"] = auth.currentUser?.uid;
-        body["authProvider"] = "google";
+          // US Residency
+          'confirmUSResidency': isUsCitizien,
+          'guardianInfoComplete': guardianInfoComplete,
+          // Signature
+          'signatureText': signature,
+        };
+        log("🔥 signatureText At Client Side: ${signature}");
       }
 
-      if (Platform.isIOS) {
-        body["authProvider"] = "apple";
-        body["appleId"] = auth.currentUser?.uid;
+      if (password == null) {
+        if (Platform.isAndroid) {
+          body["googleId"] = auth.currentUser?.uid;
+          body["authProvider"] = "google";
+        }
+
+        if (Platform.isIOS) {
+          body["authProvider"] = "apple";
+          body["appleId"] = auth.currentUser?.uid;
+        }
       }
-    }
 
-    final response = await apiService.post(signUpUrl, body, true,
-        showResult: true, successCode: 201);
-    hideLoadingDialog();
-
-    log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
-
-    if (response != null) {
-      log("Imside if gberrrrrrrrrrrrrrrrrrrrr");
-      final token = response['token'];
-      final user = response['user'];
-      final id = user['_id'];
-
-      if (token != null && token.isNotEmpty) {
-        log("Imside if stateehkgbeg");
-        newUserTempId = id;
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-        await prefs.setString('id', newUserTempId!);
-        await prefs.setString('userType', currentUserType!);
-        final model = UserModel.fromJson(user);
-        UserService.instance.userModel.value = model;
-
-        resetValues();
-        Get.dialog(widget!, barrierDismissible: false);
-      }
+      final response = await apiService.post(signUpUrl, body, true,
+          showResult: true, successCode: 201);
 
       log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
 
-      log("🔥🔥🔥🔥 signatureText Submitted: ${signature}");
+      if (response != null) {
+        log("Imside if gberrrrrrrrrrrrrrrrrrrrr");
+        final token = response['token'];
+        final user = response['user'];
+        final id = user['_id'];
+
+        if (token != null && token.isNotEmpty) {
+          log("Imside if stateehkgbeg");
+          newUserTempId = id;
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('id', newUserTempId!);
+          await prefs.setString('userType', currentUserType!);
+          final model = UserModel.fromJson(user);
+          UserService.instance.userModel.value = model;
+          hideLoadingDialog();
+          resetValues();
+          Get.dialog(widget!, barrierDismissible: false);
+          return;
+        }
+
+        log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+
+        log("🔥🔥🔥🔥 signatureText Submitted: ${signature}");
+        hideLoadingDialog();
+        return;
+      }
+      log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
+      hideLoadingDialog();
+      return;
+    } catch (e) {
+      hideLoadingDialog();
+      log('Error:-> $e');
     }
-    log("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥");
-    // } catch (e) {
-    //   hideLoadingDialog();
-    //   log('Error:-> $e');
-    // }
   }
 
   sendOtp({required String email}) async {
@@ -522,7 +526,7 @@ class AuthClientController extends GetxController {
       hideLoadingDialog();
 
       if (response != null) {
-        otpMessage.value = 'OTP send successfully.';
+        otpMessage.value = 'OTP sent successfully.';
         final message = response['message'];
         log('Message:-> $message');
         startTimer();
@@ -576,58 +580,59 @@ class AuthClientController extends GetxController {
         final message = response['message'];
         log('Message:-> $message');
         if (message != null && message.isNotEmpty) {
-          if (type == UserType.therapist.name) {
-            signUpClientMethod(
-                dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-                npiNumber: npiNumberController.text,
-                email: emailController.text.trim(),
-                password: passwordController.text.trim(),
-                fullName: fullNameController.text.trim(),
-                userType: type,
-                isUsCitizien: true,
-                signature: signatureController.text.trim(),
-                widget: widget);
-          } else if (type == UserType.client.name &&
-              userAgeStatus == UserAgeStatus.age13To17.name) {
-            signUpClientMethod(
-              widget: widget,
-              dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-              // npiNumber: ctrl.npiNumberController.text,
-              email: emailController.text.trim(),
-              password: passwordController.text.trim(),
-              fullName: fullNameController.text.trim(),
-              userType: type,
+          Get.off(SignUpSecondPage(type: type));
+          // if (type == UserType.therapist.name) {
+          //   signUpClientMethod(
+          //       dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+          //       npiNumber: npiNumberController.text,
+          //       email: emailController.text.trim(),
+          //       password: passwordController.text.trim(),
+          //       fullName: fullNameController.text.trim(),
+          //       userType: type,
+          //       isUsCitizien: true,
+          //       signature: signatureController.text.trim(),
+          //       widget: widget);
+          // } else if (type == UserType.client.name &&
+          //     userAgeStatus == UserAgeStatus.age13To17.name) {
+          //   signUpClientMethod(
+          //     widget: widget,
+          //     dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+          //     // npiNumber: ctrl.npiNumberController.text,
+          //     email: emailController.text.trim(),
+          //     password: passwordController.text.trim(),
+          //     fullName: fullNameController.text.trim(),
+          //     userType: type,
 
-              isUsCitizien: true,
+          //     isUsCitizien: true,
 
-              gradianName: guardianNameController.text.trim(),
-              gradianEmail: guardianEmailController.text.trim(),
-              gradianPhone: gradianFullPhoneNumber,
-              gradianDOB:
-                  DateTimeService.instance.getDateIsoFormat(guardianDob.value!),
+          //     gradianName: guardianNameController.text.trim(),
+          //     gradianEmail: guardianEmailController.text.trim(),
+          //     gradianPhone: gradianFullPhoneNumber,
+          //     gradianDOB:
+          //         DateTimeService.instance.getDateIsoFormat(guardianDob.value!),
 
-              emergencyName: emergencyNameController.text.trim(),
-              emergencyEmail: emergencyEmailController.text.trim(),
-              emergencyPhone: emergencyFullPhoneNumber,
-              guardianInfoComplete: true,
-              signature: signatureController.text.trim(),
-            );
-          } else if (type == UserType.client.name &&
-              userAgeStatus == UserAgeStatus.age18Plus.name) {
-            signUpClientMethod(
-                dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-                npiNumber: npiNumberController.text,
-                email: emailController.text.trim(),
-                password: passwordController.text.trim(),
-                fullName: fullNameController.text.trim(),
-                userType: type,
-                emergencyName: emergencyNameController.text.trim(),
-                emergencyEmail: emergencyEmailController.text.trim(),
-                emergencyPhone: emergencyFullPhoneNumber,
-                guardianInfoComplete: true,
-                signature: signatureController.text.trim(),
-                widget: widget);
-          }
+          //     emergencyName: emergencyNameController.text.trim(),
+          //     emergencyEmail: emergencyEmailController.text.trim(),
+          //     emergencyPhone: emergencyFullPhoneNumber,
+          //     guardianInfoComplete: true,
+          //     signature: signatureController.text.trim(),
+          //   );
+          // } else if (type == UserType.client.name &&
+          //     userAgeStatus == UserAgeStatus.age18Plus.name) {
+          //   signUpClientMethod(
+          //       dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+          //       npiNumber: npiNumberController.text,
+          //       email: emailController.text.trim(),
+          //       password: passwordController.text.trim(),
+          //       fullName: fullNameController.text.trim(),
+          //       userType: type,
+          //       emergencyName: emergencyNameController.text.trim(),
+          //       emergencyEmail: emergencyEmailController.text.trim(),
+          //       emergencyPhone: emergencyFullPhoneNumber,
+          //       guardianInfoComplete: true,
+          //       signature: signatureController.text.trim(),
+          //       widget: widget);
+          // }
         }
         // resetValues();
       } else {
@@ -1009,7 +1014,7 @@ class AuthClientController extends GetxController {
       showLoadingDialog();
 
       final url = deleteAccountUrl + id;
-      final response = await apiService.delete(url, true,
+      final response = await apiService.delete(url, false,
           showResult: true, successCode: 200);
 
       if (response != null) {
@@ -1070,7 +1075,7 @@ class AuthClientController extends GetxController {
     try {
       final DateTime now = DateTime.now();
       log("📅 User DOB: $userDob");
-
+      log("message::: ${userAgeStatus.value}");
       int age = now.year - userDob.year;
       if (now.month < userDob.month ||
           (now.month == userDob.month && now.day < userDob.day)) {

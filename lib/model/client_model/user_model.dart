@@ -21,74 +21,89 @@ class UserModel {
   final bool? authorizeMoodPrintsAccess;
   final DateTime? authorizationDateTime;
 
-  UserModel({
-    this.stripeCustomerId,
-    this.id,
-    this.deviceToken,
-    this.email,
-    this.userType,
-    this.fullName,
-    this.username,
-    this.bio,
-    this.image,
-    this.createdAt,
-    this.updatedAt,
-    this.dob,
-    this.phoneNumber,
-    this.gender,
-    this.authProvider,
-    this.therapistId,
+  final String? emergencyEmail;
+  final String? emergencyName;
+  final String? emergencyPhone;
+  final String? signatureText;
 
-    // 🔹 New variables
-    this.authorizeTherapistAccess,
-    this.authorizeMoodPrintsAccess,
-    this.authorizationDateTime,
-  });
+  UserModel(
+      {this.stripeCustomerId,
+      this.id,
+      this.deviceToken,
+      this.email,
+      this.userType,
+      this.fullName,
+      this.username,
+      this.bio,
+      this.image,
+      this.createdAt,
+      this.updatedAt,
+      this.dob,
+      this.phoneNumber,
+      this.gender,
+      this.authProvider,
+      this.therapistId,
+
+      // 🔹 New variables
+      this.authorizeTherapistAccess,
+      this.authorizeMoodPrintsAccess,
+      this.authorizationDateTime,
+      this.emergencyEmail,
+      this.emergencyName,
+      this.emergencyPhone,
+      this.signatureText});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      stripeCustomerId: json.containsKey('stripeCustomerId')
-          ? json['stripeCustomerId'] as String? ?? ''
-          : '',
-      id: json.containsKey('_id') ? json['_id'] as String? ?? '' : '',
-      deviceToken: json.containsKey('deviceToken')
-          ? json['deviceToken'] as String? ?? ''
-          : '',
-      email: json.containsKey('email') ? json['email'] as String? ?? '' : '',
-      authProvider: json.containsKey('authProvider')
-          ? json['authProvider'] as String? ?? 'email'
-          : 'email',
-      userType:
-          json.containsKey('userType') ? json['userType'] as String? ?? '' : '',
-      fullName:
-          json.containsKey('fullName') ? json['fullName'] as String? ?? '' : '',
-      username:
-          json.containsKey('username') ? json['username'] as String? ?? '' : '',
-      bio: json.containsKey('bio') ? json['bio'] as String? ?? '' : '',
-      image: json.containsKey('image') ? json['image'] as String? ?? '' : '',
-      createdAt: json.containsKey('createdAt') && json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt']) ?? DateTime(1970, 1, 1)
-          : DateTime(1970, 1, 1),
-      updatedAt: json.containsKey('updatedAt') && json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt']) ?? DateTime(1970, 1, 1)
-          : DateTime(1970, 1, 1),
-      dob: json.containsKey('dob') ? json['dob'] as String? ?? '' : '',
-      phoneNumber: json.containsKey('phoneNumber')
-          ? json['phoneNumber'] as String? ?? ''
-          : '',
-      gender: json.containsKey('gender') ? json['gender'] as String? ?? '' : '',
-      therapistId:
-          json.containsKey('therapistId') && json['therapistId'] is List
-              ? List<String>.from(json['therapistId'] as List)
-              : [],
+        stripeCustomerId: json.containsKey('stripeCustomerId')
+            ? json['stripeCustomerId'] as String? ?? ''
+            : '',
+        id: json.containsKey('_id') ? json['_id'] as String? ?? '' : '',
+        deviceToken: json.containsKey('deviceToken')
+            ? json['deviceToken'] as String? ?? ''
+            : '',
+        email: json.containsKey('email') ? json['email'] as String? ?? '' : '',
+        authProvider: json.containsKey('authProvider')
+            ? json['authProvider'] as String? ?? 'email'
+            : 'email',
+        userType: json.containsKey('userType')
+            ? json['userType'] as String? ?? ''
+            : '',
+        fullName: json.containsKey('fullName')
+            ? json['fullName'] as String? ?? ''
+            : '',
+        username: json.containsKey('username')
+            ? json['username'] as String? ?? ''
+            : '',
+        bio: json.containsKey('bio') ? json['bio'] as String? ?? '' : '',
+        image: json.containsKey('image') ? json['image'] as String? ?? '' : '',
+        createdAt: json.containsKey('createdAt') && json['createdAt'] != null
+            ? DateTime.tryParse(json['createdAt']) ?? DateTime(1970, 1, 1)
+            : DateTime(1970, 1, 1),
+        updatedAt: json.containsKey('updatedAt') && json['updatedAt'] != null
+            ? DateTime.tryParse(json['updatedAt']) ?? DateTime(1970, 1, 1)
+            : DateTime(1970, 1, 1),
+        dob: json.containsKey('dob') ? json['dob'] as String? ?? '' : '',
+        phoneNumber: json.containsKey('phoneNumber')
+            ? json['phoneNumber'] as String? ?? ''
+            : '',
+        gender:
+            json.containsKey('gender') ? json['gender'] as String? ?? '' : '',
+        therapistId:
+            json.containsKey('therapistId') && json['therapistId'] is List
+                ? List<String>.from(json['therapistId'] as List)
+                : [],
 
-      // 🔹 New variables
-      authorizeTherapistAccess: json['authorizeTherapistAccess'] as bool?,
-      authorizeMoodPrintsAccess: json['authorizeMoodPrintsAccess'] as bool?,
-      authorizationDateTime: json['authorizationDateTime'] != null
-          ? DateTime.tryParse(json['authorizationDateTime'])
-          : null,
-    );
+        // 🔹 New variables
+        authorizeTherapistAccess: json['authorizeTherapistAccess'] as bool?,
+        authorizeMoodPrintsAccess: json['authorizeMoodPrintsAccess'] as bool?,
+        authorizationDateTime: json['authorizationDateTime'] != null
+            ? DateTime.tryParse(json['authorizationDateTime'])
+            : null,
+        emergencyEmail: json["emergencyEmail"] as String?,
+        emergencyName: json["emergencyName"] as String?,
+        emergencyPhone: json["emergencyPhone"] as String?,
+        signatureText: json["signatureText"] as String?);
   }
 
   Map<String, dynamic> toJson() {
@@ -117,6 +132,10 @@ class UserModel {
         'authorizeMoodPrintsAccess': authorizeMoodPrintsAccess,
       if (authorizationDateTime != null)
         'authorizationDateTime': authorizationDateTime?.toIso8601String(),
+      if (emergencyEmail != null) 'emargencyEmail': emergencyEmail,
+      if (emergencyPhone != null) "emergencyPhone": emergencyPhone,
+      if (emergencyName != null) 'emergencyName': emergencyName,
+      if (signatureText != null) 'signatureText': signatureText
     };
   }
 }

@@ -27,7 +27,11 @@ class ProfileController extends GetxController {
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
   TextEditingController cityController = TextEditingController();
+  TextEditingController emergencyNameController = TextEditingController(),
+      emergencyEmailController = TextEditingController(),
+      emergencyPhoneNumberController = TextEditingController();
   RxString selectedGenderValue = 'Male'.obs;
+  String emergencyFullPhoneNumber = '';
   // RxList<String> genderList = <String>['Male', 'Female'].obs;
   var selectedProfileImage = Rxn<String>();
   String? downloadImageUrl;
@@ -48,7 +52,8 @@ class ProfileController extends GetxController {
   // Rxn<bool> therapistAccess = Rxn<bool>(null);
   RxBool therapistAccess = false.obs;
   RxString countryCode = '1'.obs;
-  RxString initialCountryCodeValue = ''.obs;
+  RxString initialCountryCodeValue = ''.obs,
+      initialEmergencyCountryCode = ''.obs;
 
   TextEditingController signatureController = TextEditingController();
 
@@ -79,15 +84,19 @@ class ProfileController extends GetxController {
       }
 
       UserModel body = UserModel(
-        image:
-            (downloadImageUrl != null) ? downloadImageUrl : oldProfileImageUrl,
-        fullName: fullNameController.text.trim(),
-        // email: emailController.text.trim(),
-        phoneNumber: completePhoneNumber,
-        dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-        gender: selectedGenderValue.value.toLowerCase(),
-        bio: bioController.text,
-      );
+          image: (downloadImageUrl != null)
+              ? downloadImageUrl
+              : oldProfileImageUrl,
+          fullName: fullNameController.text.trim(),
+          // email: emailController.text.trim(),
+          phoneNumber: completePhoneNumber,
+          dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+          gender: selectedGenderValue.value.toLowerCase(),
+          bio: bioController.text,
+          emergencyEmail: emergencyEmailController.text.trim(),
+          emergencyName: emergencyNameController.text.trim(),
+          signatureText: signatureController.text.trim(),
+          emergencyPhone: emergencyFullPhoneNumber);
 
       log("message::: ${body.toJson()}");
       final url = updateUserUrl + userId;
@@ -180,21 +189,26 @@ class ProfileController extends GetxController {
       }
 
       TherapistDetailModel body = TherapistDetailModel(
-        image:
-            (downloadImageUrl != null) ? downloadImageUrl : oldProfileImageUrl,
-        fullName: fullNameController.text.trim(),
-        // email: emailController.text.trim(),
-        phoneNumber: completePhoneNumber,
-        dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-        gender: selectedGenderValue.value.toLowerCase(),
-        bio: bioController.text,
-        country: countryController.text,
-        state: stateController.text,
-        city: cityController.text,
-      );
+          image: (downloadImageUrl != null)
+              ? downloadImageUrl
+              : oldProfileImageUrl,
+          fullName: fullNameController.text.trim(),
+          // email: emailController.text.trim(),
+          phoneNumber: completePhoneNumber,
+          dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
+          gender: selectedGenderValue.value.toLowerCase(),
+          bio: bioController.text,
+          country: countryController.text,
+          state: stateController.text,
+          city: cityController.text,
+          emergencyEmail: emergencyEmailController.text.trim(),
+          emergencyName: emergencyNameController.text.trim(),
+          emergencyPhone: emergencyFullPhoneNumber,
+          signatureText: signatureController.text.trim());
 
       final url = updateUserUrl + userId;
 
+      log("Body is ${body.toJson()}");
       final response = await apiService.putWithBody(url, body.toJson(), false,
           showResult: true, successCode: 200);
 
@@ -229,7 +243,7 @@ class ProfileController extends GetxController {
       final url = getAllTherapistUrl;
 
       final response =
-          await apiService.get(url, true, showResult: false, successCode: 200);
+          await apiService.get(url, false, showResult: false, successCode: 200);
 
       isLoading.value = false;
 
@@ -459,7 +473,7 @@ class ProfileController extends GetxController {
     String? message,
   }) async {
     log('Create Notification Called');
-
+    showLoadingDialog();
     final body = {
       // 'requestId': requestId,
       // 'userId': reciverID ?? UserService.instance.userModel.value.id,
@@ -475,7 +489,7 @@ class ProfileController extends GetxController {
 
     final response = await apiService.post(createNotificationUrl, body, true,
         showResult: true, successCode: 201);
-
+    hideLoadingDialog();
     if (response != null) {
       final notification = response['notification'];
       if (notification != null && notification.isNotEmpty) {
@@ -488,9 +502,28 @@ class ProfileController extends GetxController {
   Future<void> extractCountryCode(String phoneNumber) async {
     PhoneNumber number =
         await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
-    countryCode.value = number.dialCode ?? '';
+
     initialCountryCodeValue.value = number.isoCode ?? '';
-    log('Country Code: ${countryCode.value},${initialCountryCodeValue.value}');
+
+    log('Detected Country ISO: ${number.isoCode}');
+    log('Dial Code: +${number.dialCode}');
+
+    // Remove dial code from phone number and set controller text
+    phoneNumberController.text =
+        phoneNumber.replaceFirst("+${number.dialCode}", "");
+
+    log("Cleaned Phone Number: ${phoneNumberController.text}");
+  }
+
+  Future<void> extractEmergencyPhoneCountryCode(String phoneNumber) async {
+    PhoneNumber number =
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
+
+    initialEmergencyCountryCode.value = number.isoCode ?? '';
+
+    // Assign the updated number back to the controller
+    emergencyPhoneNumberController.text =
+        phoneNumber.replaceFirst("+${number.dialCode}", '');
   }
 
   bool isTenDaysCompleted(DateTime updatedDateTime) {

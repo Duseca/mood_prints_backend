@@ -15,9 +15,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 
 class HippaScreen extends StatefulWidget {
-  final bool showConsent;
-
-  const HippaScreen({super.key, this.showConsent = true});
+  const HippaScreen({
+    super.key,
+  });
   @override
   _HippaScreenState createState() => _HippaScreenState();
 }
@@ -81,137 +81,144 @@ class _HippaScreenState extends State<HippaScreen> {
             SizedBox(
               height: 5,
             ),
-            widget.showConsent
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Obx(
-                        () => CheckBoxWidget(
-                          isChecked: profileController.moodPrintAccess.value,
-                          //  profileController.moodPrintAccess.value :
-                          //  UserService.instance.userModel.value.authorizeMoodPrintsAccess!,
-                          onChanged: (bool) {
-                            profileController.moodPrintAccess.value =
-                                !profileController.moodPrintAccess.value;
-                          },
-                          // text: 'Authorize MoodPrints Access\n(Required for App Use)',
-                          text: 'I consent to this agreement.',
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MyButton(
-                          buttonText: 'Done',
-                          onTap: () {
-                            if (profileController.moodPrintAccess.value ==
-                                true) {
-                              Get.dialog(SuccessDialog(
-                                title: "MoodPrints Access Disabled",
-                                description:
-                                    "Disabling MoodPrints access will turn off mood tracking, chat, and emotional insights. Your account will be scheduled for deletion in 10 days unless access is restored.",
-                                onTap: () {
-                                  profileController.updateUserAccess();
-                                  Get.back();
-                                },
-                              ));
-                            } else if (profileController
-                                    .moodPrintAccess.value ==
-                                true) {
-                              Get.dialog(SuccessDialog(
-                                title: "MoodPrints Access Revoked",
-                                description:
-                                    "You've successfully enabled MoodPrints access.\n App functionality is now unlocked:\n• Mood tracking.\n• Emotional insights.\n•",
-                                onTap: () {
-                                  profileController.updateUserAccess();
-                                  Get.back();
-                                },
-                              ));
-                            }
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Obx(
+                  () => CheckBoxWidget(
+                    isChecked: profileController.moodPrintAccess.value,
+                    //  profileController.moodPrintAccess.value :
+                    //  UserService.instance.userModel.value.authorizeMoodPrintsAccess!,
+                    onChanged: (bool) {
+                      profileController.moodPrintAccess.value =
+                          !profileController.moodPrintAccess.value;
+                    },
+                    // text: 'Authorize MoodPrints Access\n(Required for App Use)',
+                    text: 'I consent to this agreement.',
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MyButton(
+                    buttonText: 'Done',
+                    onTap: () {
+                      if (profileController.moodPrintAccess.value ==
+                          UserService.instance.userModel.value
+                              .authorizeMoodPrintsAccess) {
+                        Get.back();
+                      } else {
+                        if (!profileController.moodPrintAccess.value) {
+                          // ❌ Access disabled
+                          Get.dialog(SuccessDialog(
+                            title: "MoodPrints Access Disabled",
+                            description:
+                                "Disabling MoodPrints access will turn off mood tracking, chat, and emotional insights. "
+                                "Your account will be scheduled for deletion in 10 days unless access is restored.",
+                            onTap: () async {
+                              await profileController.updateUserAccess();
+                              Get.back(); // navigate back to profile
+                            },
+                          ));
+                        } else {
+                          // ✅ Access enabled
+                          Get.dialog(SuccessDialog(
+                            title: "MoodPrints Access Enabled",
+                            description:
+                                "You've successfully enabled MoodPrints access.\n\nApp functionality is now unlocked:\n"
+                                "• Mood tracking\n"
+                                "• Emotional insights\n"
+                                "• Chat features",
+                            onTap: () async {
+                              await profileController.updateUserAccess();
+                              Get.back(); // navigate back to profile
+                            },
+                          ));
+                        }
+                      }
 
-                            // else if (profileController.therapistAccess.value == false &&
-                            //     profileController.moodPrintAccess.value == false) {
-                            //   Get.dialog(SuccessDialog(
-                            //     title:
-                            //         "You've disabled both MoodPrints and Therapist access.",
-                            //     description:
-                            //         "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.\n\n To continue using the app, please re-enable at least MoodPrints access.",
-                            //     isContentFromStart: true,
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // } else {
-                            //   Get.dialog(SuccessDialog(
-                            //     isContentFromStart: true,
-                            //     title: "All Access Enabled",
-                            //     description:
-                            //         "You've successfully enabled both MoodPrints and Therapist access.\nFull app functionality is now unlocked:\n• Mood tracking.\n• Emotional insights.\n• Therapist communication.\n• Personalized mental health support",
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // }
+                      // else if (profileController.therapistAccess.value == false &&
+                      //     profileController.moodPrintAccess.value == false) {
+                      //   Get.dialog(SuccessDialog(
+                      //     title:
+                      //         "You've disabled both MoodPrints and Therapist access.",
+                      //     description:
+                      //         "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.\n\n To continue using the app, please re-enable at least MoodPrints access.",
+                      //     isContentFromStart: true,
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // } else {
+                      //   Get.dialog(SuccessDialog(
+                      //     isContentFromStart: true,
+                      //     title: "All Access Enabled",
+                      //     description:
+                      //         "You've successfully enabled both MoodPrints and Therapist access.\nFull app functionality is now unlocked:\n• Mood tracking.\n• Emotional insights.\n• Therapist communication.\n• Personalized mental health support",
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // }
 
-                            // ##############################################
+                      // ##############################################
 
-                            // if (profileController.moodPrintAccess.value == false &&
-                            //     profileController.therapistAccess.value == true) {
-                            //   Get.dialog(SuccessDialog(
-                            //     title: "MoodPrints Access Disabled",
-                            //     description:
-                            //         "Disabling MoodPrints access will turn off mood tracking, chat, and emotional insights. Your account will be scheduled for deletion in 10 days unless access is restored.",
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // } else if (profileController.therapistAccess.value == false &&
-                            //     profileController.moodPrintAccess.value == true) {
-                            //   Get.dialog(SuccessDialog(
-                            //     title: "Therapist Access Revoked",
-                            //     description:
-                            //         "Your therapist will no longer be able to view your mood history or receive emotional data from your account.",
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // } else if (profileController.therapistAccess.value == false &&
-                            //     profileController.moodPrintAccess.value == false) {
-                            //   Get.dialog(SuccessDialog(
-                            //     title:
-                            //         "You've disabled both MoodPrints and Therapist access.",
-                            //     description:
-                            //         "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.\n\n To continue using the app, please re-enable at least MoodPrints access.",
-                            //     isContentFromStart: true,
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // } else {
-                            //   Get.dialog(SuccessDialog(
-                            //     isContentFromStart: true,
-                            //     title: "All Access Enabled",
-                            //     description:
-                            //         "You've successfully enabled both MoodPrints and Therapist access.\nFull app functionality is now unlocked:\n• Mood tracking.\n• Emotional insights.\n• Therapist communication.\n• Personalized mental health support",
-                            //     onTap: () {
-                            //       profileController.updateUserAccess();
-                            //       Get.back();
-                            //     },
-                            //   ));
-                            // }
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : SizedBox()
+                      // if (profileController.moodPrintAccess.value == false &&
+                      //     profileController.therapistAccess.value == true) {
+                      //   Get.dialog(SuccessDialog(
+                      //     title: "MoodPrints Access Disabled",
+                      //     description:
+                      //         "Disabling MoodPrints access will turn off mood tracking, chat, and emotional insights. Your account will be scheduled for deletion in 10 days unless access is restored.",
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // } else if (profileController.therapistAccess.value == false &&
+                      //     profileController.moodPrintAccess.value == true) {
+                      //   Get.dialog(SuccessDialog(
+                      //     title: "Therapist Access Revoked",
+                      //     description:
+                      //         "Your therapist will no longer be able to view your mood history or receive emotional data from your account.",
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // } else if (profileController.therapistAccess.value == false &&
+                      //     profileController.moodPrintAccess.value == false) {
+                      //   Get.dialog(SuccessDialog(
+                      //     title:
+                      //         "You've disabled both MoodPrints and Therapist access.",
+                      //     description:
+                      //         "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.\n\n To continue using the app, please re-enable at least MoodPrints access.",
+                      //     isContentFromStart: true,
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // } else {
+                      //   Get.dialog(SuccessDialog(
+                      //     isContentFromStart: true,
+                      //     title: "All Access Enabled",
+                      //     description:
+                      //         "You've successfully enabled both MoodPrints and Therapist access.\nFull app functionality is now unlocked:\n• Mood tracking.\n• Emotional insights.\n• Therapist communication.\n• Personalized mental health support",
+                      //     onTap: () {
+                      //       profileController.updateUserAccess();
+                      //       Get.back();
+                      //     },
+                      //   ));
+                      // }
+                    },
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),

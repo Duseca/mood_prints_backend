@@ -35,7 +35,7 @@ class _ChatHeadState extends State<ChatHead> {
       var model = UserModel();
       final url = getClientByIDUrl + userId;
       final response =
-          await apiService.get(url, true, showResult: false, successCode: 200);
+          await apiService.get(url, false, showResult: false, successCode: 200);
 
       if (response != null) {
         final user = response['user'];

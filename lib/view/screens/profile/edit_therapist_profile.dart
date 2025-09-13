@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/profile/profile_controller.dart';
+import 'package:mood_prints/core/utils/validators.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
@@ -35,7 +37,6 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     userModel = UserService.instance.therapistDetailModel.value;
@@ -63,7 +64,22 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
       ctrl.stateController.text = userModel.state ?? '';
       ctrl.cityController.text = userModel.city ?? '';
     }
-    ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+
+    ctrl.emergencyEmailController.text = userModel.emergencyEmail ?? "";
+    ctrl.emergencyNameController.text = userModel.emergencyName ?? "";
+    ctrl.emergencyFullPhoneNumber = userModel.emergencyPhone ?? "";
+    ctrl.signatureController.text = userModel.signatureText ?? "";
+
+    log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      showLoadingDialog();
+      await ctrl
+          .extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+      await ctrl
+          .extractEmergencyPhoneCountryCode(userModel.emergencyPhone ?? "");
+      hideLoadingDialog();
+    });
   }
 
   @override
@@ -335,6 +351,48 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                   controller: ctrl.cityController,
                   labelText: 'City',
                   hintText: 'City',
+                ),
+                MyTextField(
+                  controller: ctrl.emergencyNameController,
+                  labelText: 'Emergency Contact’s Full Name',
+                  hintText: 'Emergency Contact’s Full Name',
+                  validator: (value) {
+                    return ValidationService.instance.userNameValidator(value);
+                  },
+                ),
+
+                MyTextField(
+                  controller: ctrl.emergencyEmailController,
+                  labelText: 'Emergency Contact’s Email',
+                  hintText: 'Emergency Contact’s Email',
+                  validator: (value) {
+                    return ValidationService.instance.emailValidator(value);
+                  },
+                ),
+                IntlPhoneFieldWidget(
+                  initialCountryCode: ctrl.initialEmergencyCountryCode.value,
+                  controller: ctrl.emergencyPhoneNumberController,
+                  onChanged: (v) {
+                    ctrl.emergencyFullPhoneNumber = v.completeNumber;
+
+                    log("onChanged -------> ${ctrl.completePhoneNumber}");
+                  },
+                ),
+                PhoneField(
+                  title: "Emergency Contact’s Phone Number”",
+                  controller: ctrl.emergencyPhoneNumberController,
+                  onPhoneNumberChanged: (value) {
+                    ctrl.emergencyFullPhoneNumber = value;
+                    log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
+                  },
+                ),
+                MyTextField(
+                  controller: ctrl.signatureController,
+                  labelText: "Signature",
+                  hintText: "Signature",
+                  validator: (p0) {
+                    return ValidationService.instance.emptyValidator(p0);
+                  },
                 ),
                 MyTextField(
                   controller: ctrl.bioController,

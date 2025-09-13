@@ -25,7 +25,7 @@ class NotificationController extends GetxController {
 
       log("URL: $getAllNotificationUrl");
 
-      final response = await apiService.get(getAllNotificationUrl, true,
+      final response = await apiService.get(getAllNotificationUrl, false,
           showResult: false, successCode: 200);
 
       if (response != null) {

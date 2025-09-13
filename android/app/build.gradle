@@ -29,8 +29,8 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.test.moodPrints"
     compileSdk = 35
-//    ndkVersion = flutter.ndkVersion
-    ndkVersion "25.1.8937393"
+    ndkVersion = flutter.ndkVersion
+    // ndkVersion "25.1.8937393"
 
     kotlinOptions {
         jvmTarget = '17' // Ensure Kotlin targets Java 17

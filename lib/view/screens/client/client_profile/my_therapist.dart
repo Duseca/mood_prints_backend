@@ -123,7 +123,7 @@ class _MyTherapistState extends State<MyTherapist> {
             Obx(
               () => CheckBoxWidget(
                 isChecked: profileController.therapistAccess.value,
-                onChanged: (bool) {
+                onChanged: (newValue) {
                   profileController.therapistAccess.value =
                       !profileController.therapistAccess.value;
                 },
@@ -136,27 +136,35 @@ class _MyTherapistState extends State<MyTherapist> {
               padding: const EdgeInsets.all(8.0),
               child: MyButton(
                 buttonText: 'Done',
-                onTap: () {
-                  if (profileController.therapistAccess.value == true) {
-                    Get.dialog(SuccessDialog(
-                      title: "You've disabled Therapist access.",
-                      description:
-                          "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.",
-                      onTap: () {
-                        profileController.updateUserAccess();
-                        Get.back();
-                      },
-                    ));
-                  } else if (profileController.therapistAccess.value == false) {
-                    Get.dialog(SuccessDialog(
-                      title: "Therapist Access Revoked",
-                      description:
-                          "Your therapist will no longer be able to view your mood history or receive emotional data from your account.",
-                      onTap: () {
-                        profileController.updateUserAccess();
-                        Get.back();
-                      },
-                    ));
+                onTap: () async {
+                  if (UserService
+                          .instance.userModel.value.authorizeTherapistAccess ==
+                      profileController.therapistAccess.value) {
+                    Get.back();
+                  } else {
+                    if (profileController.therapistAccess.value) {
+                      // ✅ Access enabled
+                      Get.dialog(SuccessDialog(
+                        title: "Therapist Access Granted",
+                        description:
+                            "Your therapist will now be able to view your mood history and receive emotional data from your account.",
+                        onTap: () async {
+                          await profileController.updateUserAccess();
+                          Get.back();
+                        },
+                      ));
+                    } else {
+                      // ❌ Access disabled
+                      Get.dialog(SuccessDialog(
+                        title: "Therapist Access Revoked",
+                        description:
+                            "This will:\n• Disable mood tracking, insights, and chat features.\n• Revoke therapist access to your records.\n• Schedule your account for deletion in 10 days.",
+                        onTap: () async {
+                          await profileController.updateUserAccess();
+                          Get.back();
+                        },
+                      ));
+                    }
                   }
                 },
               ),

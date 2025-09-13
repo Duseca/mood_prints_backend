@@ -17,8 +17,13 @@ import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
+import 'package:mood_prints/view/screens/privacy_policy/b_a.dart';
+import 'package:mood_prints/view/screens/privacy_policy/general_terms.dart';
 import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
+import 'package:mood_prints/view/screens/privacy_policy/nopp.dart';
+import 'package:mood_prints/view/screens/privacy_policy/p_s.dart';
 import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/terms_and_telehealth_consent.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
@@ -110,8 +115,8 @@ class SignUpSecondPage extends StatelessWidget {
                           ),
                           MyTextField(
                             controller: ctrl.npiNumberController,
-                            labelText: 'Npi Number',
-                            hintText: 'Npi Number',
+                            labelText: 'NPI Number',
+                            hintText: 'NPI Number',
                             validator: (value) {
                               return ValidationService.instance
                                   .emptyValidator(value);
@@ -152,9 +157,7 @@ class SignUpSecondPage extends StatelessWidget {
                                 ctrl.checkBoxToggel(ctrl.therapist1);
                               },
                               onHyperLinkTap: () {
-                                Get.to(() => HippaScreen(
-                                      showConsent: false,
-                                    ));
+                                Get.to(() => PSPage());
                               },
                             ),
                           ),
@@ -168,9 +171,7 @@ class SignUpSecondPage extends StatelessWidget {
                                 ctrl.checkBoxToggel(ctrl.therapist2);
                               },
                               onHyperLinkTap: () {
-                                Get.to(() => HippaScreen(
-                                      showConsent: false,
-                                    ));
+                                Get.to(() => BAPage());
                               },
                             ),
                           ),
@@ -184,9 +185,7 @@ class SignUpSecondPage extends StatelessWidget {
                                 ctrl.checkBoxToggel(ctrl.therapist3);
                               },
                               onHyperLinkTap: () {
-                                Get.to(() => HippaScreen(
-                                      showConsent: false,
-                                    ));
+                                Get.to(() => GeneralTermsPage());
                               },
                             ),
                           ),
@@ -335,16 +334,17 @@ class SignUpSecondPage extends StatelessWidget {
                                         child: DobPicker(
                                           initialDateTime: ctrl.dob.value,
                                           onDateTimeChanged: (dateTime) {
-                                            // ctrl.dob.value = dateTime;
                                             dob = dateTime;
+                                            log("onchanged");
                                           },
                                           onTap: () {
+                                            log("------------------ on Tap Callledkbwriiiiiiiiiib----------------");
                                             ctrl.dob.value = dob;
 
                                             ctrl.checkIfGuardianRequired(
                                                 ctrl.dob.value!);
 
-                                            log("User Age Status: ---> ${ctrl.userAgeStatus}");
+                                            log("User Age Status: ---> ${ctrl.userAgeStatus.value}");
 
                                             Get.back();
                                           },
@@ -368,7 +368,8 @@ class SignUpSecondPage extends StatelessWidget {
 
                             // Gardian Contact if the age is less then 13
 
-                            (ctrl.userAgeStatus == UserAgeStatus.age13To17.name)
+                            (ctrl.userAgeStatus.value ==
+                                    UserAgeStatus.age13To17.name)
                                 ? MyText(
                                     paddingBottom: 20,
                                     text:
@@ -376,7 +377,7 @@ class SignUpSecondPage extends StatelessWidget {
                                     color: Colors.blue.shade800,
                                     size: 12,
                                   )
-                                : (ctrl.userAgeStatus ==
+                                : (ctrl.userAgeStatus.value ==
                                         UserAgeStatus.ageLessThan13.name)
                                     ? MyText(
                                         paddingBottom: 20,
@@ -389,7 +390,8 @@ class SignUpSecondPage extends StatelessWidget {
 
                             // --- Display Gardian Information feilds based on user age -------
 
-                            (ctrl.userAgeStatus == UserAgeStatus.age13To17.name)
+                            (ctrl.userAgeStatus.value ==
+                                    UserAgeStatus.age13To17.name)
                                 ? Column(
                                     children: [
                                       MyTextField(
@@ -748,7 +750,7 @@ class SignUpSecondPage extends StatelessWidget {
                                             ctrl.checkBoxToggel(ctrl.gradian5);
                                           },
                                           onHyperLinkTap: () {
-                                            Get.to(() => PPPage());
+                                            Get.to(() => NOPPPage());
                                           },
                                         ),
                                       ),
@@ -814,7 +816,8 @@ class SignUpSecondPage extends StatelessWidget {
                                                     ctrl.adult1);
                                               },
                                               onHyperLinkTap: () {
-                                                Get.to(() => PPPage());
+                                                Get.to(() =>
+                                                    ClientAndTeleHealthConsentPage());
                                               },
                                             ),
                                           ),
@@ -847,7 +850,7 @@ class SignUpSecondPage extends StatelessWidget {
                                                     ctrl.adult3);
                                               },
                                               onHyperLinkTap: () {
-                                                Get.to(() => PPPage());
+                                                Get.to(() => NOPPPage());
                                               },
                                             ),
                                           ),
@@ -862,7 +865,8 @@ class SignUpSecondPage extends StatelessWidget {
                                                     ctrl.adult4);
                                               },
                                               onHyperLinkTap: () {
-                                                Get.to(() => PPPage());
+                                                Get.to(
+                                                    () => GeneralTermsPage());
                                               },
                                             ),
                                           ),
@@ -951,7 +955,7 @@ class SignUpSecondPage extends StatelessWidget {
                                 ctrl.emergencyEmailController.text.trim()) {
                               displayToast(
                                 msg:
-                                    "Emergency email is not same, try different emergency email",
+                                    "Emergency email cannot be the same as yours. Try again",
                               );
                               return;
                             }
@@ -971,25 +975,36 @@ class SignUpSecondPage extends StatelessWidget {
 
                                 return;
                               }
-                              if (isSocialSignin) {
-                                ctrl.signUpClientMethod(
-                                    dob: DateTimeService.instance
-                                        .getDateIsoFormat(ctrl.dob.value!),
-                                    npiNumber: ctrl.npiNumberController.text,
-                                    email: auth.currentUser!.email ?? '',
-                                    fullName:
-                                        auth.currentUser!.displayName ?? "",
-                                    userType: type,
-                                    isUsCitizien: true,
-                                    signature:
-                                        ctrl.signatureController.text.trim(),
-                                    widget: _SuccessDialog());
-                              } else {
-                                Get.to(EmailVerification(
-                                  email: ctrl.emailController.text.trim(),
-                                  type: type,
-                                ));
-                              }
+                              // if (isSocialSignin) {
+                              ctrl.signUpClientMethod(
+                                  dob: DateTimeService.instance
+                                      .getDateIsoFormat(ctrl.dob.value!),
+                                  npiNumber: ctrl.npiNumberController.text,
+                                  password: isSocialSignin
+                                      ? null
+                                      : ctrl.passwordController.text.trim(),
+                                  email: isSocialSignin
+                                      ? auth.currentUser?.email ?? ""
+                                      : ctrl.emailController.text.trim(),
+                                  fullName: isSocialSignin
+                                      ? auth.currentUser?.displayName ?? ""
+                                      : ctrl.fullNameController.text.trim(),
+                                  emergencyName:
+                                      ctrl.emergencyNameController.text.trim(),
+                                  emergencyEmail:
+                                      ctrl.emergencyEmailController.text.trim(),
+                                  emergencyPhone: ctrl.emergencyFullPhoneNumber,
+                                  userType: type,
+                                  isUsCitizien: true,
+                                  signature:
+                                      ctrl.signatureController.text.trim(),
+                                  widget: _SuccessDialog());
+                              // } else {
+                              //   Get.to(EmailVerification(
+                              //     email: ctrl.emailController.text.trim(),
+                              //     type: type,
+                              //   ));
+                              // }
                             }
                           }
                         },
@@ -1021,7 +1036,7 @@ class SignUpSecondPage extends StatelessWidget {
                                   ctrl.emergencyEmailController.text.trim()) {
                                 displayToast(
                                   msg:
-                                      "Emergency email is not same, try different emergency email",
+                                      "Emergency email cannot be the same as yours. Try again",
                                 );
                                 return;
                               }
@@ -1052,45 +1067,50 @@ class SignUpSecondPage extends StatelessWidget {
                                             "Please inter the gurdian details");
                                     return;
                                   }
-                                  if (isSocialSignin) {
-                                    ctrl.signUpClientMethod(
-                                        dob: DateTimeService.instance
-                                            .getDateIsoFormat(ctrl.dob.value!),
-                                        // npiNumber: ctrl.npiNumberController.text,
-                                        email: auth.currentUser?.email ?? "",
-                                        fullName:
-                                            auth.currentUser?.displayName ?? "",
-                                        userType: type,
-                                        isUsCitizien: true,
-                                        gradianName: ctrl
-                                            .guardianNameController.text
-                                            .trim(),
-                                        gradianEmail: ctrl
-                                            .guardianEmailController.text
-                                            .trim(),
-                                        gradianPhone:
-                                            ctrl.gradianFullPhoneNumber,
-                                        gradianDOB: DateTimeService.instance
-                                            .getDateIsoFormat(
-                                                ctrl.guardianDob.value!),
-                                        emergencyName: ctrl
-                                            .emergencyNameController.text
-                                            .trim(),
-                                        emergencyEmail: ctrl
-                                            .emergencyEmailController.text
-                                            .trim(),
-                                        emergencyPhone:
-                                            ctrl.emergencyFullPhoneNumber,
-                                        guardianInfoComplete: true,
-                                        signature: ctrl.signatureController.text
-                                            .trim(),
-                                        widget: _SuccessDialog());
-                                  } else {
-                                    Get.to(EmailVerification(
-                                      email: ctrl.emailController.text.trim(),
-                                      type: type,
-                                    ));
-                                  }
+                                  // if (isSocialSignin) {
+                                  ctrl.signUpClientMethod(
+                                      dob: DateTimeService.instance
+                                          .getDateIsoFormat(ctrl.dob.value!),
+                                      password: isSocialSignin
+                                          ? null
+                                          : ctrl.passwordController.text.trim(),
+                                      // npiNumber: ctrl.npiNumberController.text,
+                                      email: isSocialSignin
+                                          ? auth.currentUser?.email ?? ""
+                                          : ctrl.emailController.text.trim(),
+                                      fullName: isSocialSignin
+                                          ? auth.currentUser?.displayName ?? ""
+                                          : ctrl.fullNameController.text.trim(),
+                                      userType: type,
+                                      isUsCitizien: true,
+                                      gradianName: ctrl
+                                          .guardianNameController.text
+                                          .trim(),
+                                      gradianEmail: ctrl
+                                          .guardianEmailController.text
+                                          .trim(),
+                                      gradianPhone: ctrl.gradianFullPhoneNumber,
+                                      gradianDOB: DateTimeService.instance
+                                          .getDateIsoFormat(
+                                              ctrl.guardianDob.value!),
+                                      emergencyName: ctrl
+                                          .emergencyNameController.text
+                                          .trim(),
+                                      emergencyEmail: ctrl
+                                          .emergencyEmailController.text
+                                          .trim(),
+                                      emergencyPhone:
+                                          ctrl.emergencyFullPhoneNumber,
+                                      guardianInfoComplete: true,
+                                      signature:
+                                          ctrl.signatureController.text.trim(),
+                                      widget: _SuccessDialog());
+                                  // } else {
+                                  //   Get.to(EmailVerification(
+                                  //     email: ctrl.emailController.text.trim(),
+                                  //     type: type,
+                                  //   ));
+                                  // }
 
                                   log("DOB ---- --- : ${DateTimeService.instance.getDateIsoFormat(ctrl.guardianDob.value!)}");
                                 }
@@ -1113,34 +1133,39 @@ class SignUpSecondPage extends StatelessWidget {
 
                                     return;
                                   }
-                                  if (isSocialSignin) {
-                                    ctrl.signUpClientMethod(
-                                        dob: DateTimeService.instance
-                                            .getDateIsoFormat(ctrl.dob.value!),
-                                        npiNumber:
-                                            ctrl.npiNumberController.text,
-                                        email: auth.currentUser?.email ?? "",
-                                        fullName:
-                                            auth.currentUser?.displayName ?? "",
-                                        userType: type,
-                                        emergencyName: ctrl
-                                            .emergencyNameController.text
-                                            .trim(),
-                                        emergencyEmail: ctrl
-                                            .emergencyEmailController.text
-                                            .trim(),
-                                        emergencyPhone:
-                                            ctrl.emergencyFullPhoneNumber,
-                                        guardianInfoComplete: true,
-                                        signature: ctrl.signatureController.text
-                                            .trim(),
-                                        widget: _SuccessDialog());
-                                  } else {
-                                    Get.to(EmailVerification(
-                                      email: ctrl.emailController.text.trim(),
-                                      type: type,
-                                    ));
-                                  }
+                                  // if (isSocialSignin) {
+                                  ctrl.signUpClientMethod(
+                                      dob: DateTimeService.instance
+                                          .getDateIsoFormat(ctrl.dob.value!),
+                                      npiNumber: ctrl.npiNumberController.text,
+                                      password: isSocialSignin
+                                          ? null
+                                          : ctrl.passwordController.text.trim(),
+                                      email: isSocialSignin
+                                          ? auth.currentUser?.email ?? ""
+                                          : ctrl.emailController.text.trim(),
+                                      fullName: isSocialSignin
+                                          ? auth.currentUser?.displayName ?? ""
+                                          : ctrl.fullNameController.text.trim(),
+                                      userType: type,
+                                      emergencyName: ctrl
+                                          .emergencyNameController.text
+                                          .trim(),
+                                      emergencyEmail: ctrl
+                                          .emergencyEmailController.text
+                                          .trim(),
+                                      emergencyPhone:
+                                          ctrl.emergencyFullPhoneNumber,
+                                      guardianInfoComplete: true,
+                                      signature:
+                                          ctrl.signatureController.text.trim(),
+                                      widget: _SuccessDialog());
+                                  // } else {
+                                  //   Get.to(EmailVerification(
+                                  //     email: ctrl.emailController.text.trim(),
+                                  //     type: type,
+                                  //   ));
+                                  // }
                                 }
                               }
                             }

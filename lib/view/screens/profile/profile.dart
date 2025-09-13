@@ -5,6 +5,7 @@ import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
@@ -194,7 +195,7 @@ class Profile extends StatelessWidget {
               icon: Assets.imagesHelpCenter,
               title: 'FAQs',
               onTap: () {
-                Get.to(() => HelpCenter());
+                Get.to(() => HelpCenter(), binding: FAQsBinding());
               },
               mBottom: 24,
             ),
@@ -209,10 +210,10 @@ class Profile extends StatelessWidget {
                     Get.back();
                   },
                   onLogoutTap: () async {
-                    await Get.find<AuthClientController>().logOutMethod();
                     await Get.find<AuthClientController>().deleteAccountMethod(
                         UserService.instance.therapistDetailModel.value.id
                             .toString());
+                    await Get.find<AuthClientController>().logOutMethod();
 
                     UserService.instance.relationWithClients.clear();
                     UserService.instance.relationWithTherapist.clear();

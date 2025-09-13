@@ -6,6 +6,7 @@ import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/auth/login.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/sign_up_second_page.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/headings_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
@@ -151,7 +152,10 @@ class ClientSignUp extends StatelessWidget {
               buttonText: "Next",
               onTap: () {
                 if (formKey2.currentState!.validate()) {
-                  Get.to(() => SignUpSecondPage(type: type));
+                  Get.to(EmailVerification(
+                    email: ctrl.emailController.text.trim(),
+                    type: type,
+                  ));
                 }
               },
             ),
