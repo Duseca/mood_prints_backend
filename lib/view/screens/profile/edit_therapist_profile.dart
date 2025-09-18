@@ -347,6 +347,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                 ),
                 Obx(
                   () => IntlPhoneFieldWidget(
+                    label: "Emergency Contact’s Phone Number",
                     initialCountryCode: ctrl.initialEmergencyCountryCode.value,
                     controller: ctrl.emergencyPhoneNumberController,
                     onChanged: (v) {

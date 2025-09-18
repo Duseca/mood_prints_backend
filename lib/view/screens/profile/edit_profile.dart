@@ -42,7 +42,7 @@ class _EditProfileState extends State<EditProfile> {
 
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
 
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
@@ -51,7 +51,7 @@ class _EditProfileState extends State<EditProfile> {
       }
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
@@ -294,6 +294,7 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   Obx(
                     () => IntlPhoneFieldWidget(
+                      label: "Emergency Contact’s Phone Number",
                       initialCountryCode:
                           ctrl.initialEmergencyCountryCode.value,
                       controller: ctrl.emergencyPhoneNumberController,

@@ -54,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } else {
       Get.find<AuthClientController>().logOutMethod();
-      Get.find<ClientHomeController>().clearAllData();
       Get.offAll(() => GetStarted());
     }
   }
