@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
@@ -27,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void splashScreenHandler() {
     Timer(Duration(seconds: 2), () async {
       checkUserStatus();
-      // Get.offAll(() => TherapistNavBar());
     });
   }
 
@@ -42,20 +42,13 @@ class _SplashScreenState extends State<SplashScreen> {
       final userType = await prefs.getString('userType');
 
       if (checkingID.isNotEmpty) {
-        // await Get.put(AuthController()).getCurrentUserDataMethod();
         await UserService.instance.getUserInformation();
 
         if (userType == 'client') {
-          await Get.find<ClientHomeController>().getAllBoard();
-          await Get.find<ClientHomeController>()
-              .allStats(userID: UserService.instance.userModel.value.id);
-          ();
-          Get.offAll(() => ClientNavBar());
+          Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
         } else if (userType == 'therapist') {
-          Get.offAll(() => TherapistNavBar());
+          Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
         }
-
-        // Get.offAll(() => ClientNavBar());
       } else {
         Get.offAll(() => GetStarted());
       }

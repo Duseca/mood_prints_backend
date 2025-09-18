@@ -4,6 +4,8 @@ import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
+import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/chat/chat_head.dart';
 import 'package:mood_prints/view/screens/client/client_home/client_home.dart';
@@ -25,9 +27,15 @@ class _ClientNavBarState extends State<ClientNavBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     UserService.instance.isTenDaysCompleted();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      showLoadingDialog();
+      await Get.find<ClientHomeController>().getAllBoard();
+      await Get.find<ClientHomeController>()
+          .allStats(userID: UserService.instance.userModel.value.id);
+      ();
+    });
   }
 
   void _getCurrentIndex(int index) => setState(() {

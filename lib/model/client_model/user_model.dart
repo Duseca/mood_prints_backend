@@ -1,3 +1,5 @@
+import 'package:mood_prints/model/notification/notification_model.dart';
+
 class UserModel {
   final String? stripeCustomerId;
   final String? id;
@@ -25,6 +27,7 @@ class UserModel {
   final String? emergencyName;
   final String? emergencyPhone;
   final String? signatureText;
+  final List<RequestId>? requests;
 
   UserModel(
       {this.stripeCustomerId,
@@ -42,6 +45,7 @@ class UserModel {
       this.phoneNumber,
       this.gender,
       this.authProvider,
+      this.requests,
       this.therapistId,
 
       // 🔹 New variables
@@ -93,7 +97,11 @@ class UserModel {
             json.containsKey('therapistId') && json['therapistId'] is List
                 ? List<String>.from(json['therapistId'] as List)
                 : [],
-
+        requests: json.containsKey("requests")
+            ? (json["requests"] as List)
+                .map((e) => RequestId.fromJson(e))
+                .toList()
+            : [],
         // 🔹 New variables
         authorizeTherapistAccess: json['authorizeTherapistAccess'] as bool?,
         authorizeMoodPrintsAccess: json['authorizeMoodPrintsAccess'] as bool?,

@@ -51,6 +51,31 @@ class ModeManagerController extends GetxController {
   Posting Data throught Api "Creating Board"
   */
 
+  resetValues() {
+    timer?.cancel();
+    isButtonEnabled.value = false;
+    remainingTime.value = 0;
+    dateTime = null;
+    isStartingSleepRecordSelected.value = true;
+    datePicker.value = DateTime.now();
+    endSleepDuration.value = null;
+    startSleepDuration.value = null;
+    downloadTodayPhotosUrl.clear();
+    todayPhotos.clear();
+    todayNoteController.clear();
+    selectedEmojiTextModel.value = null;
+    irritateLevel = 0;
+    irritateIconHandler.value = null;
+    stressLevel = 0;
+    stressIconHandler.value = null;
+    selectedMood.value = modeIndicatorItems.first;
+    visibilityDisplayCustomCards = {};
+    commonTextController.clear();
+    activeWidgets.clear();
+    hiddenWidgets.clear();
+    selectedEmoji.value = '';
+  }
+
   void createBoard() async {
     log("Try Called Create Board");
     try {
@@ -442,6 +467,7 @@ class ModeManagerController extends GetxController {
 
   @override
   void dispose() {
+    resetValues();
     timer?.cancel();
     super.dispose();
   }

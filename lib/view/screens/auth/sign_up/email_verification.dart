@@ -286,9 +286,7 @@ class _SuccessDialog extends StatelessWidget {
                           UserService.instance.userModel.value.fullName ?? "";
                       ctrl.emailController.text =
                           UserService.instance.userModel.value.email ?? "";
-                      ctrl.phoneNumberController.text =
-                          UserService.instance.userModel.value.phoneNumber ??
-                              "";
+                   
                       Get.off(() => ClientCompleteProfile());
                     },
                   ),

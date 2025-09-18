@@ -31,7 +31,9 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
   void initState() {
     super.initState();
 
-    ctrl.getAllNotification(UserService.instance.therapistDetailModel.value.id);
+    ctrl.getAllNotification(
+        UserService.instance.therapistDetailModel.value.id ??
+            UserService.instance.userModel.value.id);
   }
 
   @override
@@ -63,12 +65,44 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                               ?.status ==
                                           Status.accepted.name)
                                       ? Status.accepted.name
-                                      : Status.declined.name,
+                                      : (ctrl.notificationList[index].requestId
+                                                  ?.status ==
+                                              Status.removed.name)
+                                          ? Status.removed.name
+                                          : Status.declined.name,
                           title: '${ctrl.notificationList[index].title}',
                           description: '${ctrl.notificationList[index].body}',
+                          onRemoveTap: () async {
+                            await pctrl.deleteRelation(
+                                requestId: ctrl
+                                    .notificationList[index].requestId!.id
+                                    .toString(),
+                                clientID: ctrl
+                                    .notificationList[index].requestId!.clientId
+                                    .toString(),
+                                therapistID: ctrl.notificationList[index]
+                                    .requestId!.therapistId
+                                    .toString());
+                            await ctrl.deleteNotificationRequest(
+                                title: "Removal Request Accepted",
+                                message: "You have accepted removal request",
+                                requestId: ctrl
+                                    .notificationList[index].requestId!.id
+                                    .toString());
+                            await pctrl.createNotification(
+                                title: 'Removal Request accepted',
+                                fullName:
+                                    "${UserService.instance.therapistDetailModel.value.fullName}",
+                                notificationMsg:
+                                    "has accepted your${(ctrl.notificationList[index].requestId?.status == Status.removed.name) ? " removal" : ''} request.",
+                                message:
+                                    "${UserService.instance.therapistDetailModel.value.fullName} has accepted your removal request.",
+                                reciverID: ctrl
+                                    .notificationList[index].requestId!.clientId
+                                    .toString(),
+                                showcard: false);
+                          },
                           onAcceptTap: () async {
-                            log('Accept Tapped');
-
                             // ---------- Accept Request notification send to the client --------------
                             var name = UserService
                                 .instance.therapistDetailModel.value.fullName;
@@ -83,9 +117,9 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                   .notificationList[index].requestId!.clientId
                                   .toString(),
                             );
-
-                            log("Name $name");
-
+                            await ctrl.deleteNotification(
+                                notificationID:
+                                    ctrl.notificationList[index].id.toString());
                             //----------- Update notification status & Build Connection with client --------------
 
                             await ctrl.updateNotificationStatus(
@@ -101,30 +135,43 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                     .toString());
                           },
                           onDeclineTap: () async {
-                            log('Decline Tapped ${ctrl.notificationList[index].requestId!.id}');
-
                             // ---------- Declined Request notification send to the client --------------
 
-                            var name = UserService
-                                .instance.therapistDetailModel.value.fullName;
-
-                            await pctrl.createNotificationWithoutRequest(
-                              title: 'Request Declined',
-                              notificationMsg:
-                                  "${name} has declined your request.",
-                              message:
-                                  "${UserService.instance.therapistDetailModel.value.fullName} has declined your request.",
-                              reciverID: ctrl
-                                  .notificationList[index].requestId!.clientId
-                                  .toString(),
-                            );
+                            await pctrl.createNotification(
+                                title: 'Request Declined',
+                                fullName:
+                                    "${UserService.instance.therapistDetailModel.value.fullName}",
+                                notificationMsg:
+                                    "has declined your${(ctrl.notificationList[index].requestId?.status == Status.removed.name) ? " removal" : ''} request.",
+                                message:
+                                    "${UserService.instance.therapistDetailModel.value.fullName} has declined your request.",
+                                reciverID: ctrl
+                                    .notificationList[index].requestId!.clientId
+                                    .toString(),
+                                showcard: false);
 
                             //----------- Update notification status --------------
 
-                            await ctrl.deleteNotificationRequest(
-                                requestId: ctrl
-                                    .notificationList[index].requestId!.id
-                                    .toString());
+                            if ((ctrl.notificationList[index].requestId
+                                    ?.status ==
+                                Status.removed.name)) {
+                              await ctrl.updateNotificationStatus(
+                                  requestId: ctrl
+                                      .notificationList[index].requestId!.id
+                                      .toString(),
+                                  status: Status.accepted.name,
+                                  clientID: ctrl.notificationList[index]
+                                      .requestId!.clientId
+                                      .toString(),
+                                  therapistID: ctrl.notificationList[index]
+                                      .requestId!.therapistId
+                                      .toString());
+                            } else {
+                              await ctrl.deleteNotificationRequest(
+                                  requestId: ctrl
+                                      .notificationList[index].requestId!.id
+                                      .toString());
+                            }
                           },
                           onDeleteTap: (v) {
                             ctrl.deleteNotification(
@@ -154,7 +201,7 @@ class GeneralNotificationCard extends StatelessWidget {
   final String type;
   final String status;
   final bool isLoading;
-  final VoidCallback? onDeclineTap, onAcceptTap;
+  final VoidCallback? onDeclineTap, onAcceptTap, onRemoveTap;
   Function(BuildContext)? onDeleteTap;
 
   GeneralNotificationCard({
@@ -165,6 +212,7 @@ class GeneralNotificationCard extends StatelessWidget {
     this.status = 'pending',
     this.onDeclineTap,
     this.onAcceptTap,
+    this.onRemoveTap,
     required this.isLoading,
     required this.onDeleteTap,
   });
@@ -244,9 +292,41 @@ class GeneralNotificationCard extends StatelessWidget {
                                 ),
                               ],
                             )
-                          : (status == Status.accepted.name)
-                              ? SizedBox.shrink()
-                              : SizedBox.shrink()
+                          : (status == Status.removed.name)
+                              ? Row(
+                                  children: [
+                                    SizedBox(
+                                      height: 30,
+                                      width: 70,
+                                      child: MyButton(
+                                          radius: 100,
+                                          textSize: 10,
+                                          buttonText: 'Decline',
+                                          onTap: onDeclineTap,
+                                          bgColor: kGreyColor2,
+                                          textColor: kWhiteColor),
+                                    ),
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 30,
+                                      width: 70,
+                                      child: (isLoading)
+                                          ? CircularProgressIndicator(
+                                              color: kSecondaryColor,
+                                            )
+                                          : MyButton(
+                                              radius: 100,
+                                              textSize: 10,
+                                              buttonText: 'Accept',
+                                              onTap: onRemoveTap,
+                                              bgColor: Colors.red.shade600,
+                                              textColor: kWhiteColor),
+                                    ),
+                                  ],
+                                )
+                              : (status == Status.accepted.name)
+                                  ? SizedBox.shrink()
+                                  : SizedBox.shrink()
                     ],
                   ),
                 ),
@@ -359,9 +439,8 @@ class RequestAcceptedCard extends StatelessWidget {
 }
 
 class RequestDeclineCard extends StatelessWidget {
-  const RequestDeclineCard({
-    super.key,
-  });
+  final String? title, message;
+  const RequestDeclineCard({super.key, this.title, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -382,7 +461,7 @@ class RequestDeclineCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 MyText(
-                  text: 'Request Declined!',
+                  text: title ?? 'Request Declined!',
                   size: 16,
                   textAlign: TextAlign.center,
                   weight: FontWeight.w600,
@@ -391,7 +470,7 @@ class RequestDeclineCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   paddingTop: 6,
                   text:
-                      "You have declined the request. The user will be notified, and no connection has been made.",
+                      "${message ?? "You have declined the request"}. The user will be notified, and no connection has been made.",
                   size: 13,
                   color: kGreyColor,
                 ),

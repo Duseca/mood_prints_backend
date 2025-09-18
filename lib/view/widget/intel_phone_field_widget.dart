@@ -13,16 +13,16 @@ class IntlPhoneFieldWidget extends StatelessWidget {
   FutureOr<String?> Function(PhoneNumber?)? validator;
   final Function(dynamic)? onChanged;
   TextEditingController? controller = TextEditingController();
-  String? initialCountryCode;
-  IntlPhoneFieldWidget({
-    super.key,
-    this.lebel,
-    this.controller,
-    this.onChanged,
-    this.initialValue,
-    this.validator,
-    this.initialCountryCode = 'US',
-  });
+  String? initialCountryCode, label;
+  IntlPhoneFieldWidget(
+      {super.key,
+      this.lebel,
+      this.controller,
+      this.onChanged,
+      this.initialValue,
+      this.validator,
+      this.initialCountryCode = '+1',
+      this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class IntlPhoneFieldWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MyText(
-          text: "Phone Number",
+          text: label ?? "Phone Number",
           size: 12,
           paddingBottom: 6,
           weight: FontWeight.bold,
@@ -87,7 +87,7 @@ class IntlPhoneFieldWidget extends StatelessWidget {
                     borderSide:
                         BorderSide(width: 1, color: Colors.transparent)),
               ),
-              initialCountryCode: initialCountryCode,
+              initialValue: initialCountryCode,
             ),
           ),
         ),

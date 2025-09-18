@@ -11,11 +11,6 @@ class InitialBindings implements Bindings {
   @override
   void dependencies() {
     Get.put<AuthClientController>(AuthClientController());
-    Get.put<ClientHomeController>(ClientHomeController());
-    Get.put<ProfileController>(ProfileController());
-    Get.put<ModeManagerController>(ModeManagerController());
-    Get.put<ChatController>(ChatController());
-    Get.put<NotificationController>(NotificationController());
   }
 }
 
@@ -23,5 +18,16 @@ class FAQsBinding implements Bindings {
   @override
   void dependencies() {
     Get.put<FaqsController>(FaqsController());
+  }
+}
+
+class BottomBarBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.put<ClientHomeController>(ClientHomeController());
+    Get.put<ModeManagerController>(ModeManagerController());
+    Get.put<ProfileController>(ProfileController());
+    Get.put<ChatController>(ChatController());
+    Get.put<NotificationController>(NotificationController());
   }
 }

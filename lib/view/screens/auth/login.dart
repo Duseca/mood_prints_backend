@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/view/screens/auth/forgot_pass/forgot_password.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_sign_up.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
@@ -104,21 +105,11 @@ class _LoginState extends State<Login> {
             ),
             MyButton(
               onTap: () {
-                // ---------------------------------------------
-                // TODO: Saved UserType & fetch data accordingly
-                // ---------------------------------------------
-
                 if (formKey1.currentState!.validate()) {
                   ctrl.loginMethod(
                       email: ctrl.emailController.text.trim(),
                       password: ctrl.passwordController.text.trim());
                 }
-
-                // ctrl.loginMethod(
-                //     email: ctrl.emailController.text.trim(),
-                //     password: ctrl.passwordController.text.trim());
-
-                // Get.to(() => TherapistNavBar());
               },
               buttonText: 'Login',
             ),
@@ -189,10 +180,10 @@ class _LoginState extends State<Login> {
                     ctrl.passwordController.clear();
                     ctrl.acceptTermsAndCondition.value = false;
                     ctrl.passwordVisibility.value = true;
-                    Get.to(() => GetStarted());
-                    // Get.to(() => ClientSignUp(
-                    //       type: 'therapist',
-                    //     ));
+
+                    Get.to(() => ClientSignUp(
+                          type: widget.type,
+                        ));
                   },
                   text: 'Register',
                   color: kQuaternaryColor,

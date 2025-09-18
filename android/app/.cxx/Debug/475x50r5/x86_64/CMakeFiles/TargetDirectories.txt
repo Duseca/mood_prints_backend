@@ -1,0 +1,2 @@
+F:/mood_prints_backend/android/app/.cxx/Debug/475x50r5/x86_64/CMakeFiles/edit_cache.dir
+F:/mood_prints_backend/android/app/.cxx/Debug/475x50r5/x86_64/CMakeFiles/rebuild_cache.dir

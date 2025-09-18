@@ -244,7 +244,6 @@ class Profile extends StatelessWidget {
                   },
                   onLogoutTap: () async {
                     await Get.find<AuthClientController>().logOutMethod();
-                    Get.find<ClientHomeController>().clearAllData();
                   },
                 ));
               },

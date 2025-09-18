@@ -29,7 +29,6 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
   final ctrl = Get.find<ProfileController>();
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     ctrl.selectedTherapistModel.value = null;
   }
@@ -62,7 +61,7 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                               phoneNumber: ctrl
                                   .selectedTherapistModel.value?.phoneNumber,
                               location:
-                                  "${ctrl.selectedTherapistModel.value?.city}}",
+                                  "${ctrl.selectedTherapistModel.value?.city}",
                             )
                           : Column(
                               children: List.generate(
@@ -228,8 +227,6 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
             MyButton(
               buttonText: 'Request Therapist',
               onTap: () {
-                // ctrl.changeTherapist();
-
                 if (ctrl.signatureController.text.isEmpty) {
                   displayToast(
                       toastLength: Toast.LENGTH_LONG,
@@ -340,10 +337,8 @@ class TappableCard extends StatelessWidget {
 
 class RequestCard extends StatelessWidget {
   final String message;
-  const RequestCard({
-    super.key,
-    required this.message,
-  });
+  String? title;
+  RequestCard({super.key, required this.message, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +359,7 @@ class RequestCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 MyText(
-                  text: 'Request Therapist',
+                  text: title ?? 'Request Therapist',
                   size: 16,
                   textAlign: TextAlign.center,
                   weight: FontWeight.w600,

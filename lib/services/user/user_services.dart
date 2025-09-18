@@ -4,6 +4,7 @@ import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/model/client_model/user_model.dart';
+import 'package:mood_prints/model/notification/notification_model.dart';
 import 'package:mood_prints/model/relation_model/relation_client_model.dart';
 import 'package:mood_prints/model/relation_model/relation_therapist_model.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
@@ -24,6 +25,7 @@ class UserService {
   RxList<RelationTherapistModel> relationWithTherapist =
       <RelationTherapistModel>[].obs;
 
+  RxList<RequestId> requests = <RequestId>[].obs;
   // For Therapist
   Rx<TherapistDetailModel> therapistDetailModel = TherapistDetailModel().obs;
   RxList<RelationClientModel> relationWithClients = <RelationClientModel>[].obs;
@@ -32,6 +34,7 @@ class UserService {
     try {
       relationWithTherapist.clear();
       relationWithClients.clear();
+      requests.clear();
       showLoadingDialog();
 
       final id = await getStringSharedPrefMethod(key: 'id');
@@ -47,6 +50,7 @@ class UserService {
         if (response != null) {
           final user = response['user'];
           final relationships = response['relationships'];
+          final reqs = response['requests'];
 
           SharedPreferences prefs = await SharedPreferences.getInstance();
           final value = await prefs.getString('userType');
@@ -58,6 +62,9 @@ class UserService {
               relationWithTherapist
                   .add(RelationTherapistModel.fromJson(relation));
             });
+            reqs.forEach((relation) {
+              requests.add(RequestId.fromJson(relation));
+            });
             log('Relation With Therapist List length: ---> ${relationWithTherapist.length}');
           } else if (value != null && value == 'therapist') {
             log('Get UserType: ---> $value');
@@ -65,12 +72,10 @@ class UserService {
             relationships.forEach((relation) {
               relationWithClients.add(RelationClientModel.fromJson(relation));
             });
-            // log('User Model -> ${therapistDetailModel.value.toJson()}');
-            // log('Relation with Clients Length:   -> ${relationWithClients.length}');
+            reqs.forEach((relation) {
+              requests.add(RequestId.fromJson(relation));
+            });
           }
-
-          // userModel.value = UserModel.fromJson(user);
-          // log('User Model -> ${userModel.value.toJson()}');
         }
       }
       hideLoadingDialog();

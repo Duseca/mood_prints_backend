@@ -3,11 +3,7 @@ enum NotificationType {
   general,
 }
 
-enum Status {
-  accepted,
-  declined,
-  pending,
-}
+enum Status { accepted, declined, pending, removed }
 
 enum ActionType {
   create,

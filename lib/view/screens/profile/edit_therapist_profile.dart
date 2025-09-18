@@ -74,33 +74,19 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       showLoadingDialog();
-      await ctrl
-          .extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-      await ctrl
-          .extractEmergencyPhoneCountryCode(userModel.emergencyPhone ?? "");
+      if (ctrl.phoneNumberController.text.trim().isNotEmpty)
+        await ctrl
+            .extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
+      if (userModel.emergencyPhone != null &&
+          userModel.emergencyPhone!.isNotEmpty)
+        await ctrl
+            .extractEmergencyPhoneCountryCode(userModel.emergencyPhone ?? "");
       hideLoadingDialog();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    log("${UserService.instance.therapistDetailModel.value.id} -- ${userModel.state} -- ${userModel.city}");
-    // var userModel = UserService.instance.therapistDetailModel.value;
-    // if (userModel.authProvider == 'google') {
-    //   ctrl.fullNameController.text = userModel.fullName!;
-    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
-    //   ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
-    // } else {
-    //   ctrl.fullNameController.text = userModel.fullName!;
-    //   ctrl.phoneNumberController.text = userModel.phoneNumber ?? '' ;
-    //   ctrl.dob.value = DateTime.parse(userModel.dob!);
-    //   ctrl.bioController.text = userModel.bio!;
-    // }
-    // ctrl.extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-    // setState(() {
-    //
-    // });
-
     return Scaffold(
       appBar: simpleAppBar(
         title: 'Edit Profile',
@@ -202,14 +188,16 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                 //     log("Complete Phone Number: ${ctrl.completePhoneNumber}");
                 //   },
                 // ),
-                IntlPhoneFieldWidget(
-                  initialCountryCode: ctrl.initialCountryCodeValue.value,
-                  controller: ctrl.phoneNumberController,
-                  onChanged: (v) {
-                    ctrl.completePhoneNumber = v.completeNumber;
+                Obx(
+                  () => IntlPhoneFieldWidget(
+                    initialCountryCode: ctrl.initialCountryCodeValue.value,
+                    controller: ctrl.phoneNumberController,
+                    onChanged: (v) {
+                      ctrl.completePhoneNumber = v.completeNumber;
 
-                    log("onChanged -------> ${ctrl.completePhoneNumber}");
-                  },
+                      log("onChanged -------> ${ctrl.completePhoneNumber}");
+                    },
+                  ),
                 ),
                 SizedBox(height: 16.0),
 
@@ -218,7 +206,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                       ? CustomDropDown(
                           labelText: 'Gender',
                           hint: ctrl.selectedGenderValue.value,
-                          items: ['male', 'female'],
+                          items: ['male', 'female', 'other'],
                           selectedValue: ctrl.selectedGenderValue.value,
                           onChanged: (v) {
                             ctrl.selectedGenderValue.value = v;
@@ -227,7 +215,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                       : CustomDropDown(
                           labelText: 'Gender',
                           hint: ctrl.selectedGenderValue.value,
-                          items: ['female', 'male'],
+                          items: ['female', 'male', 'other'],
                           selectedValue: ctrl.selectedGenderValue.value,
                           onChanged: (v) {
                             ctrl.selectedGenderValue.value = v;
@@ -369,23 +357,18 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
                     return ValidationService.instance.emailValidator(value);
                   },
                 ),
-                IntlPhoneFieldWidget(
-                  initialCountryCode: ctrl.initialEmergencyCountryCode.value,
-                  controller: ctrl.emergencyPhoneNumberController,
-                  onChanged: (v) {
-                    ctrl.emergencyFullPhoneNumber = v.completeNumber;
+                Obx(
+                  () => IntlPhoneFieldWidget(
+                    initialCountryCode: ctrl.initialEmergencyCountryCode.value,
+                    controller: ctrl.emergencyPhoneNumberController,
+                    onChanged: (v) {
+                      ctrl.emergencyFullPhoneNumber = v.completeNumber;
 
-                    log("onChanged -------> ${ctrl.completePhoneNumber}");
-                  },
+                      log("onChanged -------> ${ctrl.completePhoneNumber}");
+                    },
+                  ),
                 ),
-                PhoneField(
-                  title: "Emergency Contact’s Phone Number”",
-                  controller: ctrl.emergencyPhoneNumberController,
-                  onPhoneNumberChanged: (value) {
-                    ctrl.emergencyFullPhoneNumber = value;
-                    log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
-                  },
-                ),
+
                 MyTextField(
                   controller: ctrl.signatureController,
                   labelText: "Signature",

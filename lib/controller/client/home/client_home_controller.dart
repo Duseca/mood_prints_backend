@@ -517,4 +517,10 @@ class ClientHomeController extends GetxController {
   //   super.onInit();
   //   allmonthlyStats(userID: UserService.instance.userModel.value.id);
   // }
+
+  @override
+  void dispose() {
+    clearAllData();
+    super.dispose();
+  }
 }

@@ -212,14 +212,16 @@ class _EditProfileState extends State<EditProfile> {
                   //   ),
                   // ),
 
-                  IntlPhoneFieldWidget(
-                    initialCountryCode: ctrl.initialCountryCodeValue.value,
-                    controller: ctrl.phoneNumberController,
-                    onChanged: (v) {
-                      ctrl.completePhoneNumber = v.completeNumber;
+                  Obx(
+                    () => IntlPhoneFieldWidget(
+                      initialCountryCode: ctrl.initialCountryCodeValue.value,
+                      controller: ctrl.phoneNumberController,
+                      onChanged: (v) {
+                        ctrl.completePhoneNumber = v.completeNumber;
 
-                      log("onChanged -------> ${ctrl.completePhoneNumber}");
-                    },
+                        log("onChanged -------> ${ctrl.completePhoneNumber}");
+                      },
+                    ),
                   ),
                   SizedBox(height: 16.0),
 
@@ -244,43 +246,6 @@ class _EditProfileState extends State<EditProfile> {
                             },
                           ),
                   ),
-
-                  // - Centerd -
-
-                  // Obx(
-                  //   () => CustomDropDown(
-                  //     labelText: 'Gender',
-                  //     hint: ctrl.selectedGenderValue.value.isEmpty
-                  //         ? 'Select Gender'
-                  //         : ctrl.selectedGenderValue.value,
-                  //     items: ctrl.genderList,
-                  //     selectedValue: ctrl.selectedGenderValue.value,
-
-                  //     // ctrl.genderList.contains(ctrl.selectedGenderValue.value.toString())
-                  //     //     ? ctrl.selectedGenderValue.value
-                  //     //     : null, // Ensure selected value exists in list
-                  //     onChanged: (v) {
-                  //       ctrl.selectedGenderValue.value = v;
-                  //     },
-                  //   ),
-                  // ),
-
-                  // MyTextField(
-                  //   labelText: 'Date of Birth',
-                  //   hintText: (ctrl.dob.value != null)
-                  //       ? ctrl.dob.value.toString()
-                  //       : 'Select date of birth',
-                  //   suffix: Column(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Image.asset(
-                  //         Assets.imagesCalendarA,
-                  //         height: 20,
-                  //         color: kSecondaryColor,
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
 
                   Obx(
                     () => MyTextField(
@@ -337,14 +302,17 @@ class _EditProfileState extends State<EditProfile> {
                       return ValidationService.instance.emailValidator(value);
                     },
                   ),
-                  IntlPhoneFieldWidget(
-                    initialCountryCode: ctrl.initialEmergencyCountryCode.value,
-                    controller: ctrl.emergencyPhoneNumberController,
-                    onChanged: (v) {
-                      ctrl.emergencyFullPhoneNumber = v.completeNumber;
+                  Obx(
+                    () => IntlPhoneFieldWidget(
+                      initialCountryCode:
+                          ctrl.initialEmergencyCountryCode.value,
+                      controller: ctrl.emergencyPhoneNumberController,
+                      onChanged: (v) {
+                        ctrl.emergencyFullPhoneNumber = v.completeNumber;
 
-                      log("onChanged -------> ${ctrl.completePhoneNumber}");
-                    },
+                        log("onChanged -------> ${ctrl.completePhoneNumber}");
+                      },
+                    ),
                   ),
                   MyTextField(
                     controller: ctrl.signatureController,

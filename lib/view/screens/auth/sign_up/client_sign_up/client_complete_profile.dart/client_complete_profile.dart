@@ -10,6 +10,7 @@ import 'package:mood_prints/main.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_drop_down_widget.dart';
+import 'package:mood_prints/view/widget/intel_phone_field_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
@@ -148,14 +149,18 @@ class ClientCompleteProfile extends StatelessWidget {
                   weight: FontWeight.w500,
                   paddingBottom: 16,
                 ),
-                PhoneField(
+
+                IntlPhoneFieldWidget(
                   controller: ctrl.phoneNumberController,
-                  onPhoneNumberChanged: (value) {
-                    ctrl.FullPhoneNumber = value;
-                    log("Full Phone Number: ${ctrl.FullPhoneNumber}");
+                  onChanged: (v) {
+                    ctrl.FullPhoneNumber = v.completeNumber;
+
+                    log("onChanged -------> ${ctrl.fullNameController}");
                   },
                 ),
-
+                SizedBox(
+                  height: 16,
+                ),
                 Obx(
                   () => CustomDropDown(
                     labelText: 'Gender',
@@ -167,47 +172,6 @@ class ClientCompleteProfile extends StatelessWidget {
                     },
                   ),
                 ),
-                // Obx(
-                //   () => MyTextField(
-                //     isReadOnly: true,
-                //     labelText: 'Date of Birth',
-                //     hintText: (ctrl.dob.value != null)
-                //         ? DateTimeService.instance
-                //             .getDateUsFormat(ctrl.dob.value!)
-                //         : "Select date",
-                //     suffix: InkWell(
-                //       onTap: () {
-                //         Get.bottomSheet(
-                //           isScrollControlled: true,
-                //           CustomBottomSheet(
-                //             height: Get.height * 0.49,
-                //             child: DobPicker(
-                //               initialDateTime: ctrl.dob.value,
-                //               onDateTimeChanged: (dateTime) {
-                //                 ctrl.dob.value = dateTime;
-
-                //                 log("date: ${ctrl.dob.value}");
-                //               },
-                //               onTap: () {
-                //                 Get.back();
-                //               },
-                //             ),
-                //           ),
-                //         );
-                //       },
-                //       child: Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           Image.asset(
-                //             Assets.imagesCalendarA,
-                //             height: 20,
-                //             color: kSecondaryColor,
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
 
                 // --------- If User type is Therapist than display these fields -------------
 

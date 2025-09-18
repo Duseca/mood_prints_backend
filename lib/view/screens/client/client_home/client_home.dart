@@ -10,6 +10,7 @@ import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/common_maps.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
+import 'package:mood_prints/view/screens/therapist/therapist_home/therapist_notification.dart';
 import 'package:mood_prints/view/widget/common_image_view_widget.dart';
 import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
@@ -39,6 +40,23 @@ class _ClientHomeState extends State<ClientHome> {
         title: 'Home',
         centerTitle: false,
         haveLeading: false,
+        actions: [
+          InkWell(
+            onTap: () {
+              Get.to(() => TherapistNotificationPage());
+            },
+            child: SizedBox(
+              height: 22,
+              width: 22,
+              child: Center(
+                child: CommonImageView(
+                  imagePath: Assets.imagesBellIcon,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 20),
+        ],
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),

@@ -87,3 +87,4 @@ String buildMoodBySleepStatsMonthlyUrl(
 
 String requestNotificationUrl = "${baseUrl}request";
 String notificationUrl = "${baseUrl}notification";
+String removeRelationUrl = '${baseUrl}request/remove-relation';

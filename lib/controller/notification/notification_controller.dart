@@ -26,7 +26,7 @@ class NotificationController extends GetxController {
       log("URL: $getAllNotificationUrl");
 
       final response = await apiService.get(getAllNotificationUrl, false,
-          showResult: false, successCode: 200);
+          showResult: true, successCode: 200);
 
       if (response != null) {
         final notifications = response['notifications'];
@@ -35,12 +35,6 @@ class NotificationController extends GetxController {
             if (notification.containsKey('requestId')) {
               notificationList.add(NotificationModel.fromJson(notification));
             }
-
-            // I wana print this notificatiion in my debug console
-            // log('Notification _Id: -> ${notification['_id']}');
-            // log('Notification userID: -> ${notification['userId']}');
-            // log('Notification type: -> ${notification['type']}');
-            // log('Notification read: -> ${notification['read']}');
           }
           log('Notifications is not null: -> ${notificationList.length}');
           isLoading.value = false;
@@ -108,9 +102,8 @@ class NotificationController extends GetxController {
 
   // --------------- Delete Request ---------------
 
-  Future<void> deleteNotificationRequest({
-    required String requestId,
-  }) async {
+  Future<void> deleteNotificationRequest(
+      {required String requestId, String? message, String? title}) async {
     try {
       String url = requestNotificationUrl + '/$requestId';
       log("requestId:--------> $requestId");
@@ -119,7 +112,10 @@ class NotificationController extends GetxController {
           showResult: false, successCode: 200);
 
       if (response != null) {
-        Get.dialog(RequestDeclineCard());
+        Get.dialog(RequestDeclineCard(
+          title: title,
+          message: message,
+        ));
       }
     } catch (e) {
       log('Error occurs during Decline notification request:-> $e');
@@ -181,17 +177,6 @@ class NotificationController extends GetxController {
           await UserService.instance.getUserInformation();
 
           log('Chat Thead Called : ---------- ');
-
-          // -------------------------------------------------------------------
-          // -------------------------------------------------------------------
-          // --- If request accepted by therepist send notification to client ---
-
-          // Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
-
-          // -------------------------------------------------------------------
-          // -------------------------------------------------------------------
-
-          // log('Relationships: -> $relationships');
         }
       }
     } catch (e) {

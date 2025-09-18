@@ -50,6 +50,14 @@ class ChatController extends GetxController {
     }
   }
 
+  deleteChatHead({
+    required String participantsID,
+    required String myID,
+  }) async {
+    String chatThreadId = "$myID-$participantsID";
+    await chatCollection.doc(chatThreadId).delete();
+  }
+
   // -------> Update chat thread <----------
 
   Future<void> updateChatThread({

@@ -11,6 +11,7 @@ import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/firebase_const.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/core/enums/user_age_status.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
@@ -150,20 +151,7 @@ class AuthClientController extends GetxController {
 
         log("if: Is email exist: $isEmailExist");
       } else {
-        // await socialSignUpMethod(
-        //     fullName: '${auth.currentUser?.displayName}',
-        //     email: '${auth.currentUser?.email}',
-        //     userType: userType!,
-        //     authId: auth.currentUser!.uid);
-
         await UserTypeService.instance.initUserType();
-        // if (UserTypeService.instance.userType == UserType.client.name) {
-        //   log('Go To Client Nav Bar');
-        //   Get.to(() => ClientNavBar());
-        // } else {
-        //   log('Go To Therapist Nav Bar');
-        //   Get.to(() => TherapistNavBar());
-        // }
 
         hideLoadingDialog();
         Get.to(SignUpSecondPage(
@@ -221,12 +209,9 @@ class AuthClientController extends GetxController {
           await UserService.instance.getUserInformation();
 
           if (userModel.userType == 'client') {
-            showLoadingDialog();
-            await Get.find<ClientHomeController>().getAllBoard();
-            hideLoadingDialog();
-            Get.to(() => ClientNavBar());
+            Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
           } else {
-            Get.to(() => TherapistNavBar());
+            Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
           }
 
           resetValues();
@@ -273,67 +258,10 @@ class AuthClientController extends GetxController {
           await UserService.instance.getUserInformation();
 
           if (userModel.userType == UserType.client.name) {
-            Get.to(() => ClientNavBar());
+            Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
           } else {
-            Get.to(() => TherapistNavBar());
+            Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
           }
-        }
-      }
-    } catch (e) {
-      hideLoadingDialog();
-      log('Error:-> $e');
-    }
-  }
-
-  // --- Social SignUp Api ---
-
-  Future<void> socialSignUpMethod({
-    required String fullName,
-    required String email,
-    required String authId,
-    required String userType,
-    String authProvider = 'google',
-  }) async {
-    log("Try Called Social signUp method");
-    log('User Type ----------- $userType');
-    try {
-      currentUserType = userType;
-      // final fcmToken = await fcm.getToken();
-      final fcmToken = await getFcmToken();
-
-      Map<String, dynamic> body = {
-        'email': email,
-        'googleId': authId,
-        'userType': userType,
-        'fullName': fullName,
-        'authProvider': authProvider,
-        'deviceToken': fcmToken,
-      };
-
-      final response = await apiService.post(signUpUrl, body, true,
-          showResult: false, successCode: 200);
-
-      if (response != null) {
-        final token = response['token'];
-        final user = response['user'];
-
-        if (token != null && token.isNotEmpty) {
-          UserModel userModel = UserModel.fromJson(user);
-          UserService.instance.userModel.value = userModel;
-          log('Social User Model -> ${userModel.username}');
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', token);
-          await prefs.setString('id', userModel.id.toString());
-          await prefs.setString('userType', userModel.userType.toString());
-          await UserService.instance.getUserInformation();
-          //
-          // if (userModel.userType == UserType.client.name) {
-          //   log('Go To Client Nav Bar');
-          //   Get.to(() => ClientNavBar());
-          // } else {
-          //   log('Go To Therapist Nav Bar');
-          //   Get.to(() => TherapistNavBar());
-          // }
         }
       }
     } catch (e) {
@@ -581,60 +509,7 @@ class AuthClientController extends GetxController {
         log('Message:-> $message');
         if (message != null && message.isNotEmpty) {
           Get.off(SignUpSecondPage(type: type));
-          // if (type == UserType.therapist.name) {
-          //   signUpClientMethod(
-          //       dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-          //       npiNumber: npiNumberController.text,
-          //       email: emailController.text.trim(),
-          //       password: passwordController.text.trim(),
-          //       fullName: fullNameController.text.trim(),
-          //       userType: type,
-          //       isUsCitizien: true,
-          //       signature: signatureController.text.trim(),
-          //       widget: widget);
-          // } else if (type == UserType.client.name &&
-          //     userAgeStatus == UserAgeStatus.age13To17.name) {
-          //   signUpClientMethod(
-          //     widget: widget,
-          //     dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-          //     // npiNumber: ctrl.npiNumberController.text,
-          //     email: emailController.text.trim(),
-          //     password: passwordController.text.trim(),
-          //     fullName: fullNameController.text.trim(),
-          //     userType: type,
-
-          //     isUsCitizien: true,
-
-          //     gradianName: guardianNameController.text.trim(),
-          //     gradianEmail: guardianEmailController.text.trim(),
-          //     gradianPhone: gradianFullPhoneNumber,
-          //     gradianDOB:
-          //         DateTimeService.instance.getDateIsoFormat(guardianDob.value!),
-
-          //     emergencyName: emergencyNameController.text.trim(),
-          //     emergencyEmail: emergencyEmailController.text.trim(),
-          //     emergencyPhone: emergencyFullPhoneNumber,
-          //     guardianInfoComplete: true,
-          //     signature: signatureController.text.trim(),
-          //   );
-          // } else if (type == UserType.client.name &&
-          //     userAgeStatus == UserAgeStatus.age18Plus.name) {
-          //   signUpClientMethod(
-          //       dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-          //       npiNumber: npiNumberController.text,
-          //       email: emailController.text.trim(),
-          //       password: passwordController.text.trim(),
-          //       fullName: fullNameController.text.trim(),
-          //       userType: type,
-          //       emergencyName: emergencyNameController.text.trim(),
-          //       emergencyEmail: emergencyEmailController.text.trim(),
-          //       emergencyPhone: emergencyFullPhoneNumber,
-          //       guardianInfoComplete: true,
-          //       signature: signatureController.text.trim(),
-          //       widget: widget);
-          // }
         }
-        // resetValues();
       } else {
         otpMessage.value = 'Invalid OTP';
         log('Invalid OTP');
@@ -707,7 +582,7 @@ class AuthClientController extends GetxController {
               final model = UserModel.fromJson(user);
               UserService.instance.userModel.value = model;
 
-              Get.offAll(() => ClientNavBar());
+              Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
               resetValues();
             }
 
@@ -749,7 +624,7 @@ class AuthClientController extends GetxController {
               final model = TherapistDetailModel.fromJson(user);
               UserService.instance.therapistDetailModel.value = model;
 
-              Get.offAll(() => TherapistNavBar());
+              Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
               resetValues();
             }
 
@@ -759,44 +634,6 @@ class AuthClientController extends GetxController {
           }
         }
         resetValues();
-
-        // UserModel model = UserModel(
-        //     fullName: fullNameController.text.trim(),
-        //     phoneNumber: FullPhoneNumber,
-        //     dob: DateTimeService.instance.getDateIsoFormat(dob.value!),
-        //     gender: selectedGenderValue.value.toLowerCase(),
-        //     bio: BioController.text,
-        //     image: (downloadImageUrl != null) ? downloadImageUrl : dummyImg);
-
-        // final updateTherapistURL = updateClientUrl + newUserTempId.toString();
-
-        // final response = await apiService.putWithBody(
-        //     updateTherapistURL, model.toJson(), false,
-        //     showResult: true, successCode: 200);
-
-        // hideLoadingDialog();
-
-        // if (response != null) {
-        //   final message = response['message'];
-        //   final user = response['user'];
-        //   log('Message:-> $message');
-        //   // log('Response:-> $response');
-        //   if (message != null && message.isNotEmpty) {
-        //     final model = UserModel.fromJson(user);
-        //     log("m username: ${model.fullName}");
-        //     log("m bio: ${model.bio}");
-
-        //     if (currentUserType == 'client') {
-        //       Get.offAll(() => ClientNavBar());
-        //     } else {
-        //       Get.offAll(() => TherapistNavBar());
-        //     }
-        //   }
-
-        //   log('User Profile Updated');
-        // } else {
-        //   log('User Not Updated');
-        // }
       } else {
         displayToast(msg: 'Please add all information');
         log('Fields are empty');

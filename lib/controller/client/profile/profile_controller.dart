@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:mood_prints/constants/all_urls.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
+import 'package:mood_prints/controller/chat/chat_controller.dart';
 import 'package:mood_prints/core/common/global_instance.dart';
 import 'package:mood_prints/core/enums/notification_type.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/model/client_model/all_therapist/all_therapist_model.dart';
 import 'package:mood_prints/model/client_model/user_model.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
+import 'package:mood_prints/services/api/api_service.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/firebase_storage/firebase_storage_service.dart';
 import 'package:mood_prints/services/image_picker/image_picker.dart';
@@ -393,6 +395,7 @@ class ProfileController extends GetxController {
         if (message != null && message.isNotEmpty) {
           // ----- New Response ---------
           //TODO:  Create Notification API
+          log("Inside if and request id is ${requestID}");
           await createNotification(
             requestId: requestID,
             reciverID: therapistID,
@@ -413,6 +416,8 @@ class ProfileController extends GetxController {
 
           hideLoadingDialog();
           Get.back();
+          Get.back();
+
           log('Request Send: $message');
           displayToast(msg: 'Request send to therapist!');
           signatureController.clear();
@@ -425,29 +430,25 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<void> createNotification({
-    // String? therapistId,
-    String? reciverID,
-    String? requestId,
-    String? title,
-    String? fullName,
-    String notificationMsg = "has requested to select you as their therapist.",
-    String? message,
-  }) async {
+  Future<void> createNotification(
+      {String? reciverID,
+      String? requestId,
+      String? title,
+      String? fullName,
+      String notificationMsg =
+          "has requested to select you as their therapist.",
+      String? message,
+      String? dialogTitle,
+      bool showcard = true}) async {
     log('Create Notification Called');
 
     final body = {
       'requestId': requestId,
-      // 'userId': reciverID ?? UserService.instance.userModel.value.id,
       'userId': reciverID,
-      // 'therapistId': therapistId,
       'title': title,
       'fullName': fullName,
       'body': "${fullName} ${notificationMsg}",
-
-      // 'body': '$fullName has requested to select you as their therapist.',
     };
-
     String createNotificationUrl = notificationUrl;
 
     final response = await apiService.post(createNotificationUrl, body, true,
@@ -456,9 +457,11 @@ class ProfileController extends GetxController {
     if (response != null) {
       final notification = response['notification'];
       if (notification != null && notification.isNotEmpty) {
-        Get.dialog(RequestCard(
-          message: '$message',
-        ));
+        if (showcard)
+          Get.dialog(RequestCard(
+            title: dialogTitle,
+            message: '$message',
+          ));
         log('Notification Created -------->');
         log('Notification: $notification');
       }
@@ -502,26 +505,15 @@ class ProfileController extends GetxController {
   Future<void> extractCountryCode(String phoneNumber) async {
     PhoneNumber number =
         await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
-
-    initialCountryCodeValue.value = number.isoCode ?? '';
-
-    log('Detected Country ISO: ${number.isoCode}');
-    log('Dial Code: +${number.dialCode}');
-
-    // Remove dial code from phone number and set controller text
+    initialCountryCodeValue.value = '+${number.dialCode}';
     phoneNumberController.text =
         phoneNumber.replaceFirst("+${number.dialCode}", "");
-
-    log("Cleaned Phone Number: ${phoneNumberController.text}");
   }
 
   Future<void> extractEmergencyPhoneCountryCode(String phoneNumber) async {
     PhoneNumber number =
         await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber);
-
-    initialEmergencyCountryCode.value = number.isoCode ?? '';
-
-    // Assign the updated number back to the controller
+    initialEmergencyCountryCode.value = '+${number.dialCode}';
     emergencyPhoneNumberController.text =
         phoneNumber.replaceFirst("+${number.dialCode}", '');
   }
@@ -530,5 +522,103 @@ class ProfileController extends GetxController {
     final DateTime now = DateTime.now();
     final Duration difference = now.difference(updatedDateTime);
     return difference.inDays >= 10;
+  }
+
+  sendRemovalRequest({
+    required String therapistID,
+    required String clientID,
+  }) async {
+    try {
+      showLoadingDialog();
+      Map<String, dynamic> body = {
+        "requestId": UserService.instance.requests.first.id,
+        "status": "removed",
+      };
+      log("Body: ${body}");
+      final response = await apiService.putWithBody(
+          requestNotificationUrl, body, false,
+          showResult: true, successCode: 201);
+      if (response != null) {
+        await UserService.instance.getUserInformation();
+        hideLoadingDialog();
+        await createNotification(
+            requestId: UserService.instance.requests.first.id,
+            reciverID: therapistID,
+            title: 'Removal from Client',
+            fullName: UserService.instance.userModel.value.fullName,
+            notificationMsg: " sent a removal request",
+            showcard: true,
+            dialogTitle: "Request Sent Successfully",
+            message:
+                "Removal request sent to therapist. You will be notified when therapist accpet or decline it.");
+      } else {
+        hideLoadingDialog();
+      }
+    } on Exception catch (e) {
+      log("Error in removal request: $e");
+      hideLoadingDialog();
+    }
+  }
+
+  deleteRelation({
+    required String requestId,
+    required String therapistID,
+    required String clientID,
+  }) async {
+    showLoadingDialog();
+    final response = await apiService.post(
+        removeRelationUrl,
+        {
+          "requestId": requestId,
+          "status": "removed",
+          "relationShipId": UserService.instance.relationWithClients
+              .firstWhere((e) => e.clientId?.id == clientID)
+        },
+        false,
+        showResult: true);
+    if (response != null) {
+      await Get.find<ChatController>()
+          .deleteChatHead(participantsID: clientID, myID: therapistID);
+      await UserService.instance.getUserInformation();
+
+      hideLoadingDialog();
+    } else {
+      hideLoadingDialog();
+    }
+  }
+
+  Future<void> removeTherapistClientRelation({
+    required String therapistID,
+    required String clientID,
+  }) async {
+    try {
+      log(' Build Relation Called');
+      var relationUrl = updateUserUrl + clientID;
+
+      log(' Therapist ID ----------> $therapistID');
+      log(' Client ID ----------> $clientID');
+
+      var body = {
+        'therapistIds': [],
+      };
+
+      final response = await apiService.putWithBody(relationUrl, body, false,
+          showResult: false, successCode: 200);
+
+      if (response != null) {
+        final relationships = response['relationships'];
+        log("RelationShips:::: ${relationships}");
+        if (relationships != null && relationships.isNotEmpty) {
+          await Get.find<ChatController>()
+              .deleteChatHead(participantsID: clientID, myID: therapistID);
+
+          await UserService.instance.getUserInformation();
+
+          log('Chat Thead Called : ---------- ');
+        }
+      }
+    } catch (e) {
+      log('Error occurs during building Therapist & Client relation:-> $e');
+    }
   }
 }

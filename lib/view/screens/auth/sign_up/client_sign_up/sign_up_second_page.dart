@@ -28,6 +28,7 @@ import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_bottom_sheet_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/dob_picker.dart';
+import 'package:mood_prints/view/widget/intel_phone_field_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
@@ -140,14 +141,19 @@ class SignUpSecondPage extends StatelessWidget {
                                   .emailValidator(value);
                             },
                           ),
-                          PhoneField(
-                            title: "Emergency Contact’s Phone Number”",
+                          IntlPhoneFieldWidget(
+                            label: "Emergency Contact’s Phone Number",
                             controller: ctrl.emergencyPhoneNumberController,
-                            onPhoneNumberChanged: (value) {
-                              ctrl.emergencyFullPhoneNumber = value;
-                              log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
+                            onChanged: (v) {
+                              ctrl.emergencyFullPhoneNumber = v.completeNumber;
+
+                              log("onChanged -------> ${ctrl.emergencyFullPhoneNumber}");
                             },
                           ),
+                          SizedBox(
+                            height: 20,
+                          ),
+
                           Obx(
                             () => CheckBoxWithHyperLink(
                               text1: "I agree to the ",
@@ -516,15 +522,19 @@ class SignUpSecondPage extends StatelessWidget {
                                     .emailValidator(value);
                               },
                             ),
-                            PhoneField(
-                              title: "Emergency Contact’s Phone Number",
+                            IntlPhoneFieldWidget(
+                              label: "Emergency Contact’s Phone Number",
                               controller: ctrl.emergencyPhoneNumberController,
-                              onPhoneNumberChanged: (value) {
-                                ctrl.emergencyFullPhoneNumber = value;
-                                log("Full Phone Number: ${ctrl.emergencyFullPhoneNumber}");
+                              onChanged: (v) {
+                                ctrl.emergencyFullPhoneNumber =
+                                    v.completeNumber;
+
+                                log("onChanged -------> ${ctrl.emergencyFullPhoneNumber}");
                               },
                             ),
-
+                            SizedBox(
+                              height: 20,
+                            ),
                             // MyTextField(
                             //     controller: ctrl.signatureController,
                             //     labelText: "Signature",
@@ -1243,15 +1253,11 @@ class _SuccessDialog extends StatelessWidget {
                     onTap: () async {
                       // await UserService.instance.getUserInformation();
                       Get.back();
-                      Get.back();
                       final ctrl = Get.find<AuthClientController>();
                       ctrl.fullNameController.text =
                           UserService.instance.userModel.value.fullName ?? "";
                       ctrl.emailController.text =
                           UserService.instance.userModel.value.email ?? "";
-                      ctrl.phoneNumberController.text =
-                          UserService.instance.userModel.value.phoneNumber ??
-                              "";
 
                       Get.off(() => ClientCompleteProfile());
                     },

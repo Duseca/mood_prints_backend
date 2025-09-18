@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/binding/binding.dart';
@@ -132,7 +133,9 @@ class ClientProfile extends StatelessWidget {
           _ProfileTile(
             icon: Assets.imagesProfile,
             title: 'My Therapist',
-            onTap: () {
+            onTap: () async {
+              showLoadingDialog();
+              await UserService.instance.getUserInformation();
               Get.to(() => MyTherapist());
             },
           ),
