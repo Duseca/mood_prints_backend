@@ -478,10 +478,7 @@ class ProfileController extends GetxController {
     log('Create Notification Called');
     showLoadingDialog();
     final body = {
-      // 'requestId': requestId,
-      // 'userId': reciverID ?? UserService.instance.userModel.value.id,
       'userId': reciverID,
-      // 'therapistId': therapistId,
       'title': title,
       'fullName': fullName,
       'body': "${notificationMsg}",
@@ -584,41 +581,6 @@ class ProfileController extends GetxController {
       hideLoadingDialog();
     } else {
       hideLoadingDialog();
-    }
-  }
-
-  Future<void> removeTherapistClientRelation({
-    required String therapistID,
-    required String clientID,
-  }) async {
-    try {
-      log(' Build Relation Called');
-      var relationUrl = updateUserUrl + clientID;
-
-      log(' Therapist ID ----------> $therapistID');
-      log(' Client ID ----------> $clientID');
-
-      var body = {
-        'therapistIds': [],
-      };
-
-      final response = await apiService.putWithBody(relationUrl, body, false,
-          showResult: false, successCode: 200);
-
-      if (response != null) {
-        final relationships = response['relationships'];
-        log("RelationShips:::: ${relationships}");
-        if (relationships != null && relationships.isNotEmpty) {
-          await Get.find<ChatController>()
-              .deleteChatHead(participantsID: clientID, myID: therapistID);
-
-          await UserService.instance.getUserInformation();
-
-          log('Chat Thead Called : ---------- ');
-        }
-      }
-    } catch (e) {
-      log('Error occurs during building Therapist & Client relation:-> $e');
     }
   }
 }

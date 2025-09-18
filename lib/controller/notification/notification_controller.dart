@@ -58,6 +58,7 @@ class NotificationController extends GetxController {
     required String clientID,
   }) async {
     try {
+      showLoadingDialog();
       isRequestAccepted.value = true;
       var body = {'requestId': requestId, 'status': status};
 
@@ -71,28 +72,19 @@ class NotificationController extends GetxController {
         if (request != null && request.isNotEmpty) {
           await buildTherapistClientRelation(
               therapistID: therapistID, clientID: clientID);
-
-          // *******************************************************************************
-          // Notification to Client ------------- 17 - Mar - 2025
-          // Notification to Client ------------- 17 - Mar - 2025
-          // Notification to Client ------------- 17 - Mar - 2025
-
-          //
-          // await Get.find<ProfileController>().createNotification(therapistId: therapistID ,requestId: requestId , title: "${UserService.instance.therapistDetailModel.value.fullName}" , notificationMsg: "has selected you as their patient." , message: "${UserService.instance.therapistDetailModel.value.fullName} has selected you as their patient.");
-          //
-
+          hideLoadingDialog();
           isRequestAccepted.value = false;
           Get.dialog(RequestAcceptedCard());
+        } else {
+          hideLoadingDialog();
         }
+      } else {
+        hideLoadingDialog();
       }
 
-      // -----------------------------------------
-      // -----------------------------------------
-      // -----------------------------------------
-
-      // await Get.find<ProfileController>().requestNotification(therapistID: therapistID , clientID: clientID);
       isRequestAccepted.value = false;
     } catch (e) {
+      hideLoadingDialog();
       isRequestAccepted.value = false;
       log('Error occurs during Notification Status updating:-> $e');
     }
@@ -139,8 +131,9 @@ class NotificationController extends GetxController {
         await getAllNotification(
             UserService.instance.therapistDetailModel.value.id);
         hideLoadingDialog();
+      } else {
+        hideLoadingDialog();
       }
-      hideLoadingDialog();
     } catch (e) {
       hideLoadingDialog();
       log('Error occurs during delete notification:-> $e');

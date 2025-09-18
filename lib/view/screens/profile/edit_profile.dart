@@ -21,7 +21,6 @@ import 'package:mood_prints/view/widget/my_text_field_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 
 import '../../widget/intel_phone_field_widget.dart';
-import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
 
 class EditProfile extends StatefulWidget {
   // UserModel? model;
@@ -67,15 +66,6 @@ class _EditProfileState extends State<EditProfile> {
     ctrl.signatureController.text = userModel.signatureText ?? "";
 
     log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      showLoadingDialog();
-      await ctrl
-          .extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-      await ctrl
-          .extractEmergencyPhoneCountryCode(userModel.emergencyPhone ?? "");
-      hideLoadingDialog();
-    });
   }
 
   final _formKey = GlobalKey<FormState>();

@@ -83,12 +83,6 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                 therapistID: ctrl.notificationList[index]
                                     .requestId!.therapistId
                                     .toString());
-                            await ctrl.deleteNotificationRequest(
-                                title: "Removal Request Accepted",
-                                message: "You have accepted removal request",
-                                requestId: ctrl
-                                    .notificationList[index].requestId!.id
-                                    .toString());
                             await pctrl.createNotification(
                                 title: 'Removal Request accepted',
                                 fullName:
@@ -101,6 +95,12 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                     .notificationList[index].requestId!.clientId
                                     .toString(),
                                 showcard: false);
+                            await ctrl.deleteNotificationRequest(
+                                title: "Removal Request Accepted",
+                                message: "You have accepted removal request",
+                                requestId: ctrl
+                                    .notificationList[index].requestId!.id
+                                    .toString());
                           },
                           onAcceptTap: () async {
                             // ---------- Accept Request notification send to the client --------------
@@ -117,9 +117,7 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                   .notificationList[index].requestId!.clientId
                                   .toString(),
                             );
-                            await ctrl.deleteNotification(
-                                notificationID:
-                                    ctrl.notificationList[index].id.toString());
+
                             //----------- Update notification status & Build Connection with client --------------
 
                             await ctrl.updateNotificationStatus(
@@ -133,6 +131,10 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                 therapistID: ctrl.notificationList[index]
                                     .requestId!.therapistId
                                     .toString());
+
+                            await ctrl.deleteNotification(
+                                notificationID:
+                                    ctrl.notificationList[index].id.toString());
                           },
                           onDeclineTap: () async {
                             // ---------- Declined Request notification send to the client --------------

@@ -42,7 +42,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
     userModel = UserService.instance.therapistDetailModel.value;
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
       if (ctrl.selectedGenderValue.value.isEmpty) {
@@ -53,7 +53,7 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
       ctrl.cityController.text = userModel.city ?? '';
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.phoneNumberController.text = userModel.phoneNumber ?? '';
+      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
@@ -71,18 +71,6 @@ class _EditTherapistProfileState extends State<EditTherapistProfile> {
     ctrl.signatureController.text = userModel.signatureText ?? "";
 
     log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      showLoadingDialog();
-      if (ctrl.phoneNumberController.text.trim().isNotEmpty)
-        await ctrl
-            .extractCountryCode('${ctrl.phoneNumberController.text.trim()}');
-      if (userModel.emergencyPhone != null &&
-          userModel.emergencyPhone!.isNotEmpty)
-        await ctrl
-            .extractEmergencyPhoneCountryCode(userModel.emergencyPhone ?? "");
-      hideLoadingDialog();
-    });
   }
 
   @override

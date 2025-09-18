@@ -664,6 +664,7 @@ class AuthClientController extends GetxController {
     await prefs.remove('id');
     await prefs.remove('token');
     await prefs.remove('userType');
+    UserService.instance.clearData();
     await GoogleSignIn().signOut();
     Get.offAll(() => GetStarted());
     hideLoadingDialog();

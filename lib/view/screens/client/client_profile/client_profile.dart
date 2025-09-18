@@ -6,6 +6,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
@@ -124,7 +125,16 @@ class ClientProfile extends StatelessWidget {
           _ProfileTile(
             icon: Assets.imagesProfile,
             title: 'Edit Profile',
-            onTap: () {
+            onTap: () async {
+              showLoadingDialog();
+              var ctrl = Get.find<ProfileController>();
+              var userModel = UserService.instance.userModel.value;
+              if ((userModel.phoneNumber ?? "").isNotEmpty)
+                await ctrl.extractCountryCode(userModel.phoneNumber ?? "");
+              if ((userModel.emergencyPhone ?? '').isNotEmpty)
+                await ctrl.extractEmergencyPhoneCountryCode(
+                    userModel.emergencyPhone ?? "");
+              hideLoadingDialog();
               Get.to(() => EditProfile(
                   // model: userModel,
                   ));
@@ -211,9 +221,7 @@ class ClientProfile extends StatelessWidget {
                   await Get.find<AuthClientController>().deleteAccountMethod(
                       UserService.instance.userModel.value.id.toString());
                   await Get.find<AuthClientController>().logOutMethod();
-
-                  UserService.instance.relationWithClients.clear();
-                  UserService.instance.relationWithTherapist.clear();
+                  Get.find<ClientHomeController>().clearAllData();
                 },
               ));
             },
@@ -231,9 +239,8 @@ class ClientProfile extends StatelessWidget {
                 },
                 onLogoutTap: () async {
                   await Get.find<AuthClientController>().logOutMethod();
+
                   Get.find<ClientHomeController>().clearAllData();
-                  UserService.instance.relationWithClients.clear();
-                  UserService.instance.relationWithTherapist.clear();
                 },
               ));
             },

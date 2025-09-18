@@ -29,6 +29,12 @@ class UserService {
   // For Therapist
   Rx<TherapistDetailModel> therapistDetailModel = TherapistDetailModel().obs;
   RxList<RelationClientModel> relationWithClients = <RelationClientModel>[].obs;
+  clearData() async {
+    userModel.value = UserModel();
+    relationWithClients.clear();
+    relationWithTherapist.clear();
+    requests.clear();
+  }
 
   Future<void> getUserInformation() async {
     try {

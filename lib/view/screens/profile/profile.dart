@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:mood_prints/constants/app_colors.dart';
 import 'package:mood_prints/constants/app_images.dart';
 import 'package:mood_prints/constants/app_sizes.dart';
+import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
 import 'package:mood_prints/model/therapist_model/therapist_detail_model.dart';
@@ -127,11 +129,30 @@ class Profile extends StatelessWidget {
             _ProfileTile(
               icon: Assets.imagesProfile,
               title: 'Edit Profile',
-              onTap: () {
+              onTap: () async {
                 if (UserTypeService.instance.userType ==
                     UserType.therapist.name) {
+                  showLoadingDialog();
+                  var ctrl = Get.find<ProfileController>();
+                  var userModel =
+                      UserService.instance.therapistDetailModel.value;
+                  if ((userModel.phoneNumber ?? "").isNotEmpty)
+                    await ctrl.extractCountryCode(userModel.phoneNumber ?? "");
+                  if ((userModel.emergencyPhone ?? '').isNotEmpty)
+                    await ctrl.extractEmergencyPhoneCountryCode(
+                        userModel.emergencyPhone ?? "");
+                  hideLoadingDialog();
                   Get.to(() => EditTherapistProfile());
                 } else {
+                  showLoadingDialog();
+                  var ctrl = Get.find<ProfileController>();
+                  var userModel = UserService.instance.userModel.value;
+                  if ((userModel.phoneNumber ?? "").isNotEmpty)
+                    await ctrl.extractCountryCode(userModel.phoneNumber ?? "");
+                  if ((userModel.emergencyPhone ?? '').isNotEmpty)
+                    await ctrl.extractEmergencyPhoneCountryCode(
+                        userModel.emergencyPhone ?? "");
+                  hideLoadingDialog();
                   Get.to(() => EditProfile());
                 }
               },
@@ -214,21 +235,9 @@ class Profile extends StatelessWidget {
                         UserService.instance.therapistDetailModel.value.id
                             .toString());
                     await Get.find<AuthClientController>().logOutMethod();
-
-                    UserService.instance.relationWithClients.clear();
-                    UserService.instance.relationWithTherapist.clear();
+                    Get.find<ClientHomeController>().clearAllData();
                   },
                 ));
-                // Get.dialog(_LogoutDialog(
-                //   onCancelTap: () {
-                //     Get.back();
-                //   },
-                //   onLogoutTap: () async {
-                //     await Get.find<AuthClientController>().logOutMethod();
-                //     UserService.instance.relationWithClients.clear();
-                //     UserService.instance.relationWithTherapist.clear();
-                //   },
-                // ));
               },
               mBottom: 24,
             ),
@@ -244,6 +253,7 @@ class Profile extends StatelessWidget {
                   },
                   onLogoutTap: () async {
                     await Get.find<AuthClientController>().logOutMethod();
+                    Get.find<ClientHomeController>().clearAllData();
                   },
                 ));
               },
