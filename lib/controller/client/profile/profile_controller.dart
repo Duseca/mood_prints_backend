@@ -521,41 +521,41 @@ class ProfileController extends GetxController {
     return difference.inDays >= 10;
   }
 
-  sendRemovalRequest({
-    required String therapistID,
-    required String clientID,
-  }) async {
-    try {
-      showLoadingDialog();
-      Map<String, dynamic> body = {
-        "requestId": UserService.instance.requests.first.id,
-        "status": "removed",
-      };
-      log("Body: ${body}");
-      final response = await apiService.putWithBody(
-          requestNotificationUrl, body, false,
-          showResult: true, successCode: 201);
-      if (response != null) {
-        await UserService.instance.getUserInformation();
-        hideLoadingDialog();
-        await createNotification(
-            requestId: UserService.instance.requests.first.id,
-            reciverID: therapistID,
-            title: 'Removal from Client',
-            fullName: UserService.instance.userModel.value.fullName,
-            notificationMsg: " sent a removal request",
-            showcard: true,
-            dialogTitle: "Request Sent Successfully",
-            message:
-                "Removal request sent to therapist. You will be notified when therapist accpet or decline it.");
-      } else {
-        hideLoadingDialog();
-      }
-    } on Exception catch (e) {
-      log("Error in removal request: $e");
-      hideLoadingDialog();
-    }
-  }
+  // sendRemovalRequest({
+  //   required String therapistID,
+  //   required String clientID,
+  // }) async {
+  //   try {
+  //     showLoadingDialog();
+  //     Map<String, dynamic> body = {
+  //       "requestId": UserService.instance.requests.first.id,
+  //       "status": "removed",
+  //     };
+  //     log("Body: ${body}");
+  //     final response = await apiService.putWithBody(
+  //         requestNotificationUrl, body, false,
+  //         showResult: true, successCode: 201);
+  //     if (response != null) {
+  //       await UserService.instance.getUserInformation();
+  //       hideLoadingDialog();
+  //       await createNotification(
+  //           requestId: UserService.instance.requests.first.id,
+  //           reciverID: therapistID,
+  //           title: 'Removal from Client',
+  //           fullName: UserService.instance.userModel.value.fullName,
+  //           notificationMsg: " sent a removal request",
+  //           showcard: true,
+  //           dialogTitle: "Request Sent Successfully",
+  //           message:
+  //               "Removal request sent to therapist. You will be notified when therapist accpet or decline it.");
+  //     } else {
+  //       hideLoadingDialog();
+  //     }
+  //   } on Exception catch (e) {
+  //     log("Error in removal request: $e");
+  //     hideLoadingDialog();
+  //   }
+  // }
 
   deleteRelation({
     required String requestId,
@@ -568,11 +568,12 @@ class ProfileController extends GetxController {
         {
           "requestId": requestId,
           "status": "removed",
-          "relationShipId": UserService.instance.relationWithClients
-              .firstWhere((e) => e.clientId?.id == clientID)
+          "relationShipId": UserService.instance.relationWithTherapist
+              .firstWhere((e) => e.clientId == clientID)
         },
         false,
-        showResult: true);
+        showResult: true,
+        successCode: 200);
     if (response != null) {
       await Get.find<ChatController>()
           .deleteChatHead(participantsID: clientID, myID: therapistID);

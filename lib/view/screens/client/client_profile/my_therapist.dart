@@ -8,6 +8,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/app_styling.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/profile/profile_controller.dart';
+import 'package:mood_prints/controller/notification/notification_controller.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/client/client_profile/add_new_therapist.dart';
 import 'package:mood_prints/view/widget/checkbox_widget.dart';
@@ -91,29 +92,59 @@ class _MyTherapistState extends State<MyTherapist> {
                       Expanded(
                         child: MyButton(
                           bgColor: kRedColor,
-                          buttonText: 'Send Removal Request',
+                          buttonText: 'Remove Therapist',
                           onTap: () async {
-                            if (UserService.instance.requests.isNotEmpty &&
-                                UserService.instance.requests.first.status !=
-                                    "removed") {
-                              Get.find<ProfileController>().sendRemovalRequest(
-                                  therapistID: UserService
-                                          .instance
-                                          .relationWithTherapist
-                                          .first
-                                          .therapist
-                                          ?.id ??
-                                      "",
-                                  clientID:
-                                      UserService.instance.userModel.value.id ??
-                                          "");
-                            } else {
-                              Get.dialog(RequestCard(
-                                title: "Request Already Exists",
-                                message:
-                                    'You already have an active removal request. Wait until therapist accept or decline it.',
-                              ));
-                            }
+                            var fullname = UserService.instance
+                                .relationWithTherapist.last.therapist?.fullName;
+                            Get.dialog(SuccessDialog(
+                              title: "Confirm Relationship Removal",
+                              description:
+                                  "Are you sure you want to end your relationship with ${fullname ?? ""}? This will also delete your chat history",
+                              onTap: () async {
+                                Get.back();
+                                if (UserService.instance.requests.isNotEmpty &&
+                                    UserService.instance.requests.last.status ==
+                                        "accepted") {
+                                  await profileController.deleteRelation(
+                                      requestId: UserService
+                                          .instance.requests.last.id
+                                          .toString(),
+                                      clientID: UserService
+                                          .instance.requests.last.clientId
+                                          .toString(),
+                                      therapistID: UserService
+                                          .instance.requests.last.therapistId
+                                          .toString());
+                                  await profileController.createNotification(
+                                      title: 'Relationship Removed',
+                                      fullName:
+                                          "${UserService.instance.userModel.value.fullName}",
+                                      notificationMsg:
+                                          "has ended the therapeutic relationship. The chat and related access have been removed",
+                                      reciverID: UserService
+                                          .instance.requests.last.therapistId
+                                          .toString(),
+                                      showcard: false);
+                                  await Get.find<NotificationController>()
+                                      .deleteNotificationRequest(
+                                          title: "Therapist Removed",
+                                          message:
+                                              "${fullname ?? ""} has been removed and notified.",
+                                          requestId: UserService
+                                              .instance.requests.first.id
+                                              .toString());
+                                  UserService.instance.requests.clear();
+                                }
+                              },
+                            ));
+
+                            // else {
+                            //   Get.dialog(RequestCard(
+                            //     title: "Request Already Exists",
+                            //     message:
+                            //         'You already have an active removal request. Wait until therapist accept or decline it.',
+                            //   ));
+                            // }
                           },
                         ),
                       ),

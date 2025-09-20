@@ -815,12 +815,14 @@ class _WeeklyState extends State<_Weekly> {
                           ),
 
                           // ------ Average Bed Time -------
-                          MyText(
-                            paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisModel.value?.averageBedtime}',
-                            size: 16,
-                            weight: FontWeight.w600,
+                          Obx(
+                            () => MyText(
+                              paddingTop: 4,
+                              text:
+                                  '${ctrl.sleepAnalysisModel.value?.averageWakeupTime ?? '-'}',
+                              size: 16,
+                              weight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -847,12 +849,14 @@ class _WeeklyState extends State<_Weekly> {
                             size: 12,
                             color: kGreyColor,
                           ),
-                          MyText(
-                            paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisModel.value?.averageWakeupTime}',
-                            size: 16,
-                            weight: FontWeight.w600,
+                          Obx(
+                            () => MyText(
+                              paddingTop: 4,
+                              text:
+                                  '${ctrl.sleepAnalysisModel.value?.averageBedtime ?? '-'}',
+                              size: 16,
+                              weight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),

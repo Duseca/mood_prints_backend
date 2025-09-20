@@ -102,14 +102,6 @@ class UserService {
     }
   }
 
-  // -------- User App Use ----------
-
-  // bool isTenDaysCompleted(DateTime updatedDateTime) {
-  //   final DateTime now = DateTime.now();
-  //   final Duration difference = now.difference(updatedDateTime);
-  //   return difference.inDays >= 10;
-  // }
-
   RxBool isAccountAccessBlocked = false.obs;
 
   void isTenDaysCompleted() {
@@ -134,9 +126,3 @@ class UserService {
     isAccountAccessBlocked.value = false;
   }
 }
-
-
-// bool isTenDaysCompleted(DateTime updatedDateTime) {
- 
-// }
-

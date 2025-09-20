@@ -65,43 +65,43 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                               ?.status ==
                                           Status.accepted.name)
                                       ? Status.accepted.name
-                                      : (ctrl.notificationList[index].requestId
-                                                  ?.status ==
-                                              Status.removed.name)
-                                          ? Status.removed.name
+                                      // :  (ctrl.notificationList[index].requestId
+                                      //             ?.status ==
+                                      //         Status.removed.name)
+                                      //     ? Status.removed.name
                                           : Status.declined.name,
                           title: '${ctrl.notificationList[index].title}',
                           description: '${ctrl.notificationList[index].body}',
-                          onRemoveTap: () async {
-                            await pctrl.deleteRelation(
-                                requestId: ctrl
-                                    .notificationList[index].requestId!.id
-                                    .toString(),
-                                clientID: ctrl
-                                    .notificationList[index].requestId!.clientId
-                                    .toString(),
-                                therapistID: ctrl.notificationList[index]
-                                    .requestId!.therapistId
-                                    .toString());
-                            await pctrl.createNotification(
-                                title: 'Removal Request accepted',
-                                fullName:
-                                    "${UserService.instance.therapistDetailModel.value.fullName}",
-                                notificationMsg:
-                                    "has accepted your${(ctrl.notificationList[index].requestId?.status == Status.removed.name) ? " removal" : ''} request.",
-                                message:
-                                    "${UserService.instance.therapistDetailModel.value.fullName} has accepted your removal request.",
-                                reciverID: ctrl
-                                    .notificationList[index].requestId!.clientId
-                                    .toString(),
-                                showcard: false);
-                            await ctrl.deleteNotificationRequest(
-                                title: "Removal Request Accepted",
-                                message: "You have accepted removal request",
-                                requestId: ctrl
-                                    .notificationList[index].requestId!.id
-                                    .toString());
-                          },
+                          // onRemoveTap: () async {
+                          //   await pctrl.deleteRelation(
+                          //       requestId: ctrl
+                          //           .notificationList[index].requestId!.id
+                          //           .toString(),
+                          //       clientID: ctrl
+                          //           .notificationList[index].requestId!.clientId
+                          //           .toString(),
+                          //       therapistID: ctrl.notificationList[index]
+                          //           .requestId!.therapistId
+                          //           .toString());
+                          //   await pctrl.createNotification(
+                          //       title: 'Removal Request accepted',
+                          //       fullName:
+                          //           "${UserService.instance.therapistDetailModel.value.fullName}",
+                          //       notificationMsg:
+                          //           "has accepted your${(ctrl.notificationList[index].requestId?.status == Status.removed.name) ? " removal" : ''} request.",
+                          //       message:
+                          //           "${UserService.instance.therapistDetailModel.value.fullName} has accepted your removal request.",
+                          //       reciverID: ctrl
+                          //           .notificationList[index].requestId!.clientId
+                          //           .toString(),
+                          //       showcard: false);
+                          //   await ctrl.deleteNotificationRequest(
+                          //       title: "Removal Request Accepted",
+                          //       message: "You have accepted removal request",
+                          //       requestId: ctrl
+                          //           .notificationList[index].requestId!.id
+                          //           .toString());
+                          // },
                           onAcceptTap: () async {
                             // ---------- Accept Request notification send to the client --------------
                             var name = UserService

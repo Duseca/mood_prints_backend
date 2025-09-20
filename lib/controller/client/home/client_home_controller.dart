@@ -253,6 +253,7 @@ class ClientHomeController extends GetxController {
 
   Future<void> getSleepStats({String? userID}) async {
     sleepStats.clear();
+    sleepAnalysisModel.value = null;
 
     final response = await apiService.get(
       buildSleepAnalysisStatsUrl(
@@ -261,7 +262,7 @@ class ClientHomeController extends GetxController {
           month: currentMonth,
           userId: userID),
       false,
-      showResult: false,
+      showResult: true,
       successCode: 200,
     );
     log(" --- Sleep weekly stats montly ---");
