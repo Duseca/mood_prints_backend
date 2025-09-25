@@ -6,6 +6,7 @@ import 'package:mood_prints/constants/app_sizes.dart';
 import 'package:mood_prints/constants/loading_animation.dart';
 import 'package:mood_prints/controller/client/auth/auth_client_controller.dart';
 import 'package:mood_prints/controller/client/home/client_home_controller.dart';
+import 'package:mood_prints/controller/client/mode_manager/mode_manager_controller.dart';
 import 'package:mood_prints/controller/client/profile/profile_controller.dart';
 import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/core/enums/user_type.dart';
@@ -17,9 +18,9 @@ import 'package:mood_prints/view/screens/client/client_profile/client_profile.da
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
 import 'package:mood_prints/view/screens/privacy_policy/b_a.dart';
-import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
+import 'package:mood_prints/view/screens/privacy_policy/general_terms.dart';
 import 'package:mood_prints/view/screens/privacy_policy/p_s.dart';
-import 'package:mood_prints/view/screens/privacy_policy/privacy_policy_page.dart';
+import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
 import 'package:mood_prints/view/screens/profile/change_pass.dart';
 import 'package:mood_prints/view/screens/profile/edit_profile.dart';
 import 'package:mood_prints/view/screens/profile/edit_therapist_profile.dart';
@@ -184,14 +185,14 @@ class Profile extends StatelessWidget {
               icon: Assets.imagesPrivacy,
               title: 'Privacy Policy',
               onTap: () {
-                Get.to(() => HippaScreen());
+                Get.to(() => PPPage());
               },
             ),
             _ProfileTile(
               icon: Assets.imagesPrivacy,
               title: 'Platform Services Agreement (PSA)',
               onTap: () {
-                Get.to(() => HippaScreen());
+                Get.to(() => PSPage());
               },
             ),
 
@@ -200,7 +201,7 @@ class Profile extends StatelessWidget {
               icon: Assets.imagesPrivacy,
               title: 'Business Associate Agreement (BAA)',
               onTap: () {
-                Get.to(() => HippaScreen());
+                Get.to(() => BAPage());
               },
             ),
 
@@ -208,7 +209,7 @@ class Profile extends StatelessWidget {
               icon: Assets.imagesPrivacy,
               title: 'General Terms of Service',
               onTap: () {
-                Get.to(() => HippaScreen());
+                Get.to(() => GeneralTermsPage());
               },
             ),
 
@@ -236,6 +237,7 @@ class Profile extends StatelessWidget {
                             .toString());
                     await Get.find<AuthClientController>().logOutMethod();
                     Get.find<ClientHomeController>().clearAllData();
+                    Get.find<ModeManagerController>().resetValues();
                   },
                 ));
               },
@@ -252,12 +254,13 @@ class Profile extends StatelessWidget {
                     Get.back();
                   },
                   onLogoutTap: () async {
+                    await Get.find<ModeManagerController>().resetValues();
                     await Get.find<AuthClientController>().logOutMethod();
                     Get.find<ClientHomeController>().clearAllData();
                   },
                 ));
               },
-              mBottom: 0,
+              mBottom: 120,
             ),
           ],
         ),

@@ -42,8 +42,6 @@ class _EditProfileState extends State<EditProfile> {
 
     if (userModel.authProvider == 'google') {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
-
       ctrl.bioController.text = userModel.bio != null ? userModel.bio! : '';
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
       if (ctrl.selectedGenderValue.value.isEmpty) {
@@ -51,7 +49,6 @@ class _EditProfileState extends State<EditProfile> {
       }
     } else {
       ctrl.fullNameController.text = userModel.fullName!;
-      ctrl.completePhoneNumber = userModel.phoneNumber ?? '';
       ctrl.dob.value = DateTime.parse(userModel.dob!);
       ctrl.bioController.text = userModel.bio!;
       ctrl.selectedGenderValue.value = userModel.gender ?? '';
@@ -62,7 +59,6 @@ class _EditProfileState extends State<EditProfile> {
 
     ctrl.emergencyEmailController.text = userModel.emergencyEmail ?? "";
     ctrl.emergencyNameController.text = userModel.emergencyName ?? "";
-    ctrl.emergencyFullPhoneNumber = userModel.emergencyPhone ?? "";
     ctrl.signatureController.text = userModel.signatureText ?? "";
 
     log('--------- VVRR --------${ctrl.selectedGenderValue.value} :: ${userModel.gender}');
@@ -211,6 +207,12 @@ class _EditProfileState extends State<EditProfile> {
 
                         log("onChanged -------> ${ctrl.completePhoneNumber}");
                       },
+                      onCountryChanged: (v) {
+                        ctrl.completePhoneNumber = ctrl.completePhoneNumber
+                            ?.replaceFirst(
+                                '${ctrl.initialCountryCodeValue.value}',
+                                '+${v.dialCode}');
+                      },
                     ),
                   ),
                   SizedBox(height: 16.0),
@@ -301,7 +303,13 @@ class _EditProfileState extends State<EditProfile> {
                       onChanged: (v) {
                         ctrl.emergencyFullPhoneNumber = v.completeNumber;
 
-                        log("onChanged -------> ${ctrl.completePhoneNumber}");
+                        log("onChanged -------> ${ctrl.emergencyFullPhoneNumber}");
+                      },
+                      onCountryChanged: (v) {
+                        ctrl.emergencyFullPhoneNumber =
+                            ctrl.emergencyFullPhoneNumber.replaceFirst(
+                                '${ctrl.initialEmergencyCountryCode.value}',
+                                '+${v.dialCode}');
                       },
                     ),
                   ),

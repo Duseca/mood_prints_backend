@@ -5,6 +5,7 @@ import 'package:mood_prints/controller/client/home/client_home_controller.dart';
 import 'package:mood_prints/core/binding/binding.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/therapist_nav_bar.dart';
 import 'package:mood_prints/view/screens/launch/get_started.dart';
@@ -45,9 +46,36 @@ class _SplashScreenState extends State<SplashScreen> {
         await UserService.instance.getUserInformation();
 
         if (userType == 'client') {
-          Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+          if (UserService.instance.userModel.value.phoneNumber == null ||
+              UserService.instance.userModel.value.phoneNumber == "") {
+            final ctrl = Get.find<AuthClientController>();
+            ctrl.fullNameController.text =
+                UserService.instance.userModel.value.fullName ?? "";
+            ctrl.emailController.text =
+                UserService.instance.userModel.value.email ?? "";
+            ctrl.newUserTempId = UserService.instance.userModel.value.id;
+
+            Get.to(ClientCompleteProfile());
+          } else {
+            Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+          }
         } else if (userType == 'therapist') {
-          Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+          if (UserService.instance.therapistDetailModel.value.phoneNumber ==
+                  null ||
+              UserService.instance.therapistDetailModel.value.phoneNumber ==
+                  "") {
+            final ctrl = Get.find<AuthClientController>();
+            ctrl.fullNameController.text =
+                UserService.instance.therapistDetailModel.value.fullName ?? "";
+            ctrl.emailController.text =
+                UserService.instance.therapistDetailModel.value.email ?? "";
+            ctrl.newUserTempId =
+                UserService.instance.therapistDetailModel.value.id;
+
+            Get.to(ClientCompleteProfile());
+          } else {
+            Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+          }
         }
       } else {
         Get.offAll(() => GetStarted());

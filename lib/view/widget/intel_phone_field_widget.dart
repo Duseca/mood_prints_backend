@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -12,12 +14,15 @@ class IntlPhoneFieldWidget extends StatelessWidget {
   final String? initialValue;
   FutureOr<String?> Function(PhoneNumber?)? validator;
   final Function(dynamic)? onChanged;
+  final Function(dynamic)? onCountryChanged;
+
   TextEditingController? controller = TextEditingController();
   String? initialCountryCode, label;
   IntlPhoneFieldWidget(
       {super.key,
       this.lebel,
       this.controller,
+      this.onCountryChanged,
       this.onChanged,
       this.initialValue,
       this.validator,
@@ -36,12 +41,12 @@ class IntlPhoneFieldWidget extends StatelessWidget {
           weight: FontWeight.bold,
         ),
         Container(
-          // height: 60,
-          //color: Colors.amber,
           child: Center(
             child: IntlPhoneField(
-              //
-              //
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              onCountryChanged: onCountryChanged,
               validator: validator,
               onChanged: onChanged,
               controller: controller,

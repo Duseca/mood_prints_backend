@@ -29,9 +29,6 @@ class _EmailVerificationState extends State<EmailVerification> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ctrl.sendOtp(email: widget.email ?? "");
-    });
     super.initState();
   }
 
@@ -153,7 +150,10 @@ class _EmailVerificationState extends State<EmailVerification> {
                         ),
                         InkWell(
                           onTap: () {
-                            ctrl.sendOtp(email: widget.email ?? "");
+                            ctrl.sendOtp(
+                                email: widget.email ?? "",
+                                isNavigate: false,
+                                type: widget.type ?? "");
                           },
                           child: MyText(
                             text: 'Resend Code',
@@ -286,7 +286,7 @@ class _SuccessDialog extends StatelessWidget {
                           UserService.instance.userModel.value.fullName ?? "";
                       ctrl.emailController.text =
                           UserService.instance.userModel.value.email ?? "";
-                   
+
                       Get.off(() => ClientCompleteProfile());
                     },
                   ),

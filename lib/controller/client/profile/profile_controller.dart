@@ -505,6 +505,7 @@ class ProfileController extends GetxController {
     initialCountryCodeValue.value = '+${number.dialCode}';
     phoneNumberController.text =
         phoneNumber.replaceFirst("+${number.dialCode}", "");
+    completePhoneNumber = phoneNumber;
   }
 
   Future<void> extractEmergencyPhoneCountryCode(String phoneNumber) async {
@@ -513,6 +514,7 @@ class ProfileController extends GetxController {
     initialEmergencyCountryCode.value = '+${number.dialCode}';
     emergencyPhoneNumberController.text =
         phoneNumber.replaceFirst("+${number.dialCode}", '');
+    emergencyFullPhoneNumber = phoneNumber;
   }
 
   bool isTenDaysCompleted(DateTime updatedDateTime) {

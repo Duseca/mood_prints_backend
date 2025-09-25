@@ -57,19 +57,19 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
                                   NotificationType.request.name)
                               ? NotificationType.request.name
                               : NotificationType.general.name,
-                          status:
-                              (ctrl.notificationList[index].requestId?.status ==
-                                      Status.pending.name)
-                                  ? Status.pending.name
-                                  : (ctrl.notificationList[index].requestId
-                                              ?.status ==
-                                          Status.accepted.name)
-                                      ? Status.accepted.name
-                                      // :  (ctrl.notificationList[index].requestId
-                                      //             ?.status ==
-                                      //         Status.removed.name)
-                                      //     ? Status.removed.name
-                                          : Status.declined.name,
+                          status: (ctrl.notificationList[index].requestId
+                                      ?.status ==
+                                  Status.pending.name)
+                              ? Status.pending.name
+                              : (ctrl.notificationList[index].requestId
+                                          ?.status ==
+                                      Status.accepted.name)
+                                  ? Status.accepted.name
+                                  // :  (ctrl.notificationList[index].requestId
+                                  //             ?.status ==
+                                  //         Status.removed.name)
+                                  //     ? Status.removed.name
+                                  : Status.declined.name,
                           title: '${ctrl.notificationList[index].title}',
                           description: '${ctrl.notificationList[index].body}',
                           // onRemoveTap: () async {
@@ -154,26 +154,12 @@ class _TherapistNotificationPageState extends State<TherapistNotificationPage> {
 
                             //----------- Update notification status --------------
 
-                            if ((ctrl.notificationList[index].requestId
-                                    ?.status ==
-                                Status.removed.name)) {
-                              await ctrl.updateNotificationStatus(
-                                  requestId: ctrl
-                                      .notificationList[index].requestId!.id
-                                      .toString(),
-                                  status: Status.accepted.name,
-                                  clientID: ctrl.notificationList[index]
-                                      .requestId!.clientId
-                                      .toString(),
-                                  therapistID: ctrl.notificationList[index]
-                                      .requestId!.therapistId
-                                      .toString());
-                            } else {
-                              await ctrl.deleteNotificationRequest(
-                                  requestId: ctrl
-                                      .notificationList[index].requestId!.id
-                                      .toString());
-                            }
+                            await ctrl.deleteNotificationRequest(
+                                message:
+                                    "You have declined the request. The user will be notified, and no connection has been made.",
+                                requestId: ctrl
+                                    .notificationList[index].requestId!.id
+                                    .toString());
                           },
                           onDeleteTap: (v) {
                             ctrl.deleteNotification(
@@ -471,8 +457,8 @@ class RequestDeclineCard extends StatelessWidget {
                 MyText(
                   textAlign: TextAlign.center,
                   paddingTop: 6,
-                  text:
-                      "${message ?? "You have declined the request"}. The user will be notified, and no connection has been made.",
+                  text: message ??
+                      "You have declined the request. The user will be notified, and no connection has been made.",
                   size: 13,
                   color: kGreyColor,
                 ),

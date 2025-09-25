@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,10 +15,8 @@ import 'package:mood_prints/core/utils/validators.dart';
 import 'package:mood_prints/services/date_formator/general_service.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
-import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/privacy_policy/b_a.dart';
 import 'package:mood_prints/view/screens/privacy_policy/general_terms.dart';
-import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
 import 'package:mood_prints/view/screens/privacy_policy/nopp.dart';
 import 'package:mood_prints/view/screens/privacy_policy/p_s.dart';
 import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
@@ -46,6 +43,7 @@ class SignUpSecondPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("message:: ${ctrl.userAgeStatus.value}");
     return Scaffold(
       appBar: logoAppBar(),
       body: Padding(
@@ -92,9 +90,6 @@ class SignUpSecondPage extends StatelessWidget {
                                         },
                                         onTap: () {
                                           ctrl.dob.value = dob;
-
-                                          log("User Age Status: ---> ${ctrl.dob}");
-
                                           Get.back();
                                         },
                                       ),
@@ -704,7 +699,8 @@ class SignUpSecondPage extends StatelessWidget {
                                             ctrl.checkBoxToggel(ctrl.gradian1);
                                           },
                                           onHyperLinkTap: () {
-                                            Get.to(() => PPPage());
+                                            Get.to(() =>
+                                                ClientAndTeleHealthConsentPage());
                                           },
                                         ),
                                       ),
@@ -718,7 +714,8 @@ class SignUpSecondPage extends StatelessWidget {
                                             ctrl.checkBoxToggel(ctrl.gradian2);
                                           },
                                           onHyperLinkTap: () {
-                                            Get.to(() => PPPage());
+                                            Get.to(() =>
+                                                ClientAndTeleHealthConsentPage());
                                           },
                                         ),
                                       ),

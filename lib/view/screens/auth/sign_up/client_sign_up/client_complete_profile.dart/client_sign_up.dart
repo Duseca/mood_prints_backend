@@ -152,10 +152,8 @@ class ClientSignUp extends StatelessWidget {
               buttonText: "Next",
               onTap: () {
                 if (formKey2.currentState!.validate()) {
-                  Get.to(EmailVerification(
-                    email: ctrl.emailController.text.trim(),
-                    type: type,
-                  ));
+                  ctrl.sendOtp(
+                      email: ctrl.emailController.text.trim(), type: type);
                 }
               },
             ),

@@ -93,7 +93,7 @@ class _AddNewTherapistState extends State<AddNewTherapist> {
                                   phoneNumber: ctrl.selectedTherapistModel.value
                                       ?.phoneNumber,
                                   location:
-                                      "${ctrl.selectedTherapistModel.value?.city}}",
+                                      "${ctrl.selectedTherapistModel.value?.city}",
                                 )
                               : NoTherapistCard()
                         ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -293,8 +294,10 @@ class ModeManagerController extends GetxController {
 
   void loadBlocks() {
     // Load active and hidden blocks from storage
-    List<dynamic>? activeData = storage.read('activeBlocks');
-    List<dynamic>? hiddenData = storage.read('hiddenBlocks');
+    List<dynamic>? activeData =
+        storage.read('${UserService.instance.userModel.value.id}_activeBlocks');
+    List<dynamic>? hiddenData =
+        storage.read('${UserService.instance.userModel.value.id}_hiddenBlocks');
 
     if (activeData != null) {
       activeWidgets.value =
@@ -365,9 +368,11 @@ class ModeManagerController extends GetxController {
 
   void saveBlocks() async {
     await storage.write(
-        'activeBlocks', activeWidgets.map((e) => e.toJson()).toList());
+        '${UserService.instance.userModel.value.id}_activeBlocks',
+        activeWidgets.map((e) => e.toJson()).toList());
     await storage.write(
-        'hiddenBlocks', hiddenWidgets.map((e) => e.toJson()).toList());
+        '${UserService.instance.userModel.value.id}_hiddenBlocks',
+        hiddenWidgets.map((e) => e.toJson()).toList());
 
     update();
   }
@@ -383,7 +388,8 @@ class ModeManagerController extends GetxController {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     // Save timestamp
-    await prefs.setInt('last_entry_time', now);
+    await prefs.setInt(
+        "${UserService.instance.userModel.value.id}_last_entry_time", now);
     await prefs.setBool('canEnterData', false);
 
     // Schedule Notification for 8 hours later
@@ -392,7 +398,9 @@ class ModeManagerController extends GetxController {
 
   Future<void> checkTimeLeft() async {
     final prefs = await SharedPreferences.getInstance();
-    final lastEntryTime = prefs.getInt('last_entry_time') ?? 0;
+    final lastEntryTime = prefs.getInt(
+            '${UserService.instance.userModel.value.id}_last_entry_time') ??
+        0;
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final timePassed = now - lastEntryTime;
@@ -425,7 +433,9 @@ class ModeManagerController extends GetxController {
 
   Future<void> displayCountdownForNextDataEntry() async {
     final prefs = await SharedPreferences.getInstance();
-    final lastEntryTime = prefs.getInt('last_entry_time') ?? 0;
+    final lastEntryTime = prefs.getInt(
+            '${UserService.instance.userModel.value.id}_last_entry_time') ??
+        0;
     final now = DateTime.now().millisecondsSinceEpoch;
     final totalDuration = Duration(hours: 12, minutes: 0).inMilliseconds;
 

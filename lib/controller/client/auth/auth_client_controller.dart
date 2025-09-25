@@ -24,6 +24,7 @@ import 'package:mood_prints/services/image_picker/image_picker.dart';
 import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/services/user/user_type_service.dart';
 import 'package:mood_prints/view/screens/auth/forgot_pass/forgot_pass_verification.dart';
+import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/client_complete_profile.dart/client_complete_profile.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/client_sign_up/sign_up_second_page.dart';
 import 'package:mood_prints/view/screens/auth/sign_up/email_verification.dart';
 import 'package:mood_prints/view/screens/bottom_nav_bar/client_nav_bar.dart';
@@ -208,10 +209,37 @@ class AuthClientController extends GetxController {
           await prefs.setBool("remember_me", isRememberMe.value);
           await UserService.instance.getUserInformation();
 
-          if (userModel.userType == 'client') {
-            Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+          log("message:: ${UserService.instance.userModel.value.phoneNumber}");
+          if (UserService.instance.userModel.value.userType == 'client') {
+            if (UserService.instance.userModel.value.phoneNumber == null ||
+                UserService.instance.userModel.value.phoneNumber == "") {
+              fullNameController.text =
+                  UserService.instance.userModel.value.fullName ?? "";
+              emailController.text =
+                  UserService.instance.userModel.value.email ?? "";
+              newUserTempId = UserService.instance.userModel.value.id;
+
+              Get.to(ClientCompleteProfile());
+            } else {
+              Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+            }
           } else {
-            Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+            if (UserService.instance.therapistDetailModel.value.phoneNumber ==
+                    null ||
+                UserService.instance.therapistDetailModel.value.phoneNumber ==
+                    "") {
+              fullNameController.text =
+                  UserService.instance.therapistDetailModel.value.fullName ??
+                      "";
+              emailController.text =
+                  UserService.instance.therapistDetailModel.value.email ?? "";
+              newUserTempId =
+                  UserService.instance.therapistDetailModel.value.id;
+
+              Get.to(ClientCompleteProfile());
+            } else {
+              Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+            }
           }
 
           resetValues();
@@ -257,10 +285,36 @@ class AuthClientController extends GetxController {
           await prefs.setString('userType', userModel.userType.toString());
           await UserService.instance.getUserInformation();
 
-          if (userModel.userType == UserType.client.name) {
-            Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+          if (userModel.userType == 'client') {
+            if (UserService.instance.userModel.value.phoneNumber == null ||
+                UserService.instance.userModel.value.phoneNumber == "") {
+              fullNameController.text =
+                  UserService.instance.userModel.value.fullName ?? "";
+              emailController.text =
+                  UserService.instance.userModel.value.email ?? "";
+              newUserTempId = UserService.instance.userModel.value.id;
+
+              Get.to(ClientCompleteProfile());
+            } else {
+              Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+            }
           } else {
-            Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+            if (UserService.instance.therapistDetailModel.value.phoneNumber ==
+                    null ||
+                UserService.instance.therapistDetailModel.value.phoneNumber ==
+                    "") {
+              fullNameController.text =
+                  UserService.instance.therapistDetailModel.value.fullName ??
+                      "";
+              emailController.text =
+                  UserService.instance.therapistDetailModel.value.email ?? "";
+              newUserTempId =
+                  UserService.instance.therapistDetailModel.value.id;
+
+              Get.to(ClientCompleteProfile());
+            } else {
+              Get.offAll(() => TherapistNavBar(), binding: BottomBarBinding());
+            }
           }
         }
       }
@@ -438,7 +492,10 @@ class AuthClientController extends GetxController {
     }
   }
 
-  sendOtp({required String email}) async {
+  sendOtp(
+      {required String email,
+      bool isNavigate = true,
+      required String type}) async {
     log("Try Called resend otp");
     log("Email ${email}");
 
@@ -454,12 +511,19 @@ class AuthClientController extends GetxController {
       hideLoadingDialog();
 
       if (response != null) {
+        Get.to(EmailVerification(
+          email: email,
+          type: type,
+        ));
         otpMessage.value = 'OTP sent successfully.';
         final message = response['message'];
         log('Message:-> $message');
         startTimer();
       } else {
         otpMessage.value = 'Failed to send otp';
+        if (isNavigate) {
+          displayToast(msg: "Failed to send otp");
+        }
         log('Invalid OTP');
       }
     } catch (e) {
@@ -583,6 +647,7 @@ class AuthClientController extends GetxController {
               UserService.instance.userModel.value = model;
 
               Get.offAll(() => ClientNavBar(), binding: BottomBarBinding());
+
               resetValues();
             }
 

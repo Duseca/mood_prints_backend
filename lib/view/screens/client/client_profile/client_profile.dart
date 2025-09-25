@@ -13,6 +13,7 @@ import 'package:mood_prints/services/user/user_services.dart';
 import 'package:mood_prints/view/screens/client/client_profile/my_therapist.dart';
 import 'package:mood_prints/view/screens/help/help.dart';
 import 'package:mood_prints/view/screens/language/language.dart';
+import 'package:mood_prints/view/screens/privacy_policy/general_terms.dart';
 import 'package:mood_prints/view/screens/privacy_policy/nopp.dart';
 import 'package:mood_prints/view/screens/privacy_policy/hippa_pdf_view.dart';
 import 'package:mood_prints/view/screens/privacy_policy/pp_page.dart';
@@ -175,19 +176,26 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesPrivacy,
             title: 'Privacy Policy',
             onTap: () {
-              Get.to(() => HippaScreen());
+              Get.to(() => PPPage());
             },
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
             title: 'Terms & Telehealth Consent (CTTC)',
             onTap: () {
-              Get.to(() => HippaScreen());
+              Get.to(() => ClientAndTeleHealthConsentPage());
             },
           ),
           _ProfileTile(
             icon: Assets.imagesPrivacy,
             title: 'Privacy Practices (NOPP)',
+            onTap: () {
+              Get.to(() => NOPPPage());
+            },
+          ),
+          _ProfileTile(
+            icon: Assets.imagesPrivacy,
+            title: 'HIPPA Compliance',
             onTap: () {
               Get.to(() => HippaScreen());
             },
@@ -196,7 +204,7 @@ class ClientProfile extends StatelessWidget {
             icon: Assets.imagesPrivacy,
             title: 'General Terms of use',
             onTap: () {
-              Get.to(() => HippaScreen());
+              Get.to(() => GeneralTermsPage());
             },
           ),
           _ProfileTile(
@@ -244,7 +252,7 @@ class ClientProfile extends StatelessWidget {
                 },
               ));
             },
-            mBottom: 70,
+            mBottom: 120,
           ),
         ],
       ),
