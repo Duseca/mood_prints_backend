@@ -182,11 +182,12 @@ class ClientHomeController extends GetxController {
   void filterDataByDateTime() {
     filterBoardData.clear();
     for (var filter in allBoardsData) {
-      if (selectedDay.value == filter.createdAt) {
+      if (selectedDay.value?.year == filter.createdAt.year &&
+          selectedDay.value?.month == filter.createdAt.month &&
+          selectedDay.value?.day == filter.createdAt.day) {
         filterBoardData.add(filter);
       }
     }
-    log("Filter Board Length : ${filterBoardData.length}");
   }
 
   // --------------------------------
@@ -445,8 +446,9 @@ class ClientHomeController extends GetxController {
     showLoadingDialog();
     log('Montly Stats Called');
 
-    selectedMonthModel.value =
-        months.firstWhere((month) => month.number == DateTime.now().month);
+    selectedMonthModel.value = months.firstWhere((month) =>
+        month.number ==
+        (selectedMonthModel.value?.number ?? DateTime.now().month));
 
     await getModeFlowMonthly(userID: userID);
     await getEmotionStatsMontly(userID: userID);

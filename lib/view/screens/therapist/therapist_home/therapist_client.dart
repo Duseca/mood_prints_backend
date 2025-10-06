@@ -42,80 +42,87 @@ class TherapistClient extends StatelessWidget {
             ? Column(
                 children: [
                   Expanded(
-                      child: ListView.builder(
-                    itemCount: UserService.instance.relationWithClients.length,
-                    physics: BouncingScrollPhysics(),
-                    padding: AppSizes.DEFAULT,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 15),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CommonImageView(
-                                    height: 44,
-                                    width: 44,
-                                    radius: 100,
-                                    url: UserService
-                                        .instance
-                                        .relationWithClients[index]
-                                        .clientId
-                                        ?.image,
-                                    // Assets.imagesProfileImageUser,
-                                  ),
-                                  MyText(
-                                    paddingLeft: 12,
-                                    text:
-                                        '${UserService.instance.relationWithClients[index].clientId?.fullName}',
-                                    size: 16,
-                                    weight: FontWeight.w700,
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                height: 36,
-                                width: 111,
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)),
-                                    border: Border.all(color: kSecondaryColor),
-                                    color: kSecondaryColor.withOpacity(0.2)),
-                                child: InkWell(
-                                  onTap: () {
-                                    Get.to(() => Report(
-                                          clientID: UserService
-                                              .instance
-                                              .relationWithClients[index]
-                                              .clientId
-                                              ?.id
-                                              .toString(),
-                                        ));
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      CommonImageView(
-                                        height: 16,
-                                        width: 16,
-                                        imagePath: Assets.imagesStatsIcon,
-                                      ),
-                                      MyText(
-                                        paddingLeft: 4,
-                                        text: 'View Stats',
-                                        size: 12,
-                                        weight: FontWeight.w600,
-                                        color: kSecondaryColor,
-                                      ),
-                                    ],
+                      child: RefreshIndicator(
+                    onRefresh: () {
+                      return UserService.instance.getUserInformation();
+                    },
+                    child: ListView.builder(
+                      itemCount:
+                          UserService.instance.relationWithClients.length,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      padding: AppSizes.DEFAULT,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 15),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CommonImageView(
+                                      height: 44,
+                                      width: 44,
+                                      radius: 100,
+                                      url: UserService
+                                          .instance
+                                          .relationWithClients[index]
+                                          .clientId
+                                          ?.image,
+                                      // Assets.imagesProfileImageUser,
+                                    ),
+                                    MyText(
+                                      paddingLeft: 12,
+                                      text:
+                                          '${UserService.instance.relationWithClients[index].clientId?.fullName}',
+                                      size: 16,
+                                      weight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  height: 36,
+                                  width: 111,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8)),
+                                      border:
+                                          Border.all(color: kSecondaryColor),
+                                      color: kSecondaryColor.withOpacity(0.2)),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.to(() => Report(
+                                            clientID: UserService
+                                                .instance
+                                                .relationWithClients[index]
+                                                .clientId
+                                                ?.id
+                                                .toString(),
+                                          ));
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        CommonImageView(
+                                          height: 16,
+                                          width: 16,
+                                          imagePath: Assets.imagesStatsIcon,
+                                        ),
+                                        MyText(
+                                          paddingLeft: 4,
+                                          text: 'View Stats',
+                                          size: 12,
+                                          weight: FontWeight.w600,
+                                          color: kSecondaryColor,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ]),
-                      );
-                    },
+                              ]),
+                        );
+                      },
+                    ),
                   ))
                 ],
               )

@@ -397,7 +397,7 @@ class ClientSignUp extends StatelessWidget {
                     ctrl.acceptTermsAndCondition.value = false;
                     ctrl.passwordVisibility.value = true;
 
-                    Get.offAll(() => Login(
+                    Get.off(() => Login(
                           type: type,
                         ));
                   },

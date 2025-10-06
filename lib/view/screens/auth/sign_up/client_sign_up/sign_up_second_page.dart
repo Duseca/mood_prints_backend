@@ -137,12 +137,22 @@ class SignUpSecondPage extends StatelessWidget {
                             },
                           ),
                           IntlPhoneFieldWidget(
+                            initialCountryCode: ctrl.emergencyCountryCode,
                             label: "Emergency Contact’s Phone Number",
                             controller: ctrl.emergencyPhoneNumberController,
+                            onCountryChanged: (v) {
+                              ctrl.emergencyFullPhoneNumber =
+                                  ctrl.emergencyFullPhoneNumber?.replaceFirst(
+                                      '${ctrl.emergencyCountryCode}',
+                                      '+${v.dialCode}');
+                              ctrl.emergencyCountryCode = '+${v.dialCode}';
+                            },
                             onChanged: (v) {
-                              ctrl.emergencyFullPhoneNumber = v.completeNumber;
+                              print(
+                                  "OnChanged::: ${ctrl.emergencyCountryCode}");
 
-                              log("onChanged -------> ${ctrl.emergencyFullPhoneNumber}");
+                              ctrl.emergencyFullPhoneNumber = v.completeNumber;
+                              log("onChanged -------> ${ctrl.emergencyFullPhoneNumber} ${ctrl.emergencyCountryCode}");
                             },
                           ),
                           SizedBox(
@@ -336,17 +346,11 @@ class SignUpSecondPage extends StatelessWidget {
                                           initialDateTime: ctrl.dob.value,
                                           onDateTimeChanged: (dateTime) {
                                             dob = dateTime;
-                                            log("onchanged");
                                           },
                                           onTap: () {
-                                            log("------------------ on Tap Callledkbwriiiiiiiiiib----------------");
                                             ctrl.dob.value = dob;
-
                                             ctrl.checkIfGuardianRequired(
                                                 ctrl.dob.value!);
-
-                                            log("User Age Status: ---> ${ctrl.userAgeStatus.value}");
-
                                             Get.back();
                                           },
                                         ),
@@ -518,13 +522,24 @@ class SignUpSecondPage extends StatelessWidget {
                               },
                             ),
                             IntlPhoneFieldWidget(
+                              initialCountryCode: ctrl.emergencyCountryCode,
                               label: "Emergency Contact’s Phone Number",
                               controller: ctrl.emergencyPhoneNumberController,
+                              onCountryChanged: (v) {
+                                ctrl.emergencyFullPhoneNumber =
+                                    ctrl.emergencyFullPhoneNumber?.replaceFirst(
+                                        '${ctrl.emergencyCountryCode}',
+                                        '+${v.dialCode}');
+                                ctrl.emergencyCountryCode = '+${v.dialCode}';
+                              },
                               onChanged: (v) {
+                                print(
+                                    "OnChanged::: ${ctrl.emergencyCountryCode}");
                                 ctrl.emergencyFullPhoneNumber =
                                     v.completeNumber;
+                                ctrl.emergencyCountryCode = '+${v.dialCode}';
 
-                                log("onChanged -------> ${ctrl.emergencyFullPhoneNumber}");
+                                log("onChanged -------> ${ctrl.emergencyFullPhoneNumber} ${ctrl.emergencyCountryCode}");
                               },
                             ),
                             SizedBox(

@@ -18,8 +18,6 @@ import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/custom_check_box_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:mood_prints/model/stats/sleep_analysis_model.dart';
 
@@ -101,10 +99,10 @@ class _ClientStatsState extends State<ClientStats> {
                   );
                 },
               ).toList(),
-              onTap: (index) {
+              onTap: (index) async {
                 log("$index");
                 if (index == 1) {
-                  ctrl.allmonthlyStats(
+                  await ctrl.allmonthlyStats(
                       userID: UserService.instance.userModel.value.id);
 
                   setState(() {});
@@ -1618,11 +1616,12 @@ class __MonthlyState extends State<_Monthly> {
               child: Center(
                 child: Obx(() => DropdownButton<MonthModel>(
                       value: ctrl.selectedMonthModel.value,
-                      onChanged: (MonthModel? newValue) {
+                      onChanged: (MonthModel? newValue) async {
                         if (newValue != null) {
                           ctrl.selectedMonthModel.value = newValue;
-
-                          // widget.onMonthSelected(newValue);
+                          await ctrl.allmonthlyStats(
+                              userID: UserService.instance.userModel.value.id);
+                          setState(() {});
                         }
                       },
                       items: ctrl.months.map<DropdownMenuItem<MonthModel>>(
@@ -1889,8 +1888,11 @@ class __MonthlyState extends State<_Monthly> {
                           ),
                           MyText(
                             paddingTop: 4,
-                            text:
-                                '${ctrl.sleepAnalysisMonthModel.value?.averageWakeupTime}',
+                            text: (ctrl.sleepAnalysisMonthModel.value
+                                        ?.averageWakeupTime !=
+                                    null)
+                                ? '${ctrl.sleepAnalysisMonthModel.value?.averageWakeupTime}'
+                                : "No data available",
                             size: 16,
                             weight: FontWeight.w600,
                           ),
@@ -1945,92 +1947,80 @@ Montly Graph Widgets
 class _MoodFlowChartMonthly extends StatelessWidget {
   final List<MoodFlowModel>? stats;
 
-  _MoodFlowChartMonthly({this.stats});
+  const _MoodFlowChartMonthly({this.stats});
 
   @override
   Widget build(BuildContext context) {
+    // Ensure we have at least 30–31 days worth of x-axis space
+    final int totalDays = stats?.length ?? 30;
+    final double chartWidth = totalDays * 20; // 50px per day tick approx.
+
     return SizedBox(
       height: 239,
-      child: SfCartesianChart(
-        tooltipBehavior: TooltipBehavior(
-          enable: true,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: chartWidth,
+          child: SfCartesianChart(
+            tooltipBehavior: TooltipBehavior(enable: true),
+            margin: EdgeInsets.zero,
+            borderWidth: 0,
+            borderColor: Colors.transparent,
+            plotAreaBorderWidth: 0,
+            enableAxisAnimation: true,
+            primaryYAxis: NumericAxis(
+              name: 'yAxis',
+              maximum: 4,
+              minimum: -4,
+              interval: 1,
+              isVisible: true,
+              plotOffset: 10.0,
+              majorGridLines: MajorGridLines(width: 1, color: kBorderColor),
+              majorTickLines: MajorTickLines(width: 0),
+              axisLine: AxisLine(width: 0),
+              opposedPosition: false,
+              labelStyle: TextStyle(
+                color: kGreyColor,
+                fontSize: 12.0,
+                fontFamily: AppFonts.URBANIST,
+              ),
+            ),
+            primaryXAxis: CategoryAxis(
+              name: 'xAxis',
+              interval: 1,
+              labelRotation: 0,
+              majorGridLines: MajorGridLines(width: 0),
+              axisLine: AxisLine(width: 0),
+              majorTickLines: MajorTickLines(width: 0),
+              labelStyle: TextStyle(
+                color: kGreyColor,
+                fontSize: 12.0,
+                fontFamily: AppFonts.URBANIST,
+              ),
+            ),
+            series: _graphData(stats),
+          ),
         ),
-        margin: EdgeInsets.zero,
-        borderWidth: 0,
-        borderColor: Colors.transparent,
-        plotAreaBorderWidth: 0,
-        enableAxisAnimation: true,
-        primaryYAxis: NumericAxis(
-          name: 'yAxis',
-          maximum: 4, // Stress level max at +4
-          minimum: -4, // Stress level min at -4
-          interval: 1,
-          isVisible: true,
-          plotOffset: 10.0,
-          majorGridLines: MajorGridLines(
-            width: 1,
-            color: kBorderColor,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          opposedPosition: false,
-          labelStyle: TextStyle(
-            color: kGreyColor,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-        ),
-        primaryXAxis: CategoryAxis(
-          name: 'xAxis',
-          maximum: 30,
-          minimum: 1,
-          interval: 1,
-          plotOffset: 5,
-          majorGridLines: MajorGridLines(
-            width: 0,
-          ),
-          axisLine: AxisLine(
-            width: 0,
-          ),
-          majorTickLines: MajorTickLines(
-            width: 0,
-          ),
-          labelStyle: TextStyle(
-            color: kGreyColor,
-            fontSize: 12.0,
-            fontFamily: AppFonts.URBANIST,
-          ),
-          labelRotation: 0, // Keep labels straight
-        ),
-        series: graphData(stats),
       ),
     );
   }
 
-  List<LineSeries<MoodFlowModel, String>> graphData(
+  List<LineSeries<MoodFlowModel, String>> _graphData(
       List<MoodFlowModel>? stats) {
     return [
       LineSeries<MoodFlowModel, String>(
-        dataSource: stats,
+        dataSource: stats ?? [],
         xValueMapper: (MoodFlowModel data, _) {
-          // Format the date as "day" only for 30 days view
-          if (data.date != null) {
-            return DateFormat('d').format(DateTime.parse(data.date!));
-          }
-          return '';
+          return data.date != null
+              ? DateFormat('d').format(DateTime.parse(data.date))
+              : '';
         },
-        yValueMapper: (MoodFlowModel data, _) => data.mood ?? 0,
+        yValueMapper: (MoodFlowModel data, _) => data.mood,
         xAxisName: 'xAxis',
         yAxisName: 'yAxis',
         color: kSecondaryColor,
         width: 2,
-        markerSettings: MarkerSettings(
-          isVisible: true,
-        ),
+        markerSettings: const MarkerSettings(isVisible: true),
       ),
     ];
   }

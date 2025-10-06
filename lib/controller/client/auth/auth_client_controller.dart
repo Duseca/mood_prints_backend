@@ -49,7 +49,7 @@ class AuthClientController extends GetxController {
   final TextEditingController phoneNumberController = TextEditingController();
   String? FullPhoneNumber;
   String? gradianFullPhoneNumber;
-  String? emergencyFullPhoneNumber;
+  String? emergencyFullPhoneNumber, emergencyCountryCode;
   RxString selectedGenderValue = 'Male'.obs;
   RxList<String> gender = <String>['Male', 'Female', 'Other'].obs;
   Rx<DateTime?> dob = Rx<DateTime?>(null);
@@ -496,9 +496,6 @@ class AuthClientController extends GetxController {
       {required String email,
       bool isNavigate = true,
       required String type}) async {
-    log("Try Called resend otp");
-    log("Email ${email}");
-
     try {
       showLoadingDialog();
 

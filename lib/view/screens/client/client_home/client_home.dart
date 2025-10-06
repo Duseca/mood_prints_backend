@@ -16,6 +16,7 @@ import 'package:mood_prints/view/widget/custom_app_bar_widget.dart';
 import 'package:mood_prints/view/widget/my_button_widget.dart';
 import 'package:mood_prints/view/widget/my_text_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class ClientHome extends StatefulWidget {
   ClientHome({super.key});
@@ -81,7 +82,13 @@ class _ClientHomeState extends State<ClientHome> {
 
                 // If Filter Applied Show clear Filter Button
 
-                (homeCtrl.filterBoardData.isNotEmpty)
+                (homeCtrl.filterBoardData.isNotEmpty ||
+                        !(homeCtrl.selectedDay.value?.year ==
+                                DateTime.now().year &&
+                            homeCtrl.selectedDay.value?.month ==
+                                DateTime.now().month &&
+                            homeCtrl.selectedDay.value?.day ==
+                                DateTime.now().day))
                     ? Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -118,56 +125,70 @@ class _ClientHomeState extends State<ClientHome> {
 
                       // If filter applied show filter data
 
-                      (homeCtrl.filterBoardData.isNotEmpty)
-                          ? Column(
-                              children: List.generate(
-                                  homeCtrl.filterBoardData.length, (headIndex) {
-                                final model =
-                                    homeCtrl.filterBoardData[headIndex];
+                      !(homeCtrl.selectedDay.value?.year ==
+                                  DateTime.now().year &&
+                              homeCtrl.selectedDay.value?.month ==
+                                  DateTime.now().month &&
+                              homeCtrl.selectedDay.value?.day ==
+                                  DateTime.now().day)
+                          ? (homeCtrl.filterBoardData.isNotEmpty)
+                              ? Column(
+                                  children: List.generate(
+                                      homeCtrl.filterBoardData.length,
+                                      (headIndex) {
+                                    final model =
+                                        homeCtrl.filterBoardData[headIndex];
 
-                                // Loop for getting emotion icon
+                                    // Loop for getting emotion icon
 
-                                int? _iconIndex;
-                                for (int i = 0; i < stressItems.length; i++) {
-                                  if (model.stressLevel ==
-                                      stressItems[i].level) {
-                                    _iconIndex = i;
-                                    break;
-                                  }
-                                }
-                                return DetailCard(
-                                  emotionWidget: Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: (_iconIndex != null)
-                                          ? CommonImageView(
-                                              height: 44,
-                                              width: 44,
-                                              imagePath: stressItems[_iconIndex]
-                                                  .selectedIcon)
-                                          : CommonImageView(
-                                              height: 44,
-                                              width: 44,
-                                              imagePath:
-                                                  stressItems[0].selectedIcon)),
-                                  imageList: (model.photos != null)
-                                      ? model.photos!
-                                      : [],
-                                  headIndex: headIndex,
-                                  note: model.note,
-                                  bedTime: model.sleep.dozeOffTime,
-                                  riseTime: model.sleep.wakeupTime,
-                                  dateTime: model.date,
-                                  onDeleteTap: () {
-                                    log('work');
-                                    log('Board ID: ${model.id}');
-                                    homeCtrl.deleteBoard(model.id);
-                                  },
-                                  // onEditTap: () {
-                                  //   // Get.to(() => EditModeManager(model: model));
-                                  // },
-                                );
-                              }),
-                            )
+                                    int? _iconIndex;
+                                    for (int i = 0;
+                                        i < stressItems.length;
+                                        i++) {
+                                      if (model.stressLevel ==
+                                          stressItems[i].level) {
+                                        _iconIndex = i;
+                                        break;
+                                      }
+                                    }
+                                    return DetailCard(
+                                      emotionWidget: Padding(
+                                          padding: EdgeInsets.only(bottom: 10),
+                                          child: (_iconIndex != null)
+                                              ? CommonImageView(
+                                                  height: 44,
+                                                  width: 44,
+                                                  imagePath:
+                                                      stressItems[_iconIndex]
+                                                          .selectedIcon)
+                                              : CommonImageView(
+                                                  height: 44,
+                                                  width: 44,
+                                                  imagePath: stressItems[0]
+                                                      .selectedIcon)),
+                                      imageList: (model.photos != null)
+                                          ? model.photos!
+                                          : [],
+                                      headIndex: headIndex,
+                                      note: model.note,
+                                      bedTime: model.sleep.dozeOffTime,
+                                      riseTime: model.sleep.wakeupTime,
+                                      dateTime: model.date,
+                                      onDeleteTap: () {
+                                        log('work');
+                                        log('Board ID: ${model.id}');
+                                        homeCtrl.deleteBoard(model.id);
+                                      },
+                                      // onEditTap: () {
+                                      //   // Get.to(() => EditModeManager(model: model));
+                                      // },
+                                    );
+                                  }),
+                                )
+                              : MyText(
+                                  text: "No Data Available",
+                                  paddingTop: 50,
+                                )
                           :
                           // No filter applied display all board data
 
